@@ -18,6 +18,6 @@ public class Abschlussprojekt_PlugIn implements PlugInFilter {
     }
 
     @Override
-    public void run(ImageProcessor ip) {
+    public void run(ImageProcessor ip) { //test
     }
 }
