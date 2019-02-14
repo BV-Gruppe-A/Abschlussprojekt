@@ -27,6 +27,9 @@ public class Abschlussprojekt_PlugIn implements PlugInFilter {
     public int setup(String args, ImagePlus im) {  
     	// this plugin accepts RGB images
         return DOES_RGB; 
+        
+    	// DEBUG FOR JANFI
+    	//return DOES_8G;
     }
 
     @Override
@@ -57,7 +60,9 @@ public class Abschlussprojekt_PlugIn implements PlugInFilter {
         	break;
         //Janfi
         case 6:
-        	
+        	// DEBUG - only usable with a binarised input image!
+        	Segmentation segm = new Segmentation();
+        	segm.addPixelsToSegment(ip);
         	break;
             
         default:   
