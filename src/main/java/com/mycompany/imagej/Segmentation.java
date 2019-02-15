@@ -1,5 +1,7 @@
 package com.mycompany.imagej;
 
+import java.util.Arrays;
+
 import ij.IJ;
 import ij.process.ImageProcessor;
 
@@ -8,9 +10,14 @@ import ij.process.ImageProcessor;
  */
 public class Segmentation {
 	// constant values
-	private final int BLACK = 0;
-	private final int WHITE = 255;
+	private final int BLACK = 255;
+	private final int WHITE = 0;
 	private final int WHITE_SEGMENT = 0;
+	private final int NOT_SEGMENTED = -1;
+	private final int STARTED_NOT_FINISHED = -2;
+	
+	// local variables
+	private int segmentCounter = WHITE_SEGMENT + 1;
 	
 	/**
 	 * fills the Segments with the corresponding pixels
@@ -19,38 +26,71 @@ public class Segmentation {
 	public void addPixelsToSegment(ImageProcessor binarisedImg) {
 		int width = binarisedImg.getWidth();
 		int height = binarisedImg.getHeight();
-		int[][] segments = new int[width][height];
-		int segmentCounter = WHITE_SEGMENT + 1;
+		segmentCounter = WHITE_SEGMENT + 1;
+		int[][] segments = new int[height][width];
+		segments = fillSegmentsArrayWithDefault(segments, height);
 		
-		for(int countInX = 0; countInX < width; countInX++) {
-			for(int countInY = 0; countInY < height; countInY++) {
+		for(int countInY = 0; countInY < height; countInY++) {
+			for(int countInX = 0; countInX < width; countInX++) {
 				int segmentToSet;
-				int currentPixel = binarisedImg.getPixel(countInX, countInY);
 				
+				int currentPixel = binarisedImg.getPixel(countInX, countInY);				
 				if (currentPixel == BLACK) {
-					// Look above
-					// ... then below
-					// ... then its a new segment
-					if(countInX - 1 >= 0 && binarisedImg.getPixel(countInX - 1, countInY) == BLACK) {
-						segmentToSet = segments[countInX - 1][countInY];						
-					} else if(countInY - 1 >= 0 && binarisedImg.getPixel(countInX, countInY - 1) == BLACK) {
-						segmentToSet = segments[countInX][countInY - 1];	
-					} else {
-						// no need to look to the right and below since we sort them into a segment afterwards
-						segmentToSet = segmentCounter++;
-					}
+					segmentToSet = findSegmentForPixel(segments, binarisedImg, countInX, countInY);
 				} else {
 					segmentToSet = WHITE_SEGMENT;
 				}
 				
-				segments[countInX][countInY] = segmentToSet;
+				segments[countInY][countInX] = segmentToSet;
 			}
 		}
 		
-		// TODO: Current problem: Too many segments
-		
 		// DEBUG to see if the segmentation worked
-		colorTheSegments(binarisedImg, segments, segmentCounter - 1);
+		colorTheSegments(binarisedImg, segments, segmentCounter);
+	}
+	
+	/**
+	 * fills the segment array with default values (-1)
+	 * @param segments two dimensional array with the segments
+	 * @param rows number of rows in the two dimensional array
+	 * @return filled two dimensional array 
+	 */
+	private int[][] fillSegmentsArrayWithDefault(int[][] segments, int rows) {
+		for(int countRows = 0; countRows < rows; countRows++) {
+			Arrays.fill(segments[countRows], NOT_SEGMENTED);			
+		}
+		return segments;
+	}
+	
+	private int findSegmentForPixel(int[][] segments, ImageProcessor image, int currentX, int currentY) {
+		if(segments[currentY][currentX] >= WHITE_SEGMENT) {
+			return segments[currentY][currentX];
+		} 
+		
+		segments[currentY][currentX] = STARTED_NOT_FINISHED;
+		
+		if (currentX - 1 >= 0) {
+			if(image.getPixel(currentX - 1, currentY) == BLACK && segments[currentY][currentX - 1] != STARTED_NOT_FINISHED) {
+				return findSegmentForPixel(segments, image, currentX - 1, currentY);
+			}
+		}
+		if (currentY - 1 >= 0) {
+			if(image.getPixel(currentX, currentY - 1) == BLACK && segments[currentY - 1][currentX] != STARTED_NOT_FINISHED) {
+				return findSegmentForPixel(segments, image, currentX, currentY - 1);
+			}
+		}
+		if (currentX + 1 < image.getWidth()) {
+			if(image.getPixel(currentX + 1, currentY) == BLACK && segments[currentY][currentX + 1] != STARTED_NOT_FINISHED) {
+				return findSegmentForPixel(segments, image, currentX + 1, currentY);
+			}
+		}
+		if (currentY + 1 < image.getHeight()) {
+			if(image.getPixel(currentX, currentY + 1) == BLACK && segments[currentY + 1][currentX] != STARTED_NOT_FINISHED) {
+				return findSegmentForPixel(segments, image, currentX, currentY + 1);
+			}
+		}
+		
+		return segmentCounter++;
 	}
 	
 	/**
@@ -63,14 +103,14 @@ public class Segmentation {
 	private void colorTheSegments(ImageProcessor image, int[][] segments, int numberOfSegments) {
 		int width = image.getWidth();
 		int height = image.getHeight();
-		int stepWidth = (int) ((double) WHITE / (double) numberOfSegments);
+		int stepWidth = (int) ((double) BLACK / (double) numberOfSegments);
 		IJ.log("Segments: " + numberOfSegments + " stepWidth: " + stepWidth);
 		
-		for(int countInX = 0; countInX < width; countInX++) {
-			for(int countInY = 0; countInY < height; countInY++) {
-				if(segments[countInX][countInY] != WHITE_SEGMENT) {
-					int currentSegment = segments[countInX][countInY];
-					int newPixel = WHITE - (currentSegment * stepWidth);
+		for(int countInY = 0; countInY < height; countInY++) {
+			for(int countInX = 0; countInX < width; countInX++) {
+				if(segments[countInY][countInX] != WHITE_SEGMENT) {
+					int currentSegment = segments[countInY][countInX];
+					int newPixel = BLACK - (currentSegment * stepWidth);
 					image.putPixel(countInX, countInY, newPixel);
 				}				
 			}
