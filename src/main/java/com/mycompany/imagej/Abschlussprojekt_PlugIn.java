@@ -18,7 +18,7 @@ public class Abschlussprojekt_PlugIn implements PlugInFilter {
 	final int GREEN_MASK = 0x0000FF00;
 	final int BLUE_MASK = 0x000000FF;
 	
-	// the weights are based on the values descriped in the book on page 324
+	// the weights are based on the values described in the book on page 324
 	final double WEIGHT_RED = 0.299;
 	final double WEIGHT_GREEN = 0.587;
 	final double WEIGHT_BLUE = 0.114;
@@ -29,7 +29,7 @@ public class Abschlussprojekt_PlugIn implements PlugInFilter {
         return DOES_RGB; 
         
     	// DEBUG FOR JANFI
-    	//return DOES_8G;
+    	// return DOES_8G;
     }
 
     @Override
@@ -62,8 +62,9 @@ public class Abschlussprojekt_PlugIn implements PlugInFilter {
         //Janfi
         case 6:
         	// DEBUG - only usable with a binarised input image!
-        	Segmentation segm = new Segmentation();
-        	segm.addPixelsToSegment(ip);
+        	Segmentation segm = new Segmentation(ip);
+        	// segm.segmentThePicture();
+        	segm.debugSegmentation();
         	break;
             
         default:   
