@@ -49,7 +49,7 @@ public class Abschlussprojekt_PlugIn implements PlugInFilter {
             break;
         //Baustelle Julian 1    
         case 3:
-        	//public void convertToGrayscale(ImageProcessor ip);
+        	
         	break;
         //FBaustelle Julian 2	
         case 4:
