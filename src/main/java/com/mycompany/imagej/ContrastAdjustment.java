@@ -16,7 +16,7 @@ public class ContrastAdjustment {
 	    int[] histogram;
 	    
 	    // Hard border for contrast adjustment
-	    int percentage = 50;
+	    int percentage = 10;
 	    
 	    histogram = ip.getHistogram();
 	    
