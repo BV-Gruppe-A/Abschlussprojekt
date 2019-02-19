@@ -1,7 +1,7 @@
 package com.mycompany.imagej;
 
-import ij.IJ;
 import ij.ImagePlus;
+import ij.gui.GenericDialog;
 import ij.plugin.filter.PlugInFilter;
 import ij.process.ImageProcessor;
 
@@ -9,19 +9,17 @@ public class Abschlussprojekt_PlugIn implements PlugInFilter {
 
     @Override    
     public int setup(String args, ImagePlus im) {  
-    	//this plugin accepts RGB images
-        return DOES_RGB; 
-        
-    	// DEBUG FOR JANFI
-    	//return DOES_8G;
+    	// needs no image, instead opens dialog
+    	return NO_IMAGE_REQUIRED;
     }
 
     @Override
-    public void run(ImageProcessor ip) { 
-    	
-    	int whichMethod = (int)IJ.getNumber("Welche Methode soll aufgerufen werden?", 1);
-    	
-    	switch(whichMethod) {
+    public void run(ImageProcessor ip) {     	
+    	MainDialog md = new MainDialog();
+    }
+    
+    public static void chooseMethod(int chosenMethod, ImageProcessor ip) {
+    	switch(chosenMethod) {
         // Baustelle Torsten 1
         case 1:      	
         	ContrastAdjustment cont = new ContrastAdjustment();
@@ -32,6 +30,7 @@ public class Abschlussprojekt_PlugIn implements PlugInFilter {
         case 2:
         	
             break;
+            
         //Baustelle Julian 1    
         case 3:
         	//RGB Bild in Grauwerten 
@@ -39,14 +38,17 @@ public class Abschlussprojekt_PlugIn implements PlugInFilter {
         	//Konvertierung in Grauwertbild funktioniert noch nicht
         	ip.convertToByteProcessor(false);
         	break;
-        //FBaustelle Julian 2	
+        	
+        //Baustelle Julian 2	
         case 4:
         	
         	break;
+        	
         //Alissa
         case 5:
         	
         	break;
+        	
         //Janfi
         case 6:
         	// DEBUG - only usable with a binarised input image!
@@ -55,8 +57,14 @@ public class Abschlussprojekt_PlugIn implements PlugInFilter {
         	segm.debugSegmentation();
         	break;
             
-        default:   
-    
+        default: 
+        	
+    	}  
+    	
+    	GenericDialog gd = new GenericDialog("");
+    	ImagePlus img = new ImagePlus();
+    	img.setImage(ip.createImage());
+    	gd.addImage(img);
+    	gd.show();
     }
-  }
 }
