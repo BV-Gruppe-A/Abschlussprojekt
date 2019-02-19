@@ -6,22 +6,6 @@ import ij.plugin.filter.PlugInFilter;
 import ij.process.ImageProcessor;
 
 public class Abschlussprojekt_PlugIn implements PlugInFilter {
-    
-	final int BLACK = 0;
-	final int WHITE = 255;
-	 
-	// maximal vector length in the RGB color space if red = green = blue = 255
-	final double MAX_VECTOR_LENGTH = Math.sqrt(3 * Math.pow(WHITE, 2));
-	
-	// masks to get the 8-Bit color value from the whole 32-Bit int
-	final int RED_MASK = 0x00FF0000;
-	final int GREEN_MASK = 0x0000FF00;
-	final int BLUE_MASK = 0x000000FF;
-	
-	// the weights are based on the values described in the book on page 324
-	final double WEIGHT_RED = 0.299;
-	final double WEIGHT_GREEN = 0.587;
-	final double WEIGHT_BLUE = 0.114;
 
     @Override    
     public int setup(String args, ImagePlus im) {  
@@ -50,7 +34,10 @@ public class Abschlussprojekt_PlugIn implements PlugInFilter {
             break;
         //Baustelle Julian 1    
         case 3:
-        	
+        	//RGB Bild in Grauwerten 
+        	Grayscale gray = new Grayscale(ip);
+        	//Konvertierung in Grauwertbild funktioniert noch nicht
+        	ip.convertToByteProcessor(false);
         	break;
         //FBaustelle Julian 2	
         case 4:
