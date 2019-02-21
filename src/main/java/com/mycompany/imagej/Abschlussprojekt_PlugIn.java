@@ -1,5 +1,7 @@
 package com.mycompany.imagej;
 
+import com.mycompany.imagej.gui.MainDialog;
+
 import ij.ImagePlus;
 import ij.gui.GenericDialog;
 import ij.plugin.filter.PlugInFilter;
@@ -65,6 +67,5 @@ public class Abschlussprojekt_PlugIn implements PlugInFilter {
     	ImagePlus img = new ImagePlus();
     	img.setImage(ip.createImage());
     	gd.addImage(img);
-    	gd.show();
     }
 }
