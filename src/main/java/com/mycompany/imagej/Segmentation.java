@@ -17,6 +17,8 @@ public class Segmentation {
 	private final int IDENTIFIED = -1;
 	private final int WHITE_SEGMENT = 0;
 	
+	private final int CHARACTER_HEIGHT = 38;
+	
 	// local variables
 	private ImageProcessor binarisedImg;
 	private int imgHeight;

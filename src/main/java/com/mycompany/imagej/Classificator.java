@@ -3,6 +3,9 @@
  */
 package com.mycompany.imagej;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.TreeMap;
 
 import ij.process.ImageProcessor;
@@ -14,6 +17,7 @@ import ij.process.ImageProcessor;
 public class Classificator {
 
 	private TreeMap<String, ImageProcessor> templates;
+	
 	
 	public Classificator() {
 		initializeTemplates();
@@ -31,12 +35,17 @@ public class Classificator {
 	 * @param characters all characters of one licence plate segregated (each with own image processor)
 	 * classifies each character and saves to string that is than writen to an excel file
 	 */
-	private void classify(ImageProcessor [] characters) {
+	public void classify(ImageProcessor [] characters, String filename) {
 		String licencePlate = "";
 		for (ImageProcessor character : characters) {
 			licencePlate += classifyChar(character);
 		}
-		writeToExcel(licencePlate);
+		
+		try {
+			writeToExcel(licencePlate, filename);
+		} catch (IOException e) {
+			System.out.println(e.getMessage());
+		}
 	}
 	
 	/**
@@ -62,11 +71,26 @@ public class Classificator {
 		
 	}
 
+
 	/**
-	 * @param s licence plate as string (result of classification)
-	 * writes one licence plate to an Excel file
+	 * @param plate plate licence plate as string (result of classification)
+	 * @param filename
+	 * writes one licence plate with filename into a row of a csv file
+	 * @throws IOException 
 	 */
-	private void writeToExcel(String s){
+	private void writeToExcel(String plate, String filename) throws IOException{
+		BufferedWriter writer = null;
+		try {
+			 writer = new BufferedWriter(new FileWriter("list.csv", true));
+			 writer.write(filename + "," + plate + "\n");
+			 writer.close();
+			
+		}catch(IOException e) {
+			if (writer != null)
+				writer.close();
+		}
+		
+		
 		//write licence plate to excel
 	}
 }
