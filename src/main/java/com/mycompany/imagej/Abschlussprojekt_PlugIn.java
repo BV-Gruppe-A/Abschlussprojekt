@@ -47,7 +47,8 @@ public class Abschlussprojekt_PlugIn implements PlugInFilter {
         	break;
         //Alissa
         case 5:
-        	
+        	Classificator classificator = new Classificator();
+        	classificator.classify(null, "Kennzeichen1");
         	break;
         //Janfi
         case 6:
