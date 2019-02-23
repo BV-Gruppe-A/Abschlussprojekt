@@ -1,8 +1,10 @@
 package com.mycompany.imagej;
 
 import ij.process.ImageProcessor;
+import ij.process.ByteProcessor;
 
-public class Grayscale {
+
+public Grayscale(ImageProcessor ip) {
 
 	final int BLACK = 0;
 	final int WHITE = 255;
@@ -15,15 +17,17 @@ public class Grayscale {
 	final int GREEN_MASK = 0x0000FF00;
 	final int BLUE_MASK = 0x000000FF;
 	
-	public Grayscale(ImageProcessor ip) {
+	public ByteProcessor Grayscale_function(ImageProcessor ip) {
+
 		int M = ip.getWidth();
         int N = ip.getHeight();
         
+        ByteProcessor greyScaleIp = new ByteProcessor(M,N);
         for (int u = 0; u < M; u++) {
             for (int v = 0; v < N; v++) {
             	int color = ip.getPixel(u, v);            	
             	int new_p = calculateIntensity(getRGBValues(color));               	
-        		ip.putPixel(u, v, new_p);            	
+        		greyScaleIp.putPixel(u, v, new_p);            	
             }
         }
 	}
@@ -45,8 +49,10 @@ public class Grayscale {
     	
     	double intensity =  Math.sqrt(redSquared + greenSquared + blueSquared);
     	int grey = (int) Math.round((intensity * (double) WHITE) / MAX_VECTOR_LENGTH);
+    
+    	return grey;
     	
-    	return makeGreyToRGBValue(grey);
+    	
     }
     
     // saves the grey value as a valid rgb value by setting r = g = b = grey

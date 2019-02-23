@@ -1,23 +1,27 @@
 package com.mycompany.imagej;
 
 import ij.process.ImageProcessor;
+import ij.process.ByteProcessor;
 
 public class ContrastAdjustment {
 	
 	final int BLACK = 0;
 	final int WHITE = 255;
-	
-	
+
+    
 	public void Contrast(ImageProcessor ip) {
 	    int M = ip.getWidth();
 	    int N = ip.getHeight();
 	    
-	    int color_min, color_max;
+        // the contrast should be expanded to the whole range of greyscales
+	    int color_max = WHITE;
+	    int color_min = BLACK;
+
 	    int[] histogram;
 	    
 	    // Hard border for contrast adjustment
-	    int percentage = 10;
-	    
+	    int percentage = 5;
+	   
 	    histogram = ip.getHistogram();
 	    
 	    int minThreshold = BLACK;
@@ -31,9 +35,6 @@ public class ContrastAdjustment {
 	        minThreshold = BLACK;
 	        maxThreshold = WHITE;	
 	        
-	        // the contrast should be expanded to the whole range of greyscales
-	        color_max = WHITE;
-	        color_min = BLACK;
 	        
 	        // the amount of pixels in the lowest/highest values
 	        int minSum = histogram[minThreshold];

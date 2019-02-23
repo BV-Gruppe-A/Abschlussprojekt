@@ -4,6 +4,7 @@ import ij.IJ;
 import ij.ImagePlus;
 import ij.plugin.filter.PlugInFilter;
 import ij.process.ImageProcessor;
+import ij.process.ByteProcessor;
 
 public class Abschlussprojekt_PlugIn implements PlugInFilter {
 
@@ -23,9 +24,9 @@ public class Abschlussprojekt_PlugIn implements PlugInFilter {
     	
     	switch(whichMethod) {
         // Baustelle Torsten 1
-        case 1:      	
+        case 1:  
         	ContrastAdjustment cont = new ContrastAdjustment();
-        	cont.Contrast(ip);
+        	cont.Contrast(ip); 
         	break;
         	
         //Baustelle Torsten 2
@@ -35,9 +36,10 @@ public class Abschlussprojekt_PlugIn implements PlugInFilter {
         //Baustelle Julian 1    
         case 3:
         	//RGB Bild in Grauwerten 
-        	Grayscale gray = new Grayscale(ip);
+           // Grayscale gray = new Grayscale();
+            //ip = gray.Grayscale_function(ip);
         	//Konvertierung in Grauwertbild funktioniert noch nicht
-        	ip.convertToByteProcessor(false);
+        	//ip.convertToByteProcessor(false);
         	break;
         //FBaustelle Julian 2	
         case 4:
