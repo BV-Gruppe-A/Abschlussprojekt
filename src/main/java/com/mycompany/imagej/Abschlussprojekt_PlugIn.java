@@ -23,23 +23,34 @@ public class Abschlussprojekt_PlugIn implements PlugInFilter {
     	int whichMethod = (int)IJ.getNumber("Welche Methode soll aufgerufen werden?", 1);
     	
     	switch(whichMethod) {
-        // Baustelle Torsten 1
+        // Kontrastanpassung angepasst und läuft
         case 1:  
+            // Hard border for contrast adjustment
+            final int percentage = 40;
+        	
         	ContrastAdjustment cont = new ContrastAdjustment();
-        	cont.Contrast(ip); 
+        	cont.Contrast(ip,percentage);
         	break;
+
         	
-        //Baustelle Torsten 2
+        //Case 3 und danach Case 1 ausführen
         case 2:
-        	
+            Grayscale gray1 = new Grayscale();
+            ip = gray1.Grayscale_function(ip);
+        	ip.convertToByteProcessor(false);
+        	new ImagePlus("GrayscaledImage",ip).show();
+        	int percentage1 = 40;
+        	ContrastAdjustment cont1 = new ContrastAdjustment();
+        	cont1.Contrast(ip,percentage1);
             break;
         //Baustelle Julian 1    
         case 3:
-        	//RGB Bild in Grauwerten 
-           // Grayscale gray = new Grayscale();
-            //ip = gray.Grayscale_function(ip);
-        	//Konvertierung in Grauwertbild funktioniert noch nicht
-        	//ip.convertToByteProcessor(false);
+        	//RGB Bild in Grauwert Bild umwandeln
+            Grayscale gray = new Grayscale();
+            ip = gray.Grayscale_function(ip);
+        	ip.convertToByteProcessor(false);
+        	new ImagePlus("GrayscaledImage",ip).show();
+        	
         	break;
         //FBaustelle Julian 2	
         case 4:

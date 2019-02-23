@@ -7,9 +7,9 @@ public class ContrastAdjustment {
 	
 	final int BLACK = 0;
 	final int WHITE = 255;
-
+	
     
-	public void Contrast(ImageProcessor ip) {
+	public void Contrast(ImageProcessor ip, int percentage) {
 	    int M = ip.getWidth();
 	    int N = ip.getHeight();
 	    
@@ -19,8 +19,7 @@ public class ContrastAdjustment {
 
 	    int[] histogram;
 	    
-	    // Hard border for contrast adjustment
-	    int percentage = 5;
+
 	   
 	    histogram = ip.getHistogram();
 	    

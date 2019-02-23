@@ -4,7 +4,7 @@ import ij.process.ImageProcessor;
 import ij.process.ByteProcessor;
 
 
-public Grayscale(ImageProcessor ip) {
+public class Grayscale {
 
 	final int BLACK = 0;
 	final int WHITE = 255;
@@ -30,6 +30,7 @@ public Grayscale(ImageProcessor ip) {
         		greyScaleIp.putPixel(u, v, new_p);            	
             }
         }
+        return greyScaleIp;
 	}
 	// splits the color-value into the 3 resulting colors (RGB)
     private int[] getRGBValues(int color) {
@@ -55,10 +56,11 @@ public Grayscale(ImageProcessor ip) {
     	
     }
     
-    // saves the grey value as a valid rgb value by setting r = g = b = grey
+/*      
+ // saves the grey value as a valid rgb value by setting r = g = b = grey
     private int makeGreyToRGBValue(int grey) {
     	return ((grey & 0xff) << 16) | ((grey & 0xff) << 8) | grey & 0xff;
     }
-    
+*/   
 	
 }
