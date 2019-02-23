@@ -4,19 +4,18 @@ import com.mycompany.imagej.gui.MainDialog;
 
 import ij.ImagePlus;
 import ij.gui.GenericDialog;
-import ij.plugin.filter.PlugInFilter;
+import ij.plugin.frame.PlugInFrame;
 import ij.process.ImageProcessor;
 
-public class Abschlussprojekt_PlugIn implements PlugInFilter {
+@SuppressWarnings("serial")
+public class Abschlussprojekt_PlugIn extends PlugInFrame {
 
-    @Override    
-    public int setup(String args, ImagePlus im) {  
-    	// needs no image, instead opens dialog
-    	return NO_IMAGE_REQUIRED;
-    }
-
-    @Override
-    public void run(ImageProcessor ip) {     	
+	public Abschlussprojekt_PlugIn() {
+		super("Abschlussprojekt Gruppe A");
+	}
+	
+	
+    public void run(String arg) {     	
     	MainDialog md = new MainDialog();
     }
     
