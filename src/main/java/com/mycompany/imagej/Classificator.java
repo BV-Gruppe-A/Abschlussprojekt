@@ -4,10 +4,12 @@
 package com.mycompany.imagej;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.TreeMap;
 
+import ij.ImagePlus;
 import ij.process.ImageProcessor;
 
 /**
@@ -28,8 +30,18 @@ public class Classificator {
 	 */
 	private void initializeTemplates() {
 		// TODO read all pictures in certain folder into tree map with character
+		//add file explorer
+		templates = new TreeMap<>();
 		
+		final File folder = new File("Templates");
+		ImagePlus i;
+		for (final File fileEntry : folder.listFiles()) {
+	        i = new ImagePlus(fileEntry.getPath());
+	        templates.put(fileEntry.getName(), i.getProcessor());
+	    }
 	}
+
+	
 
 	/**
 	 * @param characters all characters of one licence plate segregated (each with own image processor)
