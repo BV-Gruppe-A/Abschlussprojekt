@@ -4,14 +4,14 @@ import ij.IJ;
 import ij.ImagePlus;
 import ij.plugin.filter.PlugInFilter;
 import ij.process.ImageProcessor;
-import ij.process.ByteProcessor;
+
 
 public class Abschlussprojekt_PlugIn implements PlugInFilter {
 
     @Override    
     public int setup(String args, ImagePlus im) {  
     	//this plugin accepts RGB images
-        return DOES_RGB; 
+    	return DOES_RGB; 
         
     	// DEBUG FOR JANFI
     	//return DOES_8G;
@@ -26,10 +26,11 @@ public class Abschlussprojekt_PlugIn implements PlugInFilter {
         // Kontrastanpassung angepasst und läuft
         case 1:  
             // Hard border for contrast adjustment
-            final int percentage = 40;
+        	int PercentageBlack = 35;
+        	int PercentageWhite = 65;
         	
         	ContrastAdjustment cont = new ContrastAdjustment();
-        	cont.Contrast(ip,percentage);
+        	cont.Contrast(ip,PercentageWhite,PercentageBlack);
         	break;
 
         	
@@ -39,11 +40,18 @@ public class Abschlussprojekt_PlugIn implements PlugInFilter {
             ip = gray1.Grayscale_function(ip);
         	ip.convertToByteProcessor(false);
         	new ImagePlus("GrayscaledImage",ip).show();
-        	int percentage1 = 40;
+        	
+        	int PercentageBlack1 = 35;
+        	int PercentageWhite1 = 65;
+        	
         	ContrastAdjustment cont1 = new ContrastAdjustment();
-        	cont1.Contrast(ip,percentage1);
+        	cont1.Contrast(ip,PercentageWhite1,PercentageBlack1);
+        	
+            MedianFilter filt1 = new MedianFilter();
+            ip = filt1.median(ip);        
+            
             break;
-        //Baustelle Julian 1    
+    
         case 3:
         	//RGB Bild in Grauwert Bild umwandeln
             Grayscale gray = new Grayscale();
@@ -67,6 +75,13 @@ public class Abschlussprojekt_PlugIn implements PlugInFilter {
         	Segmentation segm = new Segmentation(ip);
         	// segm.segmentThePicture();
         	segm.debugSegmentation();
+        	break;
+        	
+        case 7:
+        	//Median Filter
+            MedianFilter filt = new MedianFilter();
+            ip = filt.median(ip);        	
+        	
         	break;
             
         default:   
