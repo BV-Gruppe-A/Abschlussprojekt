@@ -55,12 +55,5 @@ public class Grayscale {
     	
     	
     }
-    
-/*      
- // saves the grey value as a valid rgb value by setting r = g = b = grey
-    private int makeGreyToRGBValue(int grey) {
-    	return ((grey & 0xff) << 16) | ((grey & 0xff) << 8) | grey & 0xff;
-    }
-*/   
 	
 }
