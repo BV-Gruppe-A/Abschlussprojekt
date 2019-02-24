@@ -1,7 +1,7 @@
 package com.mycompany.imagej;
 
 import ij.process.ImageProcessor;
-import ij.process.ByteProcessor;
+
 
 public class ContrastAdjustment {
 	
@@ -9,7 +9,7 @@ public class ContrastAdjustment {
 	final int WHITE = 255;
 	
     
-	public void Contrast(ImageProcessor ip, int percentage) {
+	public void Contrast(ImageProcessor ip, int PercentageWhite, int PercentageBlack) {
 	    int M = ip.getWidth();
 	    int N = ip.getHeight();
 	    
@@ -28,7 +28,8 @@ public class ContrastAdjustment {
 	    
 	
 	        // calculate amount of pixels needed to reach x%
-	        int pixelAmount = (int) Math.ceil(ip.getPixelCount() * percentage / 100.0);
+	        int pixelAmountLow = (int) Math.ceil(ip.getPixelCount() * PercentageBlack / 100.0);
+	        int pixelAmountHigh = (int) Math.ceil(ip.getPixelCount() * PercentageWhite / 100.0);
 	        
 	        // the values that need to be colored in min/max values in the next step
 	        minThreshold = BLACK;
@@ -40,13 +41,13 @@ public class ContrastAdjustment {
 	        int maxSum = histogram[maxThreshold];
 	        
 	        // add up lowest gray shades until pixel amount needed for x% is reached
-	        while(minSum < pixelAmount) {
+	        while(minSum < pixelAmountLow) {
 	        	minThreshold++;
 	        	minSum += histogram[minThreshold];
 	        }
 	        
 	        // add up highest gray shades until pixel amount needed for x% is reached
-	        while(maxSum < pixelAmount) {
+	        while(maxSum < pixelAmountHigh) {
 	        	maxThreshold--;
 	        	maxSum += histogram[maxThreshold];
 	        }
