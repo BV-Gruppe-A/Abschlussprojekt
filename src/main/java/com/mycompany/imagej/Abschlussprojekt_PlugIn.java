@@ -1,31 +1,30 @@
 package com.mycompany.imagej;
 
-import ij.IJ;
+import com.mycompany.imagej.gui.MainWindow;
+
 import ij.ImagePlus;
-import ij.plugin.filter.PlugInFilter;
+import ij.plugin.frame.PlugInFrame;
 import ij.process.ImageProcessor;
+           
+@SuppressWarnings("serial")
+public class Abschlussprojekt_PlugIn extends PlugInFrame {
+	private final String PLUGIN_NAME = "Abschlussprojekt Gruppe A"; 
 
-
-public class Abschlussprojekt_PlugIn implements PlugInFilter {
-
-    @Override    
-    public int setup(String args, ImagePlus im) {  
-    	//this plugin accepts RGB images
-    	return DOES_RGB; 
-        
-    	// DEBUG FOR JANFI
-    	//return DOES_8G;
+	public Abschlussprojekt_PlugIn() {
+		super("Abschlussprojekt Gruppe A");
+	}
+	
+	
+    public void run(String arg) {     	
+    	MainWindow window = new MainWindow(PLUGIN_NAME);
+    	window.showDialog();
     }
-
-    @Override
-    public void run(ImageProcessor ip) { 
-    	
-    	int whichMethod = (int)IJ.getNumber("Welche Methode soll aufgerufen werden?", 1);
-    	
-    	switch(whichMethod) {
-        // Kontrastanpassung angepasst und läuft
-        case 1:  
-            // Hard border for contrast adjustment
+    
+    public static void chooseMethod(int chosenMethod, ImageProcessor ip) {
+    	switch(chosenMethod) {
+        // Baustelle Torsten 1
+        case 1:      	
+        	// Hard border for contrast adjustment
         	int PercentageBlack = 35;
         	int PercentageWhite = 65;
         	
@@ -51,7 +50,8 @@ public class Abschlussprojekt_PlugIn implements PlugInFilter {
             ip = filt1.median(ip);        
             
             break;
-    
+            
+        //Baustelle Julian 1   
         case 3:
         	//RGB Bild in Grauwert Bild umwandeln
             Grayscale gray = new Grayscale();
@@ -60,15 +60,18 @@ public class Abschlussprojekt_PlugIn implements PlugInFilter {
         	new ImagePlus("GrayscaledImage",ip).show();
         	
         	break;
-        //FBaustelle Julian 2	
+        	
+        //Baustelle Julian 2	
         case 4:
         	
         	break;
+        	
         //Alissa
         case 5:
         	Classificator classificator = new Classificator();
         	classificator.classify(null, "Kennzeichen1");
         	break;
+        	
         //Janfi
         case 6:
         	// DEBUG - only usable with a binarised input image!
@@ -84,8 +87,11 @@ public class Abschlussprojekt_PlugIn implements PlugInFilter {
         	
         	break;
             
-        default:   
-    
+        default: 
+        	
+    	}  
+    	
+    	ImagePlus imgToShow = new ImagePlus("Test", ip);
+    	imgToShow.show();
     }
-  }
 }
