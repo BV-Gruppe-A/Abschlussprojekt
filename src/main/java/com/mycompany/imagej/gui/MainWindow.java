@@ -41,7 +41,7 @@ public class MainWindow extends GenericDialog {
 	private MainWindowController controller;
 	
 	/**
-	 * Constructor which sets the titel and fills the window with life
+	 * Constructor which sets the title and fills the window with life
 	 * @param windowName window Name to set
 	 */
 	public MainWindow(String windowName) {
@@ -49,6 +49,10 @@ public class MainWindow extends GenericDialog {
 		controller = new MainWindowController(this);
 		fillWindowWithLife();
 		GUI.center(this);
+	}
+	
+	public MainWindowController getController() {
+		return controller;
 	}
 	
 	/**

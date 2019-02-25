@@ -22,6 +22,9 @@ public class MainWindowController {
 	private int medianNumber;
 	private int methodNumber;	
 	private boolean isPreprocessing = true;
+
+	// local objects
+	private ImageProcessor currentImage;
 	
 	/**
 	 * Constructor, which sets the window-object to control
@@ -42,6 +45,14 @@ public class MainWindowController {
 		}
 	}
 	
+	public ImageProcessor getCurrentImageProcessor() {
+		return currentImage;
+	}
+	
+	public void setCurrentImageProcessor(ImageProcessor imageToSet) {
+		currentImage = imageToSet;
+	}
+	
 	/**
 	 * opens a file chooser for a single image
 	 */
@@ -53,6 +64,8 @@ public class MainWindowController {
         if (returnVal == JFileChooser.APPROVE_OPTION) {
         	imgToOpen = fcOpen.getSelectedFile();
         	windowToControl.txtOpenLocation.setText(imgToOpen.getName());
+        	ImagePlus imgAsPlus = new ImagePlus(imgToOpen.getAbsolutePath());
+        	setCurrentImageProcessor(imgAsPlus.getProcessor());
         }
 	}
 	
@@ -73,16 +86,7 @@ public class MainWindowController {
         }
         */
 	}
-	
-	/**
-	 * converts the chosen file to a Image Processor
-	 * @return the corresponding image processor
-	 */
-	private ImageProcessor makeImageFromFile() {
-		ImagePlus imgAsPlus = new ImagePlus(imgToOpen.getAbsolutePath());
-		return imgAsPlus.getProcessor();
-	}
-	
+		
 	/**
 	 * Opens the file chooser to choose a location for the excel file
 	 */
@@ -144,15 +148,15 @@ public class MainWindowController {
 			
 			for(int orderCounter = 1; orderCounter < 4; orderCounter++) {
 				if(orderCounter == contrastNumber) {
-					Abschlussprojekt_PlugIn.chooseMethod(Abschlussprojekt_PlugIn.CONTRAST, makeImageFromFile());
+					Abschlussprojekt_PlugIn.chooseMethod(Abschlussprojekt_PlugIn.CONTRAST, getCurrentImageProcessor());
 				}
 				
 				if(orderCounter == grayscaleNumber) {
-					Abschlussprojekt_PlugIn.chooseMethod(Abschlussprojekt_PlugIn.GRAYSCALE, makeImageFromFile());
+					Abschlussprojekt_PlugIn.chooseMethod(Abschlussprojekt_PlugIn.GRAYSCALE, getCurrentImageProcessor());
 				}
 				
 				if(orderCounter == medianNumber) {
-					Abschlussprojekt_PlugIn.chooseMethod(Abschlussprojekt_PlugIn.MEDIAN, makeImageFromFile());
+					Abschlussprojekt_PlugIn.chooseMethod(Abschlussprojekt_PlugIn.MEDIAN, getCurrentImageProcessor());
 				}
 			}
 		} else {
@@ -160,7 +164,7 @@ public class MainWindowController {
 				return;
 			}
 			
-			Abschlussprojekt_PlugIn.chooseMethod(methodNumber, makeImageFromFile());
+			Abschlussprojekt_PlugIn.chooseMethod(methodNumber, getCurrentImageProcessor());
 		}
 	}
 	

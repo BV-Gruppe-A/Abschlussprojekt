@@ -15,7 +15,7 @@ import ij.process.ImageProcessor;
 @SuppressWarnings("serial")
 public class Abschlussprojekt_PlugIn extends PlugInFrame {
 	// constant values
-	private final String PLUGIN_NAME = "Abschlussprojekt Gruppe A"; 
+	private static final String PLUGIN_NAME = "Abschlussprojekt Gruppe A"; 
 	
 	// constant static values
 	public static final int METHOD_AMOUNT = 6;
@@ -25,6 +25,9 @@ public class Abschlussprojekt_PlugIn extends PlugInFrame {
 	public static final int NO4 = 4;
 	public static final int SEGMENTATION = 5;
 	public static final int CLASSIFICATION = 6;
+	
+	// local objects
+	private static MainWindow window = new MainWindow(PLUGIN_NAME);;
 	
 
 	/**
@@ -37,9 +40,8 @@ public class Abschlussprojekt_PlugIn extends PlugInFrame {
 	/**
 	 * run-Method which shows the main Window
 	 */
-    public void run(String arg) {     	
-    	MainWindow window = new MainWindow(PLUGIN_NAME);
-    	window.showDialog();
+    public void run(String arg) {   	
+       	window.showDialog();
     }
     
     /**
@@ -67,14 +69,14 @@ public class Abschlussprojekt_PlugIn extends PlugInFrame {
         	
         case MEDIAN:
             MedianFilter filt1 = new MedianFilter();
-            ip = filt1.median(ip);   
+            window.getController().setCurrentImageProcessor(filt1.median(ip));
             break;
             
         //Baustelle Julian 1   
         case GRAYSCALE:
         	//RGB Bild in Grauwert Bild umwandeln
             Grayscale gray = new Grayscale();
-            ip = gray.Grayscale_function(ip);
+            window.getController().setCurrentImageProcessor(gray.Grayscale_function(ip));
         	break;
         	
         //Baustelle Julian 2	
