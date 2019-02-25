@@ -1,8 +1,6 @@
 package com.mycompany.imagej;
 
 import java.util.Arrays;
-
-import ij.IJ;
 import ij.process.ImageProcessor;
 
 /**

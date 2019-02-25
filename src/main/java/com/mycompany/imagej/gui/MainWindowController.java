@@ -144,18 +144,15 @@ public class MainWindowController {
 			
 			for(int orderCounter = 1; orderCounter < 4; orderCounter++) {
 				if(orderCounter == contrastNumber) {
-					// TODO: Call Contrast
-					IJ.showMessage("Contrast as number: " + orderCounter);
+					Abschlussprojekt_PlugIn.chooseMethod(Abschlussprojekt_PlugIn.CONTRAST, makeImageFromFile());
 				}
 				
 				if(orderCounter == grayscaleNumber) {
-					// TODO: Call Grayscale
-					IJ.showMessage("Grayscale as number: " + orderCounter);
+					Abschlussprojekt_PlugIn.chooseMethod(Abschlussprojekt_PlugIn.GRAYSCALE, makeImageFromFile());
 				}
 				
 				if(orderCounter == medianNumber) {
-					// TODO: Call Median
-					IJ.showMessage("Median as number: " + orderCounter);
+					Abschlussprojekt_PlugIn.chooseMethod(Abschlussprojekt_PlugIn.MEDIAN, makeImageFromFile());
 				}
 			}
 		} else {
@@ -174,8 +171,8 @@ public class MainWindowController {
 	private boolean setMethodNumber() {
 		if(checkIfStringIsNumber(windowToControl.txtMethodNumber.getText())) {
 			methodNumber = Integer.parseInt(windowToControl.txtMethodNumber.getText());
-			if(methodNumber < 1 || methodNumber > 7) {
-				IJ.error("The Method Number should be a value between 1 and 7!");
+			if(methodNumber < 1 || methodNumber > Abschlussprojekt_PlugIn.METHOD_AMOUNT) {
+				IJ.error("The Method Number should be a value between 1 and " + Abschlussprojekt_PlugIn.METHOD_AMOUNT + "!");
 				return false;
 			}
 		} else {
