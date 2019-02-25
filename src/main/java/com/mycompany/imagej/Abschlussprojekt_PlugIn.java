@@ -1,12 +1,13 @@
 package com.mycompany.imagej;
 
 import com.mycompany.imagej.gui.MainWindow;
+import com.mycompany.imagej.preprocessing.ContrastAdjustment;
+import com.mycompany.imagej.preprocessing.Grayscale;
+import com.mycompany.imagej.preprocessing.MedianFilter;
+
 import ij.ImagePlus;
 import ij.plugin.frame.PlugInFrame;
 import ij.process.ImageProcessor;
-import preprocessing.ContrastAdjustment;
-import preprocessing.Grayscale;
-import preprocessing.MedianFilter;
            
 /**
  * Main Class for our PlugIn
@@ -48,8 +49,8 @@ public class Abschlussprojekt_PlugIn extends PlugInFrame {
      * 			2 - Median Filter
      * 			3 - Grayscale
      * 			4 - ???
-     * 			5 - Classification
-     * 			6 - Segmentation
+     * 			5 - Segmentation
+     * 			6 - Classification
      * @param ip Image Processor to use the method on
      */
     public static void chooseMethod(int chosenMethod, ImageProcessor ip) {

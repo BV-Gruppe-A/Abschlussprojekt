@@ -1,4 +1,4 @@
-package preprocessing;
+package com.mycompany.imagej.preprocessing;
 
 import java.util.Arrays;
 
