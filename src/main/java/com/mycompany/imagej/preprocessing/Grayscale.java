@@ -1,4 +1,4 @@
-package preprocessing;
+package com.mycompany.imagej.preprocessing;
 
 import ij.process.ImageProcessor;
 import ij.process.ByteProcessor;
