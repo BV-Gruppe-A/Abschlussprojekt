@@ -1,14 +1,14 @@
 package com.mycompany.imagej;
 
-import com.mycompany.imagej.gui.MainDialog;
+import com.mycompany.imagej.gui.MainWindow;
 
 import ij.ImagePlus;
-import ij.gui.GenericDialog;
 import ij.plugin.frame.PlugInFrame;
 import ij.process.ImageProcessor;
 
 @SuppressWarnings("serial")
 public class Abschlussprojekt_PlugIn extends PlugInFrame {
+	private final String PLUGIN_NAME = "Abschlussprojekt Gruppe A"; 
 
 	public Abschlussprojekt_PlugIn() {
 		super("Abschlussprojekt Gruppe A");
@@ -16,7 +16,8 @@ public class Abschlussprojekt_PlugIn extends PlugInFrame {
 	
 	
     public void run(String arg) {     	
-    	MainDialog md = new MainDialog();
+    	MainWindow window = new MainWindow(PLUGIN_NAME);
+    	window.showDialog();
     }
     
     public static void chooseMethod(int chosenMethod, ImageProcessor ip) {
@@ -62,9 +63,7 @@ public class Abschlussprojekt_PlugIn extends PlugInFrame {
         	
     	}  
     	
-    	GenericDialog gd = new GenericDialog("");
-    	ImagePlus img = new ImagePlus();
-    	img.setImage(ip.createImage());
-    	gd.addImage(img);
+    	ImagePlus imgToShow = new ImagePlus("Test", ip);
+    	imgToShow.show();
     }
 }
