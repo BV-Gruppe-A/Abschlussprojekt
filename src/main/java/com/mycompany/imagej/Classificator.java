@@ -7,6 +7,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Map;
 import java.util.TreeMap;
 
 import ij.ImagePlus;
@@ -67,8 +68,14 @@ public class Classificator {
 	 */
 	private String classifyChar(ImageProcessor character) {
 		String s = null;
-		for (ImageProcessor template : templates.values()) {
-			templateMatch(template, character);
+		double maxVal = -1;
+		double val;
+		for ( Map.Entry<String, ImageProcessor> template : templates.entrySet()) {
+			val = templateMatch(template.getValue(), character);
+			if(val > maxVal) {
+				maxVal = val;
+				s = template.getKey();
+			}
 		}
 		return s;
 	}
@@ -78,11 +85,50 @@ public class Classificator {
 	 * @param sample the sample image to compare to template
 	 * uses template matching to determine similarity
 	 */
-	private void templateMatch(ImageProcessor template, ImageProcessor sample) {
-		// TODO correlate pictures und calculate similarity
+	private double templateMatch(ImageProcessor template, ImageProcessor sample) {
+		// TODO correlate pictures and calculate similarity
+		int J = template.getWidth();
+		int K = template.getHeight();
 		
+		double numerator = 0;
+		double denominator1 = 0;
+		double  denominator2 = 0;
+		
+		double sampleMean = calcMean(sample);
+		double templateMean = calcMean(template);
+		
+		for (int j = 0; j < J; j++) {
+			for(int k = 0; k < K; k++) {
+				//calculate numerator
+				numerator += (template.getPixel(j, k) - templateMean) * (sample.getPixel(j / 2, k / 2) - sampleMean);
+				
+				//calculate denominator1
+				denominator1 += Math.pow(template.getPixel(j, k) - templateMean, 2);
+				
+				//calculate denominator2
+				denominator2 += Math.pow(sample.getPixel(j , k) - sampleMean,2);
+			}
+		}
+		denominator1 = Math.sqrt(denominator1);
+		denominator2 = Math.sqrt(denominator2);
+		
+		return numerator / (denominator1 * denominator2);
 	}
 
+
+	private double calcMean(ImageProcessor img) {
+		double mean = 0;
+		int J = img.getWidth();
+		int K = img.getHeight();
+		
+		for (int j = 0; j < J; j++) {
+			for(int k = 0; k < K; k++) {
+				mean += img.getPixel(j, k);
+			}
+		}
+		mean = mean / (J * K);
+		return mean;
+	}
 
 	/**
 	 * @param plate plate licence plate as string (result of classification)
