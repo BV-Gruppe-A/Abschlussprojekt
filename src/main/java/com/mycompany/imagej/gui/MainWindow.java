@@ -19,7 +19,7 @@ public class MainWindow extends GenericDialog {
 	protected JLabel lblMethod = new JLabel("Method: ");
 	protected JLabel lblContrast = new JLabel("Contrast Adjustment: ");
 	protected JLabel lblGrayscale = new JLabel("Grayscale: ");
-	protected JLabel lblMedian = new JLabel("Median Filter: ");
+	protected JLabel lblShading = new JLabel("Shading Filter: ");
 	protected JLabel lblExcelFile = new JLabel("Save Excel-File to: ");
 	protected JRadioButton rbOneImage = new JRadioButton("... 1 Image");
 	protected JRadioButton rbMoreImages = new JRadioButton("... more than 1 image");
@@ -30,7 +30,7 @@ public class MainWindow extends GenericDialog {
 	protected JTextField txtSaveLocation = new JTextField("Not Implemented yet...");
 	protected JTextField txtContrastNumber = new JTextField("0 to ignore");
 	protected JTextField txtGrayscaleNumber = new JTextField("0 to ignore");
-	protected JTextField txtMedianNumber = new JTextField("0 to ignore");
+	protected JTextField txtShadingNumber = new JTextField("0 to ignore");
 	protected JButton btnOpenFile = new JButton("Choose Image");
 	protected JButton btnSaveFile = new JButton("Choose Location");
 	protected JButton btnStartProcess = new JButton("Start");
@@ -109,9 +109,9 @@ public class MainWindow extends GenericDialog {
 		contentPanel.add(txtGrayscaleNumber, constraints);
 
 		setConstraints(0, currentY, 1, 0.8);
-		contentPanel.add(lblMedian, constraints);
+		contentPanel.add(lblShading, constraints);
 		setConstraints(1, currentY++, 1, 0.2);
-		contentPanel.add(txtMedianNumber, constraints);
+		contentPanel.add(txtShadingNumber, constraints);
 		
 		setConstraints(0, currentY, 1, 0.8);
 		contentPanel.add(lblMethod, constraints);

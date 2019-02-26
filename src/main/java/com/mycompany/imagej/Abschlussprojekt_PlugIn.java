@@ -3,7 +3,7 @@ package com.mycompany.imagej;
 import com.mycompany.imagej.gui.MainWindow;
 import com.mycompany.imagej.preprocessing.ContrastAdjustment;
 import com.mycompany.imagej.preprocessing.Grayscale;
-import com.mycompany.imagej.preprocessing.MedianFilter;
+import com.mycompany.imagej.preprocessing.ShadingFilter;
 
 import ij.ImagePlus;
 import ij.plugin.frame.PlugInFrame;
@@ -20,7 +20,7 @@ public class Abschlussprojekt_PlugIn extends PlugInFrame {
 	// constant static values
 	public static final int METHOD_AMOUNT = 6;
 	public static final int CONTRAST = 1;
-	public static final int MEDIAN = 2;
+	public static final int SHADING = 2;
 	public static final int GRAYSCALE = 3;
 	public static final int NO4 = 4;
 	public static final int SEGMENTATION = 5;
@@ -48,7 +48,7 @@ public class Abschlussprojekt_PlugIn extends PlugInFrame {
      * Chooses a method to open
      * @param chosenMethod number of the method
      * 			1 - Contrast Adjustement
-     * 			2 - Median Filter
+     * 			2 - SHADING Filter
      * 			3 - Grayscale
      * 			4 - ???
      * 			5 - Segmentation
@@ -67,9 +67,9 @@ public class Abschlussprojekt_PlugIn extends PlugInFrame {
         	cont.Contrast(ip, PercentageWhite, PercentageBlack);
         	break;
         	
-        case MEDIAN:
-            MedianFilter filt1 = new MedianFilter();
-            window.getController().setCurrentImageProcessor(filt1.median(ip));
+        case SHADING:
+            ShadingFilter filt1 = new ShadingFilter();
+            window.getController().setCurrentImageProcessor(filt1.shading(ip));
             break;
             
         //Baustelle Julian 1   

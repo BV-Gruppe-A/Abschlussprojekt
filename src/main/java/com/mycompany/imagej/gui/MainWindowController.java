@@ -19,7 +19,7 @@ public class MainWindowController {
 	// local variables
 	private int contrastNumber;
 	private int grayscaleNumber;
-	private int medianNumber;
+	private int shadingNumber;
 	private int methodNumber;	
 	private boolean isPreprocessing = true;
 
@@ -113,10 +113,10 @@ public class MainWindowController {
 			return false;
 		}
 		
-		if(checkIfStringIsNumber(windowToControl.txtMedianNumber.getText())) {
-			medianNumber = Integer.parseInt(windowToControl.txtMedianNumber.getText());
+		if(checkIfStringIsNumber(windowToControl.txtShadingNumber.getText())) {
+			shadingNumber = Integer.parseInt(windowToControl.txtShadingNumber.getText());
 		} else {
-			IJ.error("The Number for Median is not a Number!");
+			IJ.error("The Number for Shading is not a Number!");
 			return false;
 		}
 		
@@ -155,8 +155,8 @@ public class MainWindowController {
 					Abschlussprojekt_PlugIn.chooseMethod(Abschlussprojekt_PlugIn.GRAYSCALE, getCurrentImageProcessor());
 				}
 				
-				if(orderCounter == medianNumber) {
-					Abschlussprojekt_PlugIn.chooseMethod(Abschlussprojekt_PlugIn.MEDIAN, getCurrentImageProcessor());
+				if(orderCounter == shadingNumber) {
+					Abschlussprojekt_PlugIn.chooseMethod(Abschlussprojekt_PlugIn.SHADING, getCurrentImageProcessor());
 				}
 			}
 		} else {
@@ -192,7 +192,7 @@ public class MainWindowController {
 	 * @return true if the numbers are different
 	 */
 	private boolean checkPreprocessingOrder() {		
-		if(contrastNumber == grayscaleNumber || contrastNumber == medianNumber || medianNumber == grayscaleNumber) {
+		if(contrastNumber == grayscaleNumber || contrastNumber == shadingNumber || shadingNumber == grayscaleNumber) {
 			IJ.error("The Preprocessing methods need to have different numbers!");
 			return false;
 		} else {
@@ -213,7 +213,7 @@ public class MainWindowController {
 			return false;
 		}
 		
-		if(!checkForPreprocessingTextFields(medianNumber, "Median", 0, 3)) {
+		if(!checkForPreprocessingTextFields(shadingNumber, "Shading", 0, 3)) {
 			return false;
 		}
 		
