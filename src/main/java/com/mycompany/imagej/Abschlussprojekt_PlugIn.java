@@ -61,8 +61,8 @@ public class Abschlussprojekt_PlugIn extends PlugInFrame {
         // Baustelle Torsten 1
         case CONTRAST:      	
         	// Hard border for contrast adjustment
-        	int PercentageBlack = 35;
-        	int PercentageWhite = 65;
+        	int PercentageBlack = 5;
+        	int PercentageWhite = 5;
         	
         	ContrastAdjustment cont = new ContrastAdjustment();
         	cont.Contrast(ip, PercentageWhite, PercentageBlack);
@@ -75,6 +75,11 @@ public class Abschlussprojekt_PlugIn extends PlugInFrame {
             } else {
             	ip = filt1.shading(ip);
             }
+            
+        	int BinarizationWhite = 65;
+        	
+        	ContrastAdjustment bin = new ContrastAdjustment();
+        	bin.Binarization(ip, BinarizationWhite);
             
             break;
             

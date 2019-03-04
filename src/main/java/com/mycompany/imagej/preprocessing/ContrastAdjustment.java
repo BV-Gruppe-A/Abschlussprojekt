@@ -71,5 +71,52 @@ public class ContrastAdjustment {
 	        }
 	    }
 	}
+	
+	
+	
+	
+	public void Binarization(ImageProcessor ip, int PercentageWhite) {
+	    int M = ip.getWidth();
+	    int N = ip.getHeight();
 
+	    int[] histogram;
+
+	   
+	    histogram = ip.getHistogram();
+	    
+
+	    int maxThreshold = WHITE;  
+	    
+	
+	        // calculate amount of pixels needed to reach x%
+	        int pixelAmountHigh = (int) Math.ceil(ip.getPixelCount() * PercentageWhite / 100);
+	        
+	        // the amount of pixels in the highest values
+	        int maxSum = histogram[maxThreshold];
+	        
+	        // add up highest gray shades until pixel amount needed for x% is reached
+	        while(maxSum < pixelAmountHigh) {
+	        	maxThreshold--;
+	        	maxSum += histogram[maxThreshold];
+	        }
+	   
+	
+	    int new_p;
+	    
+	    // iterate over all image coordinates (u,v)
+	    for (int u = 0; u < M; u++) {
+	        for (int v = 0; v < N; v++) {
+	            int p = ip.getPixel(u, v);
+	            
+	            if(p < maxThreshold) {
+	            	new_p  = BLACK;
+	            	
+	            } else {
+	            	new_p =  WHITE;
+	            } 
+	        
+	            ip.putPixel(u, v, new_p);
+	        }
+	    }
+	}
 }
