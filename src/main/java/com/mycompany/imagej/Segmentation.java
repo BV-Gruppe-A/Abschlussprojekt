@@ -1,6 +1,8 @@
 package com.mycompany.imagej;
 
 import java.util.Arrays;
+import ij.IJ;
+import ij.ImagePlus;
 import ij.process.ImageProcessor;
 
 /**
@@ -16,12 +18,14 @@ public class Segmentation {
 	private final int WHITE_SEGMENT = 0;
 	
 	private final int CHARACTER_HEIGHT = 38;
+	private final int CHARACTER_WIDTH = 25;
 	
 	// local variables
 	private ImageProcessor binarisedImg;
 	private int imgHeight;
 	private int imgWidth;
 	private int segmentCounter;
+	private int finalSegmentAmount;
 	
 	private int[][] segments;
 	
@@ -43,6 +47,7 @@ public class Segmentation {
 		imgWidth = newImage.getWidth();
 		segments = new int[imgHeight][imgWidth];
 		fillSegmentsArrayWithDefault(imgHeight);
+		segmentCounter = WHITE_SEGMENT + 1;
 	}
 	
 	/**
@@ -59,14 +64,17 @@ public class Segmentation {
 	 */
 	public void debugSegmentation() {
 		fillTheSegments();
+		ImageProcessor[] debug = makeImagesOutOfSegments();
+		for(int count = 0; count < debug.length; count++) {
+			ImagePlus imgToShow = new ImagePlus("char " + (count + 1), debug[count]);
+	    	imgToShow.show();
+		}		
 	}
 	
 	/**
 	 * fills the Segments with the corresponding pixels
 	 */
-	private int[][] fillTheSegments() {
-		segmentCounter = WHITE_SEGMENT + 1;
-		
+	private void fillTheSegments() {	
 		for(int countInY = 0; countInY < imgHeight; countInY++) {
 			for(int countInX = 0; countInX < imgWidth; countInX++) {
 				if(segments[countInY][countInX] == NOT_SEGMENTED && binarisedImg.getPixel(countInX, countInY) == BLACK) {
@@ -76,9 +84,9 @@ public class Segmentation {
 			}
 		}
 		
+		finalSegmentAmount = segmentCounter - 1;
 		// DEBUG to see if the segmentation worked
-		colorTheSegments(segmentCounter - 1);
-		return segments;
+		colorTheSegments();
 	}
 
 	/**
@@ -144,18 +152,57 @@ public class Segmentation {
 	 * @return all characters as a single picture
 	 */
 	private ImageProcessor[] makeImagesOutOfSegments() {
-		// TODO: Fill with life as soon as the segmentation works properly
-		return new ImageProcessor[5];
+		ImageProcessor[] arrToReturn = new ImageProcessor[finalSegmentAmount];
+		
+		for(int countSegment = 1; countSegment <= finalSegmentAmount; countSegment++) {
+			int upperLeftX = imgWidth, upperLeftY = imgHeight;
+			int bottomRightX = 0, bottomRightY = 0;
+			
+			for(int countInY = 0; countInY < imgHeight; countInY++) {
+				for(int countInX = 0; countInX < imgWidth; countInX++) {
+					if(segments[countInY][countInX] == countSegment) {
+						if(countInX < upperLeftX) {
+							upperLeftX = countInX;
+						}
+						if(countInY < upperLeftY) {
+							upperLeftY = countInY;
+						}
+						if(countInX > bottomRightX) {
+							bottomRightX = countInX;
+						}
+						if(countInY > bottomRightY) {
+							bottomRightY = countInY;
+						}
+					}
+				}
+			}
+			
+			int charWidth = bottomRightX - upperLeftX;
+			int charHeight = bottomRightY - upperLeftY;
+			IJ.log("Segment: " + countSegment + " Width: " + charWidth + " Height: " + charHeight);
+			
+			// TODO: Scale the characters instead of doing a hard cut
+			
+			ImageProcessor tempProcessor = binarisedImg.createProcessor(CHARACTER_WIDTH, CHARACTER_HEIGHT);
+			for(int countInY = 0; countInY < CHARACTER_HEIGHT; countInY++) {
+				for(int countInX = 0; countInX < CHARACTER_WIDTH; countInX++) {
+					int pixelToPut = binarisedImg.getPixel(upperLeftX + countInX, upperLeftY + countInY);
+					tempProcessor.putPixel(countInX, countInY, pixelToPut);
+				}
+			}
+			arrToReturn[countSegment - 1] = tempProcessor;
+		}		
+		
+		return arrToReturn;
 	}
 	
 	/**
 	 * DEBUG METHOD
 	 * Colors the segments so that you can see if the segmentation functions properly
-	 * @param numberOfSegments number of (originally black) segments
 	 */
-	private void colorTheSegments(int numberOfSegments) {
-		int stepWidth = (int) ((double) (BLACK - 2) / (double) numberOfSegments);
-		// IJ.log("Segments: " + numberOfSegments + " stepWidth: " + stepWidth);
+	private void colorTheSegments() {
+		int stepWidth = (int) ((double) (BLACK - 2) / (double) finalSegmentAmount);
+		IJ.log("Segments: " + finalSegmentAmount + " stepWidth: " + stepWidth);
 		
 		for(int countInY = 0; countInY < imgHeight; countInY++) {
 			for(int countInX = 0; countInX < imgWidth; countInX++) {
