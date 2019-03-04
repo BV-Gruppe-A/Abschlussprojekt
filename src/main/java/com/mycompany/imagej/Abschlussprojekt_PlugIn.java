@@ -54,8 +54,9 @@ public class Abschlussprojekt_PlugIn extends PlugInFrame {
      * 			5 - Segmentation
      * 			6 - Classification
      * @param ip Image Processor to use the method on
+     * @param shouldChangeProcess true if the method should change the controllers image processor
      */
-    public static void chooseMethod(int chosenMethod, ImageProcessor ip) {
+    public static void chooseMethod(int chosenMethod, ImageProcessor ip, boolean shouldChangeProcess) {
     	switch(chosenMethod) {
         // Baustelle Torsten 1
         case CONTRAST:      	
@@ -69,14 +70,24 @@ public class Abschlussprojekt_PlugIn extends PlugInFrame {
         	
         case SHADING:
             ShadingFilter filt1 = new ShadingFilter();
-            window.getController().setCurrentImageProcessor(filt1.shading(ip));
+            if(shouldChangeProcess) {
+            	window.getController().setCurrentImageProcessor(filt1.shading(ip));
+            } else {
+            	ip = filt1.shading(ip);
+            }
+            
             break;
             
         //Baustelle Julian 1   
         case GRAYSCALE:
         	//RGB Bild in Grauwert Bild umwandeln
             Grayscale gray = new Grayscale();
-            window.getController().setCurrentImageProcessor(gray.Grayscale_function(ip));
+            if(shouldChangeProcess) {
+            	window.getController().setCurrentImageProcessor(gray.Grayscale_function(ip));
+            } else {
+            	ip = gray.Grayscale_function(ip);
+            }
+            
         	break;
         	
         //Baustelle Julian 2	
@@ -89,11 +100,13 @@ public class Abschlussprojekt_PlugIn extends PlugInFrame {
         	Segmentation segm = new Segmentation(ip);
         	// segm.segmentThePicture();
         	segm.debugSegmentation();
+        	
         	break;
         	
         case CLASSIFICATION:
         	Classificator classificator = new Classificator();
         	classificator.classify(null, "Kennzeichen1");
+        	
         	break;
             
         default: 

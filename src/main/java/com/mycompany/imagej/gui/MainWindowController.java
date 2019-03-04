@@ -148,15 +148,15 @@ public class MainWindowController {
 			
 			for(int orderCounter = 1; orderCounter < 4; orderCounter++) {
 				if(orderCounter == contrastNumber) {
-					Abschlussprojekt_PlugIn.chooseMethod(Abschlussprojekt_PlugIn.CONTRAST, getCurrentImageProcessor());
+					Abschlussprojekt_PlugIn.chooseMethod(Abschlussprojekt_PlugIn.CONTRAST, getCurrentImageProcessor(), true);
 				}
 				
 				if(orderCounter == grayscaleNumber) {
-					Abschlussprojekt_PlugIn.chooseMethod(Abschlussprojekt_PlugIn.GRAYSCALE, getCurrentImageProcessor());
+					Abschlussprojekt_PlugIn.chooseMethod(Abschlussprojekt_PlugIn.GRAYSCALE, getCurrentImageProcessor(), true);
 				}
 				
 				if(orderCounter == shadingNumber) {
-					Abschlussprojekt_PlugIn.chooseMethod(Abschlussprojekt_PlugIn.SHADING, getCurrentImageProcessor());
+					Abschlussprojekt_PlugIn.chooseMethod(Abschlussprojekt_PlugIn.SHADING, getCurrentImageProcessor(), true);
 				}
 			}
 		} else {
@@ -164,7 +164,7 @@ public class MainWindowController {
 				return;
 			}
 			
-			Abschlussprojekt_PlugIn.chooseMethod(methodNumber, getCurrentImageProcessor());
+			Abschlussprojekt_PlugIn.chooseMethod(methodNumber, getCurrentImageProcessor(), false);
 		}
 	}
 	
