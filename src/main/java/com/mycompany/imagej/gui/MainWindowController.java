@@ -191,13 +191,26 @@ public class MainWindowController {
 	 * checks if all the preprocessing numbers have different values
 	 * @return true if the numbers are different
 	 */
-	private boolean checkPreprocessingOrder() {		
-		if(contrastNumber == grayscaleNumber || contrastNumber == shadingNumber || shadingNumber == grayscaleNumber) {
-			IJ.error("The Preprocessing methods need to have different numbers!");
-			return false;
-		} else {
-			return true;
+	private boolean checkPreprocessingOrder() {	
+		boolean isValidOrder = true;
+		
+		if(contrastNumber == grayscaleNumber && contrastNumber != 0) {
+			isValidOrder = false;
 		}
+		
+		if(contrastNumber == shadingNumber && contrastNumber != 0) {
+			isValidOrder = false;
+		}
+		
+		if(shadingNumber == grayscaleNumber && shadingNumber != 0) {
+			isValidOrder = false;
+		}
+		
+		if(!isValidOrder) {
+			IJ.error("The Preprocessing methods need to have different numbers!");
+		}
+		
+		return isValidOrder;
 	}
 	
 	/**

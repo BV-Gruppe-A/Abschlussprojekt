@@ -17,25 +17,25 @@ public class MainWindow extends GenericDialog {
 	protected JPanel contentPanel = new JPanel(new GridBagLayout());
 	protected JLabel lblOpenText = new JLabel("Open & identify ...");
 	protected JLabel lblMethod = new JLabel("Method: ");
-	protected JLabel lblContrast = new JLabel("Contrast Adjustment: ");
-	protected JLabel lblGrayscale = new JLabel("Grayscale: ");
-	protected JLabel lblShading = new JLabel("Shading Filter: ");
+	protected JLabel lblContrast = new JLabel("Contrast Adjustment (0 to ignore): ");
+	protected JLabel lblGrayscale = new JLabel("Grayscale (0 to ignore): ");
+	protected JLabel lblShading = new JLabel("Shading Filter (0 to ignore): ");
 	protected JLabel lblExcelFile = new JLabel("Save Excel-File to: ");
 	protected JRadioButton rbOneImage = new JRadioButton("... 1 Image");
 	protected JRadioButton rbMoreImages = new JRadioButton("... more than 1 image");
 	protected JRadioButton rbPreprocessing = new JRadioButton("Test order for Preprocessing");
 	protected JRadioButton rbCertainMethod = new JRadioButton("Test one specific method");
 	protected JTextField txtOpenLocation = new JTextField("File Location");
-	protected JTextField txtMethodNumber = new JTextField("Number");
 	protected JTextField txtSaveLocation = new JTextField("Not Implemented yet...");
-	protected JTextField txtContrastNumber = new JTextField("0 to ignore");
-	protected JTextField txtGrayscaleNumber = new JTextField("0 to ignore");
-	protected JTextField txtShadingNumber = new JTextField("0 to ignore");
+	protected JTextField txtMethodNumber = new JTextField("");
+	protected JTextField txtContrastNumber = new JTextField("");
+	protected JTextField txtGrayscaleNumber = new JTextField("");
+	protected JTextField txtShadingNumber = new JTextField("");
 	protected JButton btnOpenFile = new JButton("Choose Image");
 	protected JButton btnSaveFile = new JButton("Choose Location");
 	protected JButton btnStartProcess = new JButton("Start");
 	
-	// local variables
+	// local variables & objects
 	private int currentY = 0;
 	private GridBagConstraints constraints = new GridBagConstraints();
 	private MainWindowController controller;
@@ -51,6 +51,9 @@ public class MainWindow extends GenericDialog {
 		GUI.center(this);
 	}
 	
+	/**
+	 * @return connected MainWindowController of this object
+	 */
 	public MainWindowController getController() {
 		return controller;
 	}
@@ -97,7 +100,7 @@ public class MainWindow extends GenericDialog {
 		contentPanel.add(rbPreprocessing, constraints);
 		setConstraints(1, currentY++, 1, 0.5);
 		contentPanel.add(rbCertainMethod, constraints);
-		
+				
 		setConstraints(0, currentY, 1, 0.8);
 		contentPanel.add(lblContrast, constraints);
 		setConstraints(1, currentY++, 1, 0.2);
@@ -128,6 +131,9 @@ public class MainWindow extends GenericDialog {
 		
 		setConstraints(1, currentY++, 1, 0.2);
 		contentPanel.add(btnSaveFile, constraints);
+		btnSaveFile.addActionListener((e) -> {
+			controller.openFileChooserForSaving();
+		});		
 		
 		// Start Button
 		setConstraints(1, currentY++, 1, 0.0);
@@ -151,5 +157,6 @@ public class MainWindow extends GenericDialog {
 		constraints.gridy = yPos;
 		constraints.gridwidth = width;
 		constraints.weightx = weightInX;
+		constraints.fill = GridBagConstraints.HORIZONTAL;
 	}
 }
