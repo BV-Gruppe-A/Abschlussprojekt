@@ -153,6 +153,7 @@ public class Segmentation {
 	 */
 	private ImageProcessor[] makeImagesOutOfSegments() {
 		ImageProcessor[] arrToReturn = new ImageProcessor[finalSegmentAmount];
+		int currentArrayPos = 0;
 		
 		for(int countSegment = 1; countSegment <= finalSegmentAmount; countSegment++) {
 			int upperLeftX = imgWidth, upperLeftY = imgHeight;
@@ -177,24 +178,50 @@ public class Segmentation {
 				}
 			}
 			
-			int charWidth = bottomRightX - upperLeftX;
-			int charHeight = bottomRightY - upperLeftY;
-			IJ.log("Segment: " + countSegment + " Width: " + charWidth + " Height: " + charHeight);
+			int charWidth = bottomRightX > upperLeftX ? bottomRightX - upperLeftX : upperLeftX - bottomRightX;
+			int charHeight = bottomRightY > upperLeftY ? bottomRightY - upperLeftY : upperLeftY - bottomRightY;
+			// IJ.log("Segment: " + countSegment + " Width: " + charWidth + " Height: " + charHeight);
 			
-			// TODO: Scale the characters instead of doing a hard cut
-			
-			ImageProcessor tempProcessor = binarisedImg.createProcessor(CHARACTER_WIDTH, CHARACTER_HEIGHT);
-			for(int countInY = 0; countInY < CHARACTER_HEIGHT; countInY++) {
-				for(int countInX = 0; countInX < CHARACTER_WIDTH; countInX++) {
-					int pixelToPut = binarisedImg.getPixel(upperLeftX + countInX, upperLeftY + countInY);
-					tempProcessor.putPixel(countInX, countInY, pixelToPut);
+			// if the segment is only one pixel, the resizing would not work
+			if(charWidth != 0 && charHeight != 0) {
+				ImageProcessor tempProcessor = binarisedImg.createProcessor(charWidth, charHeight);
+				for(int countInY = 0; countInY < charHeight; countInY++) {
+					for(int countInX = 0; countInX < charWidth; countInX++) {
+						int pixelToPut = binarisedImg.getPixel(upperLeftX + countInX, upperLeftY + countInY);
+						tempProcessor.putPixel(countInX, countInY, pixelToPut);
+					}
 				}
-			}
-			arrToReturn[countSegment - 1] = tempProcessor;
+				
+				arrToReturn[currentArrayPos] = tempProcessor.resize(CHARACTER_WIDTH, CHARACTER_HEIGHT);
+				currentArrayPos++;
+			}			
 		}		
 		
-		return arrToReturn;
+		return cleanUpImageArray(arrToReturn);
 	}
+	
+	/**
+	 * shortens the array so that only full image processors are used
+	 * @param arrayToClean array which needs to be cleaned
+	 * @return the cleaned-up array
+	 */
+	private ImageProcessor[] cleanUpImageArray(ImageProcessor[] arrToClean) {
+		int countFilledImages = 0;
+		for(int count = 0; count < arrToClean.length; count++) {
+			if(arrToClean[count] != null) {
+				countFilledImages++;
+			}
+		}
+		
+		ImageProcessor[] arrToReturn = new ImageProcessor[countFilledImages];
+		for(int count = 0, countReturn = 0; count < arrToClean.length; count++) {
+			if(arrToClean[count] != null) {
+				arrToReturn[countReturn++] = arrToClean[count];
+			}
+		}
+		
+		return arrToReturn;
+ 	}
 	
 	/**
 	 * DEBUG METHOD
@@ -212,7 +239,6 @@ public class Segmentation {
 					binarisedImg.putPixel(countInX, countInY, newPixel);
 				}				
 			}
-		}
-		
+		}		
 	}
 }
