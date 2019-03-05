@@ -109,8 +109,11 @@ public class Abschlussprojekt_PlugIn extends PlugInFrame {
         	break;
         	
         case CLASSIFICATION:
+        	Segmentation segm1 = new Segmentation(ip);
+        	//ImageProcessor[] image = new ImageProcessor[1];
+        	//image[0] = ip;
         	Classificator classificator = new Classificator();
-        	classificator.classify(null, "Kennzeichen1");
+        	classificator.classify(segm1.segmentThePicture(), "Kennzeichen1");
         	
         	break;
             

@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
 
+import ij.IJ;
 import ij.ImagePlus;
 import ij.process.ImageProcessor;
 
@@ -72,6 +73,7 @@ public class Classificator {
 		double val;
 		for ( Map.Entry<String, ImageProcessor> template : templates.entrySet()) {
 			val = templateMatch(template.getValue(), character);
+			IJ.log(template.getKey() + ": " + val);
 			if(val > maxVal) {
 				maxVal = val;
 				s = template.getKey();
@@ -100,33 +102,34 @@ public class Classificator {
 		for (int j = 0; j < J; j++) {
 			for(int k = 0; k < K; k++) {
 				//calculate numerator
-				numerator += (template.getPixel(j, k) - templateMean) * (sample.getPixel(j / 2, k / 2) - sampleMean);
+				numerator += ((double)template.getPixel(j, k) - templateMean) * ((double)sample.getPixel(j , k) - sampleMean);
 				
 				//calculate denominator1
-				denominator1 += Math.pow(template.getPixel(j, k) - templateMean, 2);
+				denominator1 += Math.pow((double)template.getPixel(j, k) - templateMean, 2);
 				
 				//calculate denominator2
-				denominator2 += Math.pow(sample.getPixel(j , k) - sampleMean,2);
+				denominator2 += Math.pow((double)sample.getPixel(j , k) - sampleMean,2);
 			}
 		}
 		denominator1 = Math.sqrt(denominator1);
 		denominator2 = Math.sqrt(denominator2);
 		
-		return numerator / (denominator1 * denominator2);
+		return numerator / (denominator1 * denominator2) * 100;
 	}
 
 
 	private double calcMean(ImageProcessor img) {
-		double mean = 0;
+		double mean = 0.0;
 		int J = img.getWidth();
-		int K = img.getHeight();
-		
+		int K = img.getHeight(); 
 		for (int j = 0; j < J; j++) {
 			for(int k = 0; k < K; k++) {
 				mean += img.getPixel(j, k);
+				IJ.log("mean: " + mean);
 			}
 		}
-		mean = mean / (J * K);
+		mean = mean / (double) img.getPixelCount();
+		
 		return mean;
 	}
 
