@@ -56,7 +56,7 @@ public class ImageFileFilter extends FileFilter {
 	 * @return true if the file is an image
 	 */
 	private boolean checkForImageExtension(String extension) {
-		if(extension.equals("jpg") || extension.equals("jpeg") || extension.equals("png") || extension.equals("tif") || extension.equals("tiff")) {
+		if(extension.equals("jpg") || extension.equals("jpeg") || extension.equals("png") || extension.equals("tif") || extension.equals("tiff") || extension.equals("bmp")) {
 			return true;
 		} else {
 			return false;
