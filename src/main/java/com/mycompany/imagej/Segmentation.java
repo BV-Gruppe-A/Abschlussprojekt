@@ -74,7 +74,12 @@ public class Segmentation {
 	/**
 	 * fills the Segments with the corresponding pixels
 	 */
-	private void fillTheSegments() {	
+	private void fillTheSegments() {
+		if(!binarisedImg.isBinary()) {     	
+        	IJ.log("ImageProcessor is not binary!");
+        	return;
+		}
+		
 		for(int countInY = 0; countInY < imgHeight; countInY++) {
 			for(int countInX = 0; countInX < imgWidth; countInX++) {
 				if(segments[countInY][countInX] == NOT_SEGMENTED && binarisedImg.getPixel(countInX, countInY) == BLACK) {
