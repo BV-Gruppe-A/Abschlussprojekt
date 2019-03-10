@@ -13,7 +13,7 @@ import ij.process.ImageProcessor;
 public class MainWindowController {
 	// local objects
 	private MainWindow windowToControl;
-	private File imgToOpen;
+	private File imgOrFolderToOpen;
 	private File placeToSave;
 	
 	// local variables
@@ -22,6 +22,7 @@ public class MainWindowController {
 	private int shadingNumber;
 	private int methodNumber;	
 	private boolean isPreprocessing = true;
+	private boolean isOneFile = true;
 
 	// local objects
 	private ImageProcessor currentImage;
@@ -38,17 +39,26 @@ public class MainWindowController {
 	 * decides, if a single or more than one file should be chosen
 	 */
 	public void decideWhichFileChooser() {
-		if(windowToControl.rbOneImage.isSelected()) {
+		isOneFile = windowToControl.rbOneImage.isSelected();
+		
+		if(isOneFile) {
 			openFileChooserLoadingSingleImage();
 		} else {
 			openFileChooserLoadingImages();
 		}
 	}
 	
+	/**
+	 * @return the current Image as an Image Processor
+	 */
 	public ImageProcessor getCurrentImageProcessor() {
 		return currentImage;
 	}
 	
+	/**
+	 * sets the current Image Processor to the given one
+	 * @param imageToSet new Image Processor to set
+	 */
 	public void setCurrentImageProcessor(ImageProcessor imageToSet) {
 		currentImage = imageToSet;
 	}
@@ -62,9 +72,9 @@ public class MainWindowController {
 		
         int returnVal = fcOpen.showOpenDialog(windowToControl.btnOpenFile);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-        	imgToOpen = fcOpen.getSelectedFile();
-        	windowToControl.txtOpenLocation.setText(imgToOpen.getName());
-        	ImagePlus imgAsPlus = new ImagePlus(imgToOpen.getAbsolutePath());
+        	imgOrFolderToOpen = fcOpen.getSelectedFile();
+        	windowToControl.txtOpenLocation.setText(imgOrFolderToOpen.getName());
+        	ImagePlus imgAsPlus = new ImagePlus(imgOrFolderToOpen.getAbsolutePath());
         	setCurrentImageProcessor(imgAsPlus.getProcessor());
         }
 	}
@@ -73,25 +83,28 @@ public class MainWindowController {
 	 * opens a file chooser for a whole folder
 	 */
 	private void openFileChooserLoadingImages() {
-		IJ.error("More than one file is currently not implemented!");
-		
-		// TODO: Add this file chooser
-		/*
 		JFileChooser fcOpen = new JFileChooser();
-		fcOpen.setFileFilter(new ImageFileFilter());
+		fcOpen.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		
         int returnVal = fcOpen.showOpenDialog(windowToControl.btnOpenFile);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-        	imgToOpen = fcOpen.getSelectedFile();
+        	imgOrFolderToOpen = fcOpen.getSelectedFile();    
+        	// TODO: Open all images in this Folder
         }
-        */
 	}
 		
 	/**
 	 * Opens the file chooser to choose a location for the excel file
 	 */
 	public void openFileChooserForSaving() {
-		// TODO: Add this file chooser
+		JFileChooser fcSave = new JFileChooser();
+		
+		int returnVal = fcSave.showSaveDialog(windowToControl.btnSaveFile);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+        	placeToSave = fcSave.getSelectedFile();
+        	windowToControl.txtSaveLocation.setText(placeToSave.getName());
+        	// TODO: give the file location to the classifier
+        }
 	}
 	
 	/**
@@ -129,13 +142,13 @@ public class MainWindowController {
 	public void reactToStartButton() {
 		isPreprocessing = windowToControl.rbPreprocessing.isSelected();
 		
-		if(imgToOpen == null || !imgToOpen.exists()) {
+		if(imgOrFolderToOpen == null || !imgOrFolderToOpen.exists()) {
 			IJ.error("No existing image to open was chosen");
 			return;
 		}
 		
 		/*
-		if(placeToSave == null || !placeToSave.exists()) {
+		if(placeToSave == null) {
 			IJ.error("No existing place to save was chosen");
 			return;
 		}

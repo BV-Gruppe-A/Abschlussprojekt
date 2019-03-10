@@ -25,8 +25,8 @@ public class MainWindow extends GenericDialog {
 	protected JRadioButton rbMoreImages = new JRadioButton("... more than 1 image");
 	protected JRadioButton rbPreprocessing = new JRadioButton("Test order for Preprocessing");
 	protected JRadioButton rbCertainMethod = new JRadioButton("Test one specific method");
-	protected JTextField txtOpenLocation = new JTextField("File Location");
-	protected JTextField txtSaveLocation = new JTextField("Not Implemented yet...");
+	protected JTextField txtOpenLocation = new JTextField("Imagefile Location");
+	protected JTextField txtSaveLocation = new JTextField("CSV File Location");
 	protected JTextField txtMethodNumber = new JTextField("");
 	protected JTextField txtContrastNumber = new JTextField("");
 	protected JTextField txtGrayscaleNumber = new JTextField("");
@@ -150,7 +150,7 @@ public class MainWindow extends GenericDialog {
 	 * @param xPos current column
 	 * @param yPos current row
 	 * @param width how many columns the element should span
-	 * @param weightInX wight in X direction
+	 * @param weightInX weight in X direction
 	 */
 	private void setConstraints(int xPos, int yPos, int width, double weightInX) {
 		constraints.gridx = xPos;
