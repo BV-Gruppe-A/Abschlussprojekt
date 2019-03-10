@@ -3,6 +3,8 @@ package com.mycompany.imagej.gui;
 import java.io.File;
 import javax.swing.JFileChooser;
 import com.mycompany.imagej.Abschlussprojekt_PlugIn;
+import com.mycompany.imagej.gui.filefilters.ImgFilterDirectoryLoop;
+import com.mycompany.imagej.gui.filefilters.ImgFilterFileChooser;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.process.ImageProcessor;
@@ -68,12 +70,12 @@ public class MainWindowController {
 	 */
 	private void openFileChooserLoadingSingleImage() {
 		JFileChooser fcOpen = new JFileChooser();
-		fcOpen.setFileFilter(new ImageFileFilter());
+		fcOpen.setFileFilter(new ImgFilterFileChooser());
 		
         int returnVal = fcOpen.showOpenDialog(windowToControl.btnOpenFile);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
         	imgOrFolderToOpen = fcOpen.getSelectedFile();
-        	windowToControl.txtOpenLocation.setText(imgOrFolderToOpen.getName());
+        	windowToControl.txtOpenLocation.setText(imgOrFolderToOpen.getPath());
         	ImagePlus imgAsPlus = new ImagePlus(imgOrFolderToOpen.getAbsolutePath());
         	setCurrentImageProcessor(imgAsPlus.getProcessor());
         }
@@ -88,8 +90,8 @@ public class MainWindowController {
 		
         int returnVal = fcOpen.showOpenDialog(windowToControl.btnOpenFile);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-        	imgOrFolderToOpen = fcOpen.getSelectedFile();    
-        	// TODO: Open all images in this Folder
+        	imgOrFolderToOpen = fcOpen.getSelectedFile();   
+        	windowToControl.txtOpenLocation.setText(imgOrFolderToOpen.getPath());
         }
 	}
 		
@@ -102,7 +104,7 @@ public class MainWindowController {
 		int returnVal = fcSave.showSaveDialog(windowToControl.btnSaveFile);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
         	placeToSave = fcSave.getSelectedFile();
-        	windowToControl.txtSaveLocation.setText(placeToSave.getName());
+        	windowToControl.txtSaveLocation.setText(placeToSave.getPath());
         	// TODO: give the file location to the classifier
         }
 	}
@@ -142,7 +144,7 @@ public class MainWindowController {
 	public void reactToStartButton() {
 		isPreprocessing = windowToControl.rbPreprocessing.isSelected();
 		
-		if(imgOrFolderToOpen == null || !imgOrFolderToOpen.exists()) {
+		if(imgOrFolderToOpen == null || !imgOrFolderToOpen.exists() && !imgOrFolderToOpen.isDirectory()) {
 			IJ.error("No existing image to open was chosen");
 			return;
 		}
@@ -154,6 +156,21 @@ public class MainWindowController {
 		}
 		*/
 		
+		if(isOneFile) {
+			startProcessForOneImage();
+		} else {
+			for(File currentImage : imgOrFolderToOpen.listFiles(new ImgFilterDirectoryLoop())) {
+				ImagePlus imgAsPlus = new ImagePlus(currentImage.getAbsolutePath());
+	        	setCurrentImageProcessor(imgAsPlus.getProcessor());
+	        	startProcessForOneImage();
+			}
+		}		
+	}
+	
+	/**
+	 * starts a chosen process for one specific image
+	 */
+	private void startProcessForOneImage() {
 		if(isPreprocessing) {
 			if(!setPreprocessingNumbers() || !checkIfPreproccessingValid() || !checkPreprocessingOrder()) {
 				return;
