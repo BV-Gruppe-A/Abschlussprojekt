@@ -102,14 +102,16 @@ public class Abschlussprojekt_PlugIn extends PlugInFrame {
         	
         case SEGMENTATION:
         	// DEBUG - only usable with a binarised input image!
-        	Segmentation segm = new Segmentation(ip);
+        	Segmentation segm = new Segmentation();
+        	segm.changeImage(ip);
         	// segm.segmentThePicture();
         	segm.debugSegmentation();
         	
         	break;
         	
         case CLASSIFICATION:
-        	Segmentation segm1 = new Segmentation(ip);
+        	Segmentation segm1 = new Segmentation();
+        	segm1.changeImage(ip);
         	//ImageProcessor[] image = new ImageProcessor[1];
         	//image[0] = ip;
         	Classificator classificator = new Classificator();

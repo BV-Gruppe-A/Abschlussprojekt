@@ -5,6 +5,8 @@ import javax.swing.filechooser.FileFilter;
 
 /**
  * Filters the shown images in the file chooser
+ * based on this class from the Oracle Java Tutorials
+ * https://docs.oracle.com/javase/tutorial/uiswing/examples/components/FileChooserDemo2Project/src/components/ImageFilter.java
  */
 public class ImageFileFilter extends FileFilter {
 	/**

@@ -30,14 +30,6 @@ public class Segmentation {
 	private int[][] segments;
 	
 	/**
-	 * Constructor which sets the first picture to work with
-	 * @param image first picture to work on
-	 */
-	public Segmentation(ImageProcessor image) {
-		changeImage(image);
-	}
-	
-	/**
 	 * changes the images which is currently worked on
 	 * @param newImage new Image to work on
 	 */
