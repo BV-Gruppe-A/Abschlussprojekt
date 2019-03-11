@@ -83,7 +83,7 @@ public class Segmentation {
 		
 		finalSegmentAmount = segmentCounter - 1;
 		// DEBUG to see if the segmentation worked
-		colorTheSegments();
+		//colorTheSegments();
 	}
 
 	/**

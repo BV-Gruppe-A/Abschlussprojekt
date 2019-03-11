@@ -39,8 +39,11 @@ public class Classificator {
 		ImagePlus i;
 		for (final File fileEntry : folder.listFiles()) {
 	        i = new ImagePlus(fileEntry.getPath());
-	        templates.put(fileEntry.getName(), i.getProcessor());
+	        templates.put(fileEntry.getName().replaceFirst("[.][^.]+$", ""), i.getProcessor().convertToByte(false));
 	    }
+		for ( Map.Entry<String, ImageProcessor> template : templates.entrySet()) {
+			template.getValue().invert();
+		}
 	}
 
 	
@@ -122,13 +125,15 @@ public class Classificator {
 		double mean = 0.0;
 		int J = img.getWidth();
 		int K = img.getHeight(); 
+		IJ.log(K + "," + J);
+		double N = (double) J * K;
 		for (int j = 0; j < J; j++) {
 			for(int k = 0; k < K; k++) {
-				mean += img.getPixel(j, k);
-				IJ.log("mean: " + mean);
+				mean += img.getPixel(j, k) / N;
+				
 			}
 		}
-		mean = mean / (double) img.getPixelCount();
+		//mean = mean / (double) img.getPixelCount();
 		
 		return mean;
 	}
