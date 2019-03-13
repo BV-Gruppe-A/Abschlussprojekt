@@ -12,13 +12,19 @@ public class Segmentation {
 	// constant values
 	private final int BLACK = 255;
 	private final int WHITE = 0;
-	
+
+	private final int SEGMENTS_START_AMOUNT = 0;	
 	private final int NOT_SEGMENTED = -2;
 	private final int IDENTIFIED = -1;
-	private final int WHITE_SEGMENT = 0;
 	
-	private final int CHARACTER_HEIGHT = 38;
-	private final int CHARACTER_WIDTH = 25;
+	private final double THRESHOLD = 0.2;	
+	private final int OPT_CHAR_HEIGHT = 38;
+	private final int MAX_CHAR_HEIGHT = OPT_CHAR_HEIGHT + (int) Math.round(OPT_CHAR_HEIGHT * THRESHOLD);
+	private final int MIN_CHAR_HEIGHT = OPT_CHAR_HEIGHT - (int) Math.round(OPT_CHAR_HEIGHT * THRESHOLD);
+	
+	private final int OPT_CHAR_WIDTH = 25;
+	private final int MAX_CHAR_WIDTH = OPT_CHAR_WIDTH + (int) Math.round(OPT_CHAR_WIDTH * THRESHOLD);
+	private final int MIN_CHAR_WIDTH = OPT_CHAR_WIDTH - (int) Math.round(OPT_CHAR_WIDTH * THRESHOLD);
 	
 	// local variables
 	private ImageProcessor binarisedImg;
@@ -30,7 +36,7 @@ public class Segmentation {
 	private int[][] segments;
 	
 	/**
-	 * changes the images which is currently worked on
+	 * changes the image which is currently worked on
 	 * @param newImage new Image to work on
 	 */
 	public void changeImage(ImageProcessor newImage) {
@@ -39,12 +45,12 @@ public class Segmentation {
 		imgWidth = newImage.getWidth();
 		segments = new int[imgHeight][imgWidth];
 		fillSegmentsArrayWithDefault(imgHeight);
-		segmentCounter = WHITE_SEGMENT + 1;
+		segmentCounter = SEGMENTS_START_AMOUNT;
 	}
 	
 	/**
 	 * segments the given picture
-	 * @return each character as a single image
+	 * @return each character as a single image processor
 	 */
 	public ImageProcessor[] segmentThePicture() {	
 		fillTheSegments();
@@ -69,21 +75,20 @@ public class Segmentation {
 	private void fillTheSegments() {
 		if(!binarisedImg.isBinary()) {     	
         	IJ.log("ImageProcessor is not binary!");
+			// TODO: Maybe throw an exception? Or Delete but not just logging
         	return;
 		}
-		
+				
 		for(int countInY = 0; countInY < imgHeight; countInY++) {
 			for(int countInX = 0; countInX < imgWidth; countInX++) {
 				if(segments[countInY][countInX] == NOT_SEGMENTED && binarisedImg.getPixel(countInX, countInY) == BLACK) {
-					identifyAWholeSegment(countInX, countInY);
+					identifyWholeSegment(countInX, countInY);
 					sortPixelsIntoSegments(segmentCounter++);
 				}
 			}
 		}
 		
 		finalSegmentAmount = segmentCounter - 1;
-		// DEBUG to see if the segmentation worked
-		//colorTheSegments();
 	}
 
 	/**
@@ -91,30 +96,30 @@ public class Segmentation {
 	 * @param startX x-Coordinate of the starting pixel
 	 * @param startY y-Coordinate of the starting pixel
 	 */
-	private void identifyAWholeSegment(int startX, int startY) {
+	private void identifyWholeSegment(int startX, int startY) {
 		segments[startY][startX] = IDENTIFIED;
 		
 		if (startY - 1 >= 0) {
 			if(binarisedImg.getPixel(startX, startY - 1) == BLACK && segments[startY - 1][startX] != IDENTIFIED) {
-				identifyAWholeSegment(startX, startY - 1);
+				identifyWholeSegment(startX, startY - 1);
 			}
 		}
 		
 		if (startX - 1 >= 0) {
 			if(binarisedImg.getPixel(startX - 1, startY) == BLACK && segments[startY][startX - 1] != IDENTIFIED) {
-				identifyAWholeSegment(startX - 1, startY);
+				identifyWholeSegment(startX - 1, startY);
 			}
 		}
 		
 		if (startY + 1 < imgHeight) {
 			if(binarisedImg.getPixel(startX, startY + 1) == BLACK && segments[startY + 1][startX] != IDENTIFIED) {
-				identifyAWholeSegment(startX, startY + 1);
+				identifyWholeSegment(startX, startY + 1);
 			}
 		}
 		
 		if (startX + 1 < imgWidth) {
 			if(binarisedImg.getPixel(startX + 1, startY) == BLACK && segments[startY][startX + 1] != IDENTIFIED) {
-				identifyAWholeSegment(startX + 1, startY);
+				identifyWholeSegment(startX + 1, startY);
 			}
 		}
 	}	
@@ -146,61 +151,89 @@ public class Segmentation {
 	
 	/**
 	 * takes a single picture and slices it up into different segments, each representing a single character
-	 * @return all characters as a single picture
+	 * @return all characters as a single image processor
 	 */
 	private ImageProcessor[] makeImagesOutOfSegments() {
 		ImageProcessor[] arrToReturn = new ImageProcessor[finalSegmentAmount];
 		int currentArrayPos = 0;
 		
-		for(int countSegment = 1; countSegment <= finalSegmentAmount; countSegment++) {
-			int upperLeftX = imgWidth, upperLeftY = imgHeight;
-			int bottomRightX = 0, bottomRightY = 0;
+		for(int countSegment = SEGMENTS_START_AMOUNT; countSegment < finalSegmentAmount; countSegment++) {
+			int leftBorder = imgWidth, upperBorder = imgHeight;
+			int rightBorder = 0, bottomBorder = 0;
 			
 			for(int countInY = 0; countInY < imgHeight; countInY++) {
 				for(int countInX = 0; countInX < imgWidth; countInX++) {
 					if(segments[countInY][countInX] == countSegment) {
-						if(countInX < upperLeftX) {
-							upperLeftX = countInX;
+						if(countInX < leftBorder) {
+							leftBorder = countInX;
 						}
-						if(countInY < upperLeftY) {
-							upperLeftY = countInY;
+						if(countInY < upperBorder) {
+							upperBorder = countInY;
 						}
-						if(countInX > bottomRightX) {
-							bottomRightX = countInX;
+						if(countInX > rightBorder) {
+							rightBorder = countInX;
 						}
-						if(countInY > bottomRightY) {
-							bottomRightY = countInY;
+						if(countInY > bottomBorder) {
+							bottomBorder = countInY;
 						}
 					}
 				}
 			}
 			
-			int charWidth = bottomRightX > upperLeftX ? bottomRightX - upperLeftX : upperLeftX - bottomRightX;
-			int charHeight = bottomRightY > upperLeftY ? bottomRightY - upperLeftY : upperLeftY - bottomRightY;
-			// IJ.log("Segment: " + countSegment + " Width: " + charWidth + " Height: " + charHeight);
+			int charWidth = rightBorder - leftBorder;
+			int charHeight = bottomBorder - upperBorder;
 			
-			// if the segment is only one pixel, the resizing would not work
-			if(charWidth != 0 && charHeight != 0) {
-				ImageProcessor tempProcessor = binarisedImg.createProcessor(charWidth, charHeight);
-				for(int countInY = 0; countInY < charHeight; countInY++) {
-					for(int countInX = 0; countInX < charWidth; countInX++) {
-						int pixelToPut = binarisedImg.getPixel(upperLeftX + countInX, upperLeftY + countInY);
-						tempProcessor.putPixel(countInX, countInY, pixelToPut);
+			if(checkIfInvalidCharacter(charWidth, charHeight)) {
+				continue;
+			}
+			
+			// check if there is a black pixel above the current segment (probably from ö, ä or ü)
+			for(int countInY = 0; countInY < upperBorder; countInY++) {
+				for(int countInX = 0; countInX < charWidth; countInX++) {
+					if(binarisedImg.getPixel(leftBorder + countInX, countInY) == BLACK) {
+						upperBorder = countInY;
+						charHeight = bottomBorder - upperBorder;
 					}
 				}
-				
-				arrToReturn[currentArrayPos] = tempProcessor.resize(CHARACTER_WIDTH, CHARACTER_HEIGHT);
-				currentArrayPos++;
-			}			
+			}
+			
+			ImageProcessor tempProcessor = binarisedImg.createProcessor(charWidth, charHeight);
+			for(int countInY = 0; countInY < charHeight; countInY++) {
+				for(int countInX = 0; countInX < charWidth; countInX++) {
+					int pixelToPut = binarisedImg.getPixel(leftBorder + countInX, upperBorder + countInY);
+					tempProcessor.putPixel(countInX, countInY, pixelToPut);
+				}
+			}
+			
+			arrToReturn[currentArrayPos] = tempProcessor.resize(OPT_CHAR_WIDTH, OPT_CHAR_HEIGHT);
+			currentArrayPos++;		
 		}		
 		
 		return cleanUpImageArray(arrToReturn);
 	}
 	
 	/**
+	 * checks if a segment has a size which could be a character
+	 * @param width width of the segment
+	 * @param height height of the segment
+	 * @return true if the segment is not a valid possibility for a character
+	 */
+	private boolean checkIfInvalidCharacter(int width, int height) {
+		if(width > MAX_CHAR_WIDTH || height > MAX_CHAR_HEIGHT) {
+			return true;
+		}
+		
+		if(width < MIN_CHAR_WIDTH || height < MIN_CHAR_HEIGHT) {
+			return true;
+		}
+		
+		return false;
+	}
+	
+	/**
 	 * shortens the array so that only full image processors are used
 	 * @param arrayToClean array which needs to be cleaned
-	 * @return the cleaned-up array
+	 * @return a new, cleaned-up array
 	 */
 	private ImageProcessor[] cleanUpImageArray(ImageProcessor[] arrToClean) {
 		int countFilledImages = 0;
@@ -209,33 +242,7 @@ public class Segmentation {
 				countFilledImages++;
 			}
 		}
-		
-		ImageProcessor[] arrToReturn = new ImageProcessor[countFilledImages];
-		for(int count = 0, countReturn = 0; count < arrToClean.length; count++) {
-			if(arrToClean[count] != null) {
-				arrToReturn[countReturn++] = arrToClean[count];
-			}
-		}
-		
-		return arrToReturn;
- 	}
 	
-	/**
-	 * DEBUG METHOD
-	 * Colors the segments so that you can see if the segmentation functions properly
-	 */
-	private void colorTheSegments() {
-		int stepWidth = (int) ((double) (BLACK - 2) / (double) finalSegmentAmount);
-		IJ.log("Segments: " + finalSegmentAmount + " stepWidth: " + stepWidth);
-		
-		for(int countInY = 0; countInY < imgHeight; countInY++) {
-			for(int countInX = 0; countInX < imgWidth; countInX++) {
-				if(segments[countInY][countInX] != WHITE_SEGMENT) {
-					int currentSegment = segments[countInY][countInX];
-					int newPixel = WHITE + (currentSegment * stepWidth);
-					binarisedImg.putPixel(countInX, countInY, newPixel);
-				}				
-			}
-		}		
-	}
+		return Arrays.copyOf(arrToClean, countFilledImages);
+ 	}
 }

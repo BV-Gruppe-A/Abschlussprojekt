@@ -25,6 +25,7 @@ public class Abschlussprojekt_PlugIn extends PlugInFrame {
 	public static final int NO4 = 4;
 	public static final int SEGMENTATION = 5;
 	public static final int CLASSIFICATION = 6;
+	public static final int EVERYTHING = 7;
 	
 	// local objects
 	private static MainWindow window = new MainWindow(PLUGIN_NAME);;
@@ -119,26 +120,18 @@ public class Abschlussprojekt_PlugIn extends PlugInFrame {
         	
         	break;
             
-        case 7:
+        case EVERYTHING:
         	//RGB Bild in Grauwert Bild umwandeln
             Grayscale gray1 = new Grayscale();
-            if(shouldChangeProcess) {
-            	window.getController().setCurrentImageProcessor(gray1.Grayscale_function(ip));
-            } else {
-            	ip = gray1.Grayscale_function(ip);
-            }
-         // Hard border for contrast adjustment
+            ip = gray1.Grayscale_function(ip);
+            // Hard border for contrast adjustment
         	int PercentageBlack1 = 5;
         	int PercentageWhite1 = 5;
         	
         	ContrastAdjustment cont1 = new ContrastAdjustment();
         	cont1.Contrast(ip, PercentageWhite1, PercentageBlack1);
         	ShadingFilter filt = new ShadingFilter();
-            if(shouldChangeProcess) {
-            	window.getController().setCurrentImageProcessor(filt.shading(ip));
-            } else {
-            	ip = filt.shading(ip);
-            }
+        	ip = filt.shading(ip);
             
         	int BinarizationWhite1 = 65;
         	
@@ -149,8 +142,7 @@ public class Abschlussprojekt_PlugIn extends PlugInFrame {
         	//ImageProcessor[] image = new ImageProcessor[1];
         	//image[0] = ip;
         	Classificator classificator1 = new Classificator();
-        	classificator1.classify(segm11.segmentThePicture(), "Kennzeichen1");
-        	
+        	classificator1.classify(segm11.segmentThePicture(), "Kennzeichen1");        	
             
         	break;
         	
