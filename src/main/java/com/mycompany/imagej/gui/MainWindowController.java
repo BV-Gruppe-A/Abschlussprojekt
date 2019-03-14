@@ -54,7 +54,7 @@ public class MainWindowController {
 	 * @return the current Image as an Image Processor
 	 */
 	public ImageProcessor getCurrentImageProcessor() {
-		return currentImage;
+		return currentImage.resize(295);
 	}
 	
 	/**

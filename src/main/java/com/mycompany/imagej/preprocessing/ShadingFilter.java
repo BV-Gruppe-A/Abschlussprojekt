@@ -34,8 +34,8 @@ public class ShadingFilter {
 				back.putPixel(u, v, region[region.length-1]);
 			}
 		}
-		ImagePlus imgToShow = new ImagePlus("Background", back);
-    	imgToShow.show();
+		ImagePlus img = new ImagePlus("shading",back);
+		img.show();
     	//Weight pixels with background / lighting values
 		for (int u = 0; u < M; u++) {
 			for (int v = 0; v < N; v++) {
@@ -43,10 +43,10 @@ public class ShadingFilter {
 				//Christian Demant, Bernd Streicher-Abel, Axel Springhoff
 				//Springer-Verlag, 03.01.2011
 				back.putPixel(u, v, (int)(255*((float)ip.getPixel(u,v))/((float)back.getPixel(u,v))));
+				
 			}
 		}
-		ImagePlus imgToShow2 = new ImagePlus("ShadingResult", back);
-    	imgToShow2.show();
+		
 		return back;
 	}
 }

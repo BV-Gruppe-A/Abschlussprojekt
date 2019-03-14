@@ -41,9 +41,9 @@ public class Classificator {
 	        i = new ImagePlus(fileEntry.getPath());
 	        templates.put(fileEntry.getName().replaceFirst("[.][^.]+$", ""), i.getProcessor().convertToByte(false));
 	    }
-		for ( Map.Entry<String, ImageProcessor> template : templates.entrySet()) {
+		/*for ( Map.Entry<String, ImageProcessor> template : templates.entrySet()) {
 			template.getValue().invert();
-		}
+		}*/
 	}
 
 	
@@ -76,7 +76,7 @@ public class Classificator {
 		double val;
 		for ( Map.Entry<String, ImageProcessor> template : templates.entrySet()) {
 			val = templateMatch(template.getValue(), character);
-			IJ.log(template.getKey() + ": " + val);
+			// IJ.log(template.getKey() + ": " + val);
 			if(val > maxVal) {
 				maxVal = val;
 				s = template.getKey();
@@ -125,7 +125,7 @@ public class Classificator {
 		double mean = 0.0;
 		int J = img.getWidth();
 		int K = img.getHeight(); 
-		IJ.log(K + "," + J);
+		// IJ.log(K + "," + J);
 		double N = (double) J * K;
 		for (int j = 0; j < J; j++) {
 			for(int k = 0; k < K; k++) {

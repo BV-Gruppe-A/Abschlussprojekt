@@ -10,8 +10,8 @@ import ij.process.ImageProcessor;
  */
 public class Segmentation {
 	// constant values
-	private final int BLACK = 255;
-	private final int WHITE = 0;
+	private final int BLACK = 0;
+	private final int WHITE = 255;
 
 	private final int SEGMENTS_START_AMOUNT = 0;	
 	private final int NOT_SEGMENTED = -2;
@@ -187,6 +187,7 @@ public class Segmentation {
 				continue;
 			}
 			
+			/*
 			// check if there is a black pixel above the current segment (probably from ö, ä or ü)
 			for(int countInY = 0; countInY < upperBorder; countInY++) {
 				for(int countInX = 0; countInX < charWidth; countInX++) {
@@ -196,6 +197,7 @@ public class Segmentation {
 					}
 				}
 			}
+			*/
 			
 			ImageProcessor tempProcessor = binarisedImg.createProcessor(charWidth, charHeight);
 			for(int countInY = 0; countInY < charHeight; countInY++) {
