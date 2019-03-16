@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.mycompany.imagej;
 
 import java.io.BufferedWriter;
@@ -20,30 +17,53 @@ import ij.process.ImageProcessor;
  */
 public class Classificator {
 
-	private TreeMap<String, ImageProcessor> templates;
+	private Template[] templates;
+	private String csvName = "list.csv";
 	
-	
+	/**
+	 * 
+	 */
 	public Classificator() {
 		initializeTemplates();
 	}
 	
+	
+	
+	/**
+	 * @return
+	 */
+	public String getCsvName() {
+		return csvName;
+	}
+
+
+
+	/**
+	 * @param csvName
+	 */
+	public void setCsvName(String csvName) {
+		if(!csvName.endsWith(".csv")){
+			csvName += ".csv";
+		}
+		this.csvName = csvName;
+	}
+
+
+
 	/**
 	 * reads in all template pictures of characters in FE font and maps it to the character it represents
 	 */
 	private void initializeTemplates() {
-		// TODO read all pictures in certain folder into tree map with character
 		//add file explorer
-		templates = new TreeMap<>();
-		
 		final File folder = new File("Templates");
-		ImagePlus i;
-		for (final File fileEntry : folder.listFiles()) {
-	        i = new ImagePlus(fileEntry.getPath());
-	        templates.put(fileEntry.getName().replaceFirst("[.][^.]+$", ""), i.getProcessor().convertToByte(false));
+		File[] files = folder.listFiles();
+		templates = new Template[files.length];
+		ImageProcessor img;
+		for (int i = 0; i < files.length; i++) {
+	        img = new ImagePlus(files[i].getPath()).getProcessor().convertToByte(false);
+	        
+	        templates[i] = new Template(files[i].getName().replaceFirst("[.][^.]+$", ""), calcMean(img), img);
 	    }
-		/*for ( Map.Entry<String, ImageProcessor> template : templates.entrySet()) {
-			template.getValue().invert();
-		}*/
 	}
 
 	
@@ -74,41 +94,41 @@ public class Classificator {
 		String s = null;
 		double maxVal = -1;
 		double val;
-		for ( Map.Entry<String, ImageProcessor> template : templates.entrySet()) {
-			val = templateMatch(template.getValue(), character);
-			// IJ.log(template.getKey() + ": " + val);
+		for ( Template template : templates) {
+			val = templateMatch(template, character);
 			if(val > maxVal) {
 				maxVal = val;
-				s = template.getKey();
+				s = template.getCharacter();
 			}
 		}
 		return s;
 	}
 	
 	/**
+	 * uses template matching to determine similarity
 	 * @param template the template to compare the sample to
 	 * @param sample the sample image to compare to template
-	 * uses template matching to determine similarity
 	 */
-	private double templateMatch(ImageProcessor template, ImageProcessor sample) {
-		// TODO correlate pictures and calculate similarity
-		int J = template.getWidth();
-		int K = template.getHeight();
+	private double templateMatch(Template template, ImageProcessor sample) {
+		int J = sample.getWidth();
+		int K = sample.getHeight();
 		
 		double numerator = 0;
 		double denominator1 = 0;
 		double  denominator2 = 0;
 		
 		double sampleMean = calcMean(sample);
-		double templateMean = calcMean(template);
+		double templateMean = template.getMean();
+		
+		ImageProcessor templateImg = template.getImage();
 		
 		for (int j = 0; j < J; j++) {
 			for(int k = 0; k < K; k++) {
 				//calculate numerator
-				numerator += ((double)template.getPixel(j, k) - templateMean) * ((double)sample.getPixel(j , k) - sampleMean);
+				numerator += ((double)templateImg.getPixel(j, k) - templateMean) * ((double)sample.getPixel(j , k) - sampleMean);
 				
 				//calculate denominator1
-				denominator1 += Math.pow((double)template.getPixel(j, k) - templateMean, 2);
+				denominator1 += Math.pow((double)templateImg.getPixel(j, k) - templateMean, 2);
 				
 				//calculate denominator2
 				denominator2 += Math.pow((double)sample.getPixel(j , k) - sampleMean,2);
@@ -121,42 +141,39 @@ public class Classificator {
 	}
 
 
+	/**
+	 * calculates the mean of the values of all pixels of an image
+	 * @param img
+	 * @return mean of the images pixel values
+	 */
 	private double calcMean(ImageProcessor img) {
 		double mean = 0.0;
 		int J = img.getWidth();
 		int K = img.getHeight(); 
-		// IJ.log(K + "," + J);
 		double N = (double) J * K;
 		for (int j = 0; j < J; j++) {
 			for(int k = 0; k < K; k++) {
-				mean += img.getPixel(j, k) / N;
-				
+				mean += img.getPixel(j, k) / N;		
 			}
-		}
-		//mean = mean / (double) img.getPixelCount();
-		
+		}		
 		return mean;
 	}
 
 	/**
+	 * writes one licence plate with filename into a row of a csv file
 	 * @param plate plate licence plate as string (result of classification)
 	 * @param filename
-	 * writes one licence plate with filename into a row of a csv file
 	 * @throws IOException 
 	 */
 	private void writeToExcel(String plate, String filename) throws IOException{
 		BufferedWriter writer = null;
 		try {
-			 writer = new BufferedWriter(new FileWriter("list.csv", true));
+			 writer = new BufferedWriter(new FileWriter(csvName, true));
 			 writer.write(filename + "," + plate + "\n");
 			 writer.close();
-			
 		}catch(IOException e) {
 			if (writer != null)
 				writer.close();
 		}
-		
-		
-		//write licence plate to excel
 	}
 }

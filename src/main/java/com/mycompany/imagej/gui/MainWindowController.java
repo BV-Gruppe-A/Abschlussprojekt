@@ -157,20 +157,36 @@ public class MainWindowController {
 		*/
 		
 		if(isOneFile) {
-			startProcessForOneImage();
+			startProcessForOneImage(removeFileExtension(imgOrFolderToOpen.getName()));
 		} else {
 			for(File currentImage : imgOrFolderToOpen.listFiles(new ImgFilterDirectoryLoop())) {
 				ImagePlus imgAsPlus = new ImagePlus(currentImage.getAbsolutePath());
 	        	setCurrentImageProcessor(imgAsPlus.getProcessor());
-	        	startProcessForOneImage();
+	        	startProcessForOneImage(removeFileExtension(currentImage.getName()));
 			}
 		}		
 	}
 	
 	/**
-	 * starts a chosen process for one specific image
+	 * removes the file extension from the given file name
+	 * @param nameWithExtension name to remove the extension from
+	 * @return filename without an extension
 	 */
-	private void startProcessForOneImage() {
+	private String removeFileExtension(String nameWithExtension) {
+		int dotIndex = nameWithExtension.lastIndexOf('.');
+
+        if (dotIndex > 0 &&  dotIndex < nameWithExtension.length() - 1) {
+            return nameWithExtension.substring(0, dotIndex);
+        }
+        
+        return nameWithExtension;
+	}
+	
+	/**
+	 * starts a chosen process for one specific image
+	 * @param imageName name of the file which is processsed
+	 */
+	private void startProcessForOneImage(String imageName) {
 		if(isPreprocessing) {
 			if(!setPreprocessingNumbers() || !checkIfPreproccessingValid() || !checkPreprocessingOrder()) {
 				return;
@@ -178,15 +194,15 @@ public class MainWindowController {
 			
 			for(int orderCounter = 1; orderCounter < 4; orderCounter++) {
 				if(orderCounter == contrastNumber) {
-					Abschlussprojekt_PlugIn.chooseMethod(Abschlussprojekt_PlugIn.CONTRAST, getCurrentImageProcessor(), true);
+					Abschlussprojekt_PlugIn.chooseMethod(Abschlussprojekt_PlugIn.CONTRAST, getCurrentImageProcessor(), imageName);
 				}
 				
 				if(orderCounter == grayscaleNumber) {
-					Abschlussprojekt_PlugIn.chooseMethod(Abschlussprojekt_PlugIn.GRAYSCALE, getCurrentImageProcessor(), true);
+					Abschlussprojekt_PlugIn.chooseMethod(Abschlussprojekt_PlugIn.GRAYSCALE, getCurrentImageProcessor(), imageName);
 				}
 				
 				if(orderCounter == shadingNumber) {
-					Abschlussprojekt_PlugIn.chooseMethod(Abschlussprojekt_PlugIn.SHADING, getCurrentImageProcessor(), true);
+					Abschlussprojekt_PlugIn.chooseMethod(Abschlussprojekt_PlugIn.SHADING, getCurrentImageProcessor(), imageName);
 				}
 			}
 		} else {
@@ -194,7 +210,7 @@ public class MainWindowController {
 				return;
 			}
 			
-			Abschlussprojekt_PlugIn.chooseMethod(methodNumber, getCurrentImageProcessor(), false);
+			Abschlussprojekt_PlugIn.chooseMethod(methodNumber, getCurrentImageProcessor(), imageName);
 		}
 	}
 	

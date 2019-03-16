@@ -57,7 +57,7 @@ public class Abschlussprojekt_PlugIn extends PlugInFrame {
      * @param ip Image Processor to use the method on
      * @param shouldChangeProcess true if the method should change the controllers image processor
      */
-    public static void chooseMethod(int chosenMethod, ImageProcessor ip, boolean shouldChangeProcess) {
+    public static void chooseMethod(int chosenMethod, ImageProcessor ip, String imageName) {
     	switch(chosenMethod) {
         // Baustelle Torsten 1
         case CONTRAST:      	
@@ -71,11 +71,9 @@ public class Abschlussprojekt_PlugIn extends PlugInFrame {
         	
         case SHADING:
             ShadingFilter filt1 = new ShadingFilter();
-            if(shouldChangeProcess) {
-            	window.getController().setCurrentImageProcessor(filt1.shading(ip));
-            } else {
-            	ip = filt1.shading(ip);
-            }
+
+           	window.getController().setCurrentImageProcessor(filt1.shading(ip));
+            
             
         	int BinarizationWhite = 65;
         	
@@ -88,12 +86,9 @@ public class Abschlussprojekt_PlugIn extends PlugInFrame {
         case GRAYSCALE:
         	//RGB Bild in Grauwert Bild umwandeln
             Grayscale gray = new Grayscale();
-            if(shouldChangeProcess) {
-            	window.getController().setCurrentImageProcessor(gray.Grayscale_function(ip));
-            } else {
-            	ip = gray.Grayscale_function(ip);
-            }
             
+            window.getController().setCurrentImageProcessor(gray.Grayscale_function(ip));
+           
         	break;
         	
         //Baustelle Julian 2	
@@ -142,7 +137,7 @@ public class Abschlussprojekt_PlugIn extends PlugInFrame {
         	//ImageProcessor[] image = new ImageProcessor[1];
         	//image[0] = ip;
         	Classificator classificator1 = new Classificator();
-        	classificator1.classify(segm11.segmentThePicture(), "Kennzeichen1");        	
+        	classificator1.classify(segm11.segmentThePicture(), imageName);        	
             
         	break;
         	
