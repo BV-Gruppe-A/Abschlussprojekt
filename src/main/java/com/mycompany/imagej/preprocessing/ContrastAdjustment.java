@@ -1,21 +1,18 @@
 package com.mycompany.imagej.preprocessing;
 
+import com.mycompany.imagej.Abschlussprojekt_PlugIn;
+
 import ij.process.ImageProcessor;
 
 
-public class ContrastAdjustment {
-	
-	final int BLACK = 0;
-	final int WHITE = 255;
-	
-    
+public class ContrastAdjustment {    
 	public void Contrast(ImageProcessor ip, int PercentageWhite, int PercentageBlack) {
 	    int M = ip.getWidth();
 	    int N = ip.getHeight();
 	    
         // the contrast should be expanded to the whole range of greyscales
-	    int color_max = WHITE;
-	    int color_min = BLACK;
+	    int color_max = Abschlussprojekt_PlugIn.WHITE;
+	    int color_min = Abschlussprojekt_PlugIn.BLACK;
 
 	    int[] histogram;
 	    
@@ -23,8 +20,8 @@ public class ContrastAdjustment {
 	   
 	    histogram = ip.getHistogram();
 	    
-	    int minThreshold = BLACK;
-	    int maxThreshold = WHITE;  
+	    int minThreshold = Abschlussprojekt_PlugIn.BLACK;
+	    int maxThreshold = Abschlussprojekt_PlugIn.WHITE;  
 	    
 	
 	        // calculate amount of pixels needed to reach x%
@@ -32,8 +29,8 @@ public class ContrastAdjustment {
 	        int pixelAmountHigh = (int) Math.ceil(ip.getPixelCount() * PercentageWhite / 100.0);
 	        
 	        // the values that need to be colored in min/max values in the next step
-	        minThreshold = BLACK;
-	        maxThreshold = WHITE;	
+	        minThreshold = Abschlussprojekt_PlugIn.BLACK;
+	        maxThreshold = Abschlussprojekt_PlugIn.WHITE;	
 	        
 	        
 	        // the amount of pixels in the lowest/highest values
@@ -85,7 +82,7 @@ public class ContrastAdjustment {
 	    histogram = ip.getHistogram();
 	    
 
-	    int maxThreshold = WHITE;  
+	    int maxThreshold = Abschlussprojekt_PlugIn.WHITE;  
 	    
 	
 	        // calculate amount of pixels needed to reach x%
@@ -109,10 +106,10 @@ public class ContrastAdjustment {
 	            int p = ip.getPixel(u, v);
 	            
 	            if(p < maxThreshold) {
-	            	new_p  = BLACK;
+	            	new_p  = Abschlussprojekt_PlugIn.BLACK;
 	            	
 	            } else {
-	            	new_p =  WHITE;
+	            	new_p =  Abschlussprojekt_PlugIn.WHITE;
 	            } 
 	        
 	            ip.putPixel(u, v, new_p);

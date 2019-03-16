@@ -3,8 +3,14 @@ package com.mycompany.imagej.gui;
 import java.io.File;
 import javax.swing.JFileChooser;
 import com.mycompany.imagej.Abschlussprojekt_PlugIn;
+import com.mycompany.imagej.Classificator;
+import com.mycompany.imagej.Segmentation;
 import com.mycompany.imagej.gui.filefilters.ImgFilterDirectoryLoop;
 import com.mycompany.imagej.gui.filefilters.ImgFilterFileChooser;
+import com.mycompany.imagej.preprocessing.ContrastAdjustment;
+import com.mycompany.imagej.preprocessing.Grayscale;
+import com.mycompany.imagej.preprocessing.ShadingFilter;
+
 import ij.IJ;
 import ij.ImagePlus;
 import ij.process.ImageProcessor;
@@ -13,10 +19,28 @@ import ij.process.ImageProcessor;
  * Controller, which controls everything that happens in the main Window
  */
 public class MainWindowController {
+	// constant values
+	public final int METHOD_AMOUNT = 7;
+	public final int CONTRAST = 1;
+	public final int SHADING = 2;
+	public final int GRAYSCALE = 3;
+	public final int NO4 = 4;
+	public final int SEGMENTATION = 5;
+	public final int CLASSIFICATION = 6;
+	public final int EVERYTHING = 7;
+	
+	public final int AVRG_IMAGE_WIDTH = 295;
+	
 	// local objects
 	private MainWindow windowToControl;
 	private File imgOrFolderToOpen;
 	private File placeToSave;
+	
+	private ContrastAdjustment cont = new ContrastAdjustment();
+	private Grayscale gray = new Grayscale();
+	private ShadingFilter shading = new ShadingFilter();
+	private Segmentation segm = new Segmentation();
+	private Classificator classificator = new Classificator();
 	
 	// local variables
 	private int contrastNumber;
@@ -54,7 +78,7 @@ public class MainWindowController {
 	 * @return the current Image as an Image Processor
 	 */
 	public ImageProcessor getCurrentImageProcessor() {
-		return currentImage.resize(295);
+		return currentImage;
 	}
 	
 	/**
@@ -62,7 +86,7 @@ public class MainWindowController {
 	 * @param imageToSet new Image Processor to set
 	 */
 	public void setCurrentImageProcessor(ImageProcessor imageToSet) {
-		currentImage = imageToSet;
+		currentImage = imageToSet.resize(AVRG_IMAGE_WIDTH);
 	}
 	
 	/**
@@ -194,15 +218,15 @@ public class MainWindowController {
 			
 			for(int orderCounter = 1; orderCounter < 4; orderCounter++) {
 				if(orderCounter == contrastNumber) {
-					Abschlussprojekt_PlugIn.chooseMethod(Abschlussprojekt_PlugIn.CONTRAST, getCurrentImageProcessor(), imageName);
+					chooseMethod(CONTRAST, imageName);
 				}
 				
 				if(orderCounter == grayscaleNumber) {
-					Abschlussprojekt_PlugIn.chooseMethod(Abschlussprojekt_PlugIn.GRAYSCALE, getCurrentImageProcessor(), imageName);
+					chooseMethod(GRAYSCALE, imageName);
 				}
 				
 				if(orderCounter == shadingNumber) {
-					Abschlussprojekt_PlugIn.chooseMethod(Abschlussprojekt_PlugIn.SHADING, getCurrentImageProcessor(), imageName);
+					chooseMethod(SHADING, imageName);
 				}
 			}
 		} else {
@@ -210,9 +234,79 @@ public class MainWindowController {
 				return;
 			}
 			
-			Abschlussprojekt_PlugIn.chooseMethod(methodNumber, getCurrentImageProcessor(), imageName);
+			chooseMethod(methodNumber, imageName);
 		}
 	}
+	
+	 /**
+     * Chooses a method to open
+     * @param chosenMethod number of the method
+     * 			1 - Contrast Adjustement
+     * 			2 - SHADING Filter
+     * 			3 - Grayscale
+     * 			4 - ???
+     * 			5 - Segmentation
+     * 			6 - Classification
+     * 			7 - Everything combinde
+     * @param imageName Name of the current image
+     */
+    private void chooseMethod(int chosenMethod, String imageName) {
+    	// Hard border for contrast adjustment
+    	int PercentageBlack = 5;
+    	int PercentageWhite = 5;  
+    	int BinarizationWhite = 65;
+    	
+    	switch(chosenMethod) {
+        case CONTRAST:              	
+        	cont.Contrast(getCurrentImageProcessor(), PercentageWhite, PercentageBlack);
+        	
+        	break;
+        	
+        case SHADING:
+           	setCurrentImageProcessor(shading.shading(getCurrentImageProcessor()));          
+        	cont.Binarization(getCurrentImageProcessor(), BinarizationWhite);            
+        	
+            break;
+              
+        case GRAYSCALE:
+        	//RGB Bild in Grauwert Bild umwandeln
+            setCurrentImageProcessor(gray.Grayscale_function(getCurrentImageProcessor()));    
+            
+        	break;
+        	
+        case NO4:
+        	
+        	break;
+        	
+        case SEGMENTATION:
+        	// DEBUG - only usable with a binarised input image!
+        	segm.changeImage(getCurrentImageProcessor());
+        	segm.debugSegmentation();
+        	
+        	break;
+        	
+        case CLASSIFICATION:
+        	segm.changeImage(getCurrentImageProcessor());
+        	classificator.classify(segm.segmentThePicture(), imageName);
+        	
+        	break;
+            
+        case EVERYTHING:
+        	setCurrentImageProcessor(gray.Grayscale_function(getCurrentImageProcessor()));   
+        	cont.Contrast(getCurrentImageProcessor(), PercentageWhite, PercentageBlack);
+        	setCurrentImageProcessor(shading.shading(getCurrentImageProcessor()));           	
+        	cont.Binarization(getCurrentImageProcessor(), BinarizationWhite);    
+        	segm.changeImage(getCurrentImageProcessor());
+        	classificator.classify(segm.segmentThePicture(), imageName);   	
+            
+        	break;        	
+        default: 
+        	
+    	}  
+    	
+    	ImagePlus imgToShow = new ImagePlus(imageName, getCurrentImageProcessor());
+    	imgToShow.show();
+    }
 	
 	/**
 	 * sets the Method Number to the value from its textfield
@@ -221,8 +315,8 @@ public class MainWindowController {
 	private boolean setMethodNumber() {
 		if(checkIfStringIsNumber(windowToControl.txtMethodNumber.getText())) {
 			methodNumber = Integer.parseInt(windowToControl.txtMethodNumber.getText());
-			if(methodNumber < 1 || methodNumber > Abschlussprojekt_PlugIn.METHOD_AMOUNT) {
-				IJ.error("The Method Number should be a value between 1 and " + Abschlussprojekt_PlugIn.METHOD_AMOUNT + "!");
+			if(methodNumber < 1 || methodNumber > METHOD_AMOUNT) {
+				IJ.error("The Method Number should be a value between 1 and " + METHOD_AMOUNT + "!");
 				return false;
 			}
 		} else {

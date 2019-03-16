@@ -1,16 +1,13 @@
 package com.mycompany.imagej.preprocessing;
 
 import ij.process.ImageProcessor;
+import com.mycompany.imagej.Abschlussprojekt_PlugIn;
 import ij.process.ByteProcessor;
 
 
-public class Grayscale {
-
-	final int BLACK = 0;
-	final int WHITE = 255;
-	 
+public class Grayscale { 
 	// maximal vector length in the RGB color space if red = green = blue = 255
-	final double MAX_VECTOR_LENGTH = Math.sqrt(3 * Math.pow(WHITE, 2));
+	final double MAX_VECTOR_LENGTH = Math.sqrt(3 * Math.pow(Abschlussprojekt_PlugIn.WHITE, 2));
 	
 	// masks to get the 8-Bit color value from the whole 32-Bit int
 	final int RED_MASK = 0x00FF0000;
@@ -49,7 +46,7 @@ public class Grayscale {
     	double blueSquared =  Math.pow(rgbValues[2], 2);
     	
     	double intensity =  Math.sqrt(redSquared + greenSquared + blueSquared);
-    	int grey = (int) Math.round((intensity * (double) WHITE) / MAX_VECTOR_LENGTH);
+    	int grey = (int) Math.round((intensity * (double) Abschlussprojekt_PlugIn.WHITE) / MAX_VECTOR_LENGTH);
     
     	return grey;
     	

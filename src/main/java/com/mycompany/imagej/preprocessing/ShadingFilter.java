@@ -1,8 +1,6 @@
 package com.mycompany.imagej.preprocessing;
 
 import java.util.Arrays;
-
-import ij.ImagePlus;
 import ij.process.ByteProcessor;
 import ij.process.ImageProcessor;
 

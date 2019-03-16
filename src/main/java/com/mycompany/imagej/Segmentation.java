@@ -13,9 +13,6 @@ import ij.process.ImageProcessor;
  */
 public class Segmentation {
 	// constant values
-	private final int BLACK = 0;
-	private final int WHITE = 255;
-
 	private final int SEGMENTS_START_AMOUNT = 0;	
 	private final int NOT_SEGMENTED = -2;
 	private final int IDENTIFIED = -1;
@@ -75,7 +72,7 @@ public class Segmentation {
 				
 		for(int countInY = 0; countInY < imgHeight; countInY++) {
 			for(int countInX = 0; countInX < imgWidth; countInX++) {
-				if(segments[countInY][countInX] == NOT_SEGMENTED && binarisedImg.getPixel(countInX, countInY) == BLACK) {
+				if(segments[countInY][countInX] == NOT_SEGMENTED && binarisedImg.getPixel(countInX, countInY) == Abschlussprojekt_PlugIn.BLACK) {
 					identifyWholeSegment(countInX, countInY);
 					sortPixelsIntoSegments(segmentCounter++);
 				}
@@ -94,25 +91,25 @@ public class Segmentation {
 		segments[startY][startX] = IDENTIFIED;
 		
 		if (startY - 1 >= 0) {
-			if(binarisedImg.getPixel(startX, startY - 1) == BLACK && segments[startY - 1][startX] != IDENTIFIED) {
+			if(binarisedImg.getPixel(startX, startY - 1) == Abschlussprojekt_PlugIn.BLACK && segments[startY - 1][startX] != IDENTIFIED) {
 				identifyWholeSegment(startX, startY - 1);
 			}
 		}
 		
 		if (startX - 1 >= 0) {
-			if(binarisedImg.getPixel(startX - 1, startY) == BLACK && segments[startY][startX - 1] != IDENTIFIED) {
+			if(binarisedImg.getPixel(startX - 1, startY) == Abschlussprojekt_PlugIn.BLACK && segments[startY][startX - 1] != IDENTIFIED) {
 				identifyWholeSegment(startX - 1, startY);
 			}
 		}
 		
 		if (startY + 1 < imgHeight) {
-			if(binarisedImg.getPixel(startX, startY + 1) == BLACK && segments[startY + 1][startX] != IDENTIFIED) {
+			if(binarisedImg.getPixel(startX, startY + 1) == Abschlussprojekt_PlugIn.BLACK && segments[startY + 1][startX] != IDENTIFIED) {
 				identifyWholeSegment(startX, startY + 1);
 			}
 		}
 		
 		if (startX + 1 < imgWidth) {
-			if(binarisedImg.getPixel(startX + 1, startY) == BLACK && segments[startY][startX + 1] != IDENTIFIED) {
+			if(binarisedImg.getPixel(startX + 1, startY) == Abschlussprojekt_PlugIn.BLACK && segments[startY][startX + 1] != IDENTIFIED) {
 				identifyWholeSegment(startX + 1, startY);
 			}
 		}
