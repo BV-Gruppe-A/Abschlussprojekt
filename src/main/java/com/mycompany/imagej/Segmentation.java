@@ -1,6 +1,9 @@
 package com.mycompany.imagej;
 
 import java.util.Arrays;
+
+import com.mycompany.imagej.datamodels.CharacterCandidate;
+
 import ij.IJ;
 import ij.ImagePlus;
 import ij.process.ImageProcessor;
@@ -16,15 +19,6 @@ public class Segmentation {
 	private final int SEGMENTS_START_AMOUNT = 0;	
 	private final int NOT_SEGMENTED = -2;
 	private final int IDENTIFIED = -1;
-	
-	private final double THRESHOLD = 0.2;	
-	private final int OPT_CHAR_HEIGHT = 38;
-	private final int MAX_CHAR_HEIGHT = OPT_CHAR_HEIGHT + (int) Math.round(OPT_CHAR_HEIGHT * THRESHOLD);
-	private final int MIN_CHAR_HEIGHT = OPT_CHAR_HEIGHT - (int) Math.round(OPT_CHAR_HEIGHT * THRESHOLD);
-	
-	private final int OPT_CHAR_WIDTH = 25;
-	private final int MAX_CHAR_WIDTH = OPT_CHAR_WIDTH + (int) Math.round(OPT_CHAR_WIDTH * THRESHOLD);
-	private final int MIN_CHAR_WIDTH = OPT_CHAR_WIDTH - (int) Math.round(OPT_CHAR_WIDTH * THRESHOLD);
 	
 	// local variables
 	private ImageProcessor binarisedImg;
@@ -52,7 +46,7 @@ public class Segmentation {
 	 * segments the given picture
 	 * @return each character as a single image processor
 	 */
-	public ImageProcessor[] segmentThePicture() {	
+	public CharacterCandidate[] segmentThePicture() {	
 		fillTheSegments();
 		return makeImagesOutOfSegments();
 	}
@@ -62,9 +56,9 @@ public class Segmentation {
 	 */
 	public void debugSegmentation() {
 		fillTheSegments();
-		ImageProcessor[] debug = makeImagesOutOfSegments();
+		CharacterCandidate[] debug = makeImagesOutOfSegments();
 		for(int count = 0; count < debug.length; count++) {
-			ImagePlus imgToShow = new ImagePlus("char " + (count + 1), debug[count]);
+			ImagePlus imgToShow = new ImagePlus("char " + (count + 1), debug[count].getImage());
 	    	imgToShow.show();
 		}		
 	}
@@ -151,10 +145,10 @@ public class Segmentation {
 	
 	/**
 	 * takes a single picture and slices it up into different segments, each representing a single character
-	 * @return all characters as a single image processor
+	 * @return array containing all possible characters
 	 */
-	private ImageProcessor[] makeImagesOutOfSegments() {
-		ImageProcessor[] arrToReturn = new ImageProcessor[finalSegmentAmount];
+	private CharacterCandidate[] makeImagesOutOfSegments() {
+		CharacterCandidate[] arrToReturn = new CharacterCandidate[finalSegmentAmount];
 		int currentArrayPos = 0;
 		
 		for(int countSegment = SEGMENTS_START_AMOUNT; countSegment < finalSegmentAmount; countSegment++) {
@@ -180,12 +174,12 @@ public class Segmentation {
 				}
 			}
 			
-			int charWidth = rightBorder - leftBorder;
-			int charHeight = bottomBorder - upperBorder;
-			
-			if(checkIfInvalidCharacter(charWidth, charHeight)) {
+			CharacterCandidate tempChar = new CharacterCandidate(leftBorder, rightBorder, upperBorder, bottomBorder);	
+			if(tempChar.checkIfInvalidCharacter()) {
 				continue;
 			}
+			tempChar.setAndScaleImage(binarisedImg);
+			arrToReturn[currentArrayPos++] = tempChar;
 			
 			/*
 			// check if there is a black pixel above the current segment (probably from ö, ä or ü)
@@ -198,38 +192,9 @@ public class Segmentation {
 				}
 			}
 			*/
-			
-			ImageProcessor tempProcessor = binarisedImg.createProcessor(charWidth, charHeight);
-			for(int countInY = 0; countInY < charHeight; countInY++) {
-				for(int countInX = 0; countInX < charWidth; countInX++) {
-					int pixelToPut = binarisedImg.getPixel(leftBorder + countInX, upperBorder + countInY);
-					tempProcessor.putPixel(countInX, countInY, pixelToPut);
-				}
-			}
-			
-			arrToReturn[currentArrayPos] = tempProcessor.resize(OPT_CHAR_WIDTH, OPT_CHAR_HEIGHT);
-			currentArrayPos++;		
 		}		
 		
-		return cleanUpImageArray(arrToReturn);
-	}
-	
-	/**
-	 * checks if a segment has a size which could be a character
-	 * @param width width of the segment
-	 * @param height height of the segment
-	 * @return true if the segment is not a valid possibility for a character
-	 */
-	private boolean checkIfInvalidCharacter(int width, int height) {
-		if(width > MAX_CHAR_WIDTH || height > MAX_CHAR_HEIGHT) {
-			return true;
-		}
-		
-		if(width < MIN_CHAR_WIDTH || height < MIN_CHAR_HEIGHT) {
-			return true;
-		}
-		
-		return false;
+		return cleanUpAndSortCharacterArray(arrToReturn, currentArrayPos);
 	}
 	
 	/**
@@ -237,14 +202,9 @@ public class Segmentation {
 	 * @param arrayToClean array which needs to be cleaned
 	 * @return a new, cleaned-up array
 	 */
-	private ImageProcessor[] cleanUpImageArray(ImageProcessor[] arrToClean) {
-		int countFilledImages = 0;
-		for(int count = 0; count < arrToClean.length; count++) {
-			if(arrToClean[count] != null) {
-				countFilledImages++;
-			}
-		}
-	
-		return Arrays.copyOf(arrToClean, countFilledImages);
+	private CharacterCandidate[] cleanUpAndSortCharacterArray(CharacterCandidate[] arrToProcess, int filledImages) {	
+		CharacterCandidate[] cleanedArray = Arrays.copyOf(arrToProcess, filledImages);
+		Arrays.sort(cleanedArray);
+		return cleanedArray;
  	}
 }

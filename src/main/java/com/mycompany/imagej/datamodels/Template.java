@@ -1,4 +1,4 @@
-package com.mycompany.imagej;
+package com.mycompany.imagej.datamodels;
 
 import ij.process.ImageProcessor;
 

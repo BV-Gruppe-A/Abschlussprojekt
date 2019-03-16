@@ -4,10 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Map;
-import java.util.TreeMap;
-
-import ij.IJ;
+import com.mycompany.imagej.datamodels.*;
 import ij.ImagePlus;
 import ij.process.ImageProcessor;
 
@@ -72,10 +69,10 @@ public class Classificator {
 	 * @param characters all characters of one licence plate segregated (each with own image processor)
 	 * classifies each character and saves to string that is than writen to an excel file
 	 */
-	public void classify(ImageProcessor [] characters, String filename) {
+	public void classify(CharacterCandidate[] characters, String filename) {
 		String licencePlate = "";
-		for (ImageProcessor character : characters) {
-			licencePlate += classifyChar(character);
+		for (CharacterCandidate character : characters) {
+			licencePlate += classifyChar(character.getImage());
 		}
 		
 		try {

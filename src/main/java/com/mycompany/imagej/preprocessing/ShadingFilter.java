@@ -34,8 +34,6 @@ public class ShadingFilter {
 				back.putPixel(u, v, region[region.length-1]);
 			}
 		}
-		ImagePlus img = new ImagePlus("shading",back);
-		img.show();
     	//Weight pixels with background / lighting values
 		for (int u = 0; u < M; u++) {
 			for (int v = 0; v < N; v++) {
