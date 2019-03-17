@@ -55,8 +55,6 @@ public class Classificator {
 	private void initializeTemplates() {
 		//String with all possible licence plate characters
 		final String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ-0123456789";
-		// Get current classloader
-		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		//initialize array with alphabets length
 		templates = new Template[alphabet.length()];
 		
@@ -64,7 +62,7 @@ public class Classificator {
 		Image template;
 		//for each char in the alphabet create a Template object
 		for (int i = 0; i < templates.length; i++) {
-			template = Toolkit.getDefaultToolkit().getImage((cl.getResource("Templates/" + alphabet.substring(i, i+1) + ".png")));
+			template = Toolkit.getDefaultToolkit().getImage((getClass().getClassLoader().getResource("Templates/" + alphabet.substring(i, i+1) + ".png")));
 	        img = new ImagePlus(template.toString(),template).getProcessor().convertToByte(false);
 	        templates[i] = new Template(alphabet.substring(i, i+1), calcMean(img), img);
 	        
