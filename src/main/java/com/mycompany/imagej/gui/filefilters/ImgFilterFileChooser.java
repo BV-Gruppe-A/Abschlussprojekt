@@ -5,8 +5,6 @@ import javax.swing.filechooser.FileFilter;
 
 /**
  * Filters the shown images in the file chooser
- * based on this class from the Oracle Java Tutorials
- * https://docs.oracle.com/javase/tutorial/uiswing/examples/components/FileChooserDemo2Project/src/components/ImageFilter.java
  */
 public class ImgFilterFileChooser extends FileFilter {
 	/**
@@ -34,6 +32,6 @@ public class ImgFilterFileChooser extends FileFilter {
 	 */
 	@Override
 	public String getDescription() {
-		return "Just Images";
+		return "Images: jpg, jpeg, bmp, png, tif or tiff";
 	}
 }

@@ -2,6 +2,8 @@ package com.mycompany.imagej.gui.filefilters;
 
 /**
  * Image File Filter which handels the most important aspects for the two slightly different filters
+ * based on this class from the Oracle Java Tutorials
+ * https://docs.oracle.com/javase/tutorial/uiswing/examples/components/FileChooserDemo2Project/src/components/ImageFilter.java
  */
 public class ImgFileFilter {
 	/**
@@ -19,7 +21,13 @@ public class ImgFileFilter {
 	}
 	
 	/**
-	 * check if the extension is one of the image-extensions
+	 * check if the extension is one of the following image-extensions:
+	 * 			- jpg
+	 * 			- jpeg
+	 * 			- png
+	 * 			- tif
+	 * 			- tiff
+	 * 			- bmp
 	 * @param extension string to check for
 	 * @return true if the file is an image
 	 */

@@ -2,15 +2,13 @@ package com.mycompany.imagej.gui;
 
 import java.io.File;
 import javax.swing.JFileChooser;
-import com.mycompany.imagej.Abschlussprojekt_PlugIn;
 import com.mycompany.imagej.Classificator;
 import com.mycompany.imagej.Segmentation;
-import com.mycompany.imagej.gui.filefilters.ImgFilterDirectoryLoop;
+import com.mycompany.imagej.gui.filefilters.ImgFilterDirectory;
 import com.mycompany.imagej.gui.filefilters.ImgFilterFileChooser;
 import com.mycompany.imagej.preprocessing.ContrastAdjustment;
 import com.mycompany.imagej.preprocessing.Grayscale;
 import com.mycompany.imagej.preprocessing.ShadingFilter;
-
 import ij.IJ;
 import ij.ImagePlus;
 import ij.process.ImageProcessor;
@@ -129,7 +127,7 @@ public class MainWindowController {
         if (returnVal == JFileChooser.APPROVE_OPTION) {
         	placeToSave = fcSave.getSelectedFile();
         	windowToControl.txtSaveLocation.setText(placeToSave.getPath());
-        	// TODO: give the file location to the classifier
+        	classificator.setCsvName(placeToSave.getAbsolutePath());
         }
 	}
 	
@@ -173,17 +171,15 @@ public class MainWindowController {
 			return;
 		}
 		
-		/*
 		if(placeToSave == null) {
 			IJ.error("No existing place to save was chosen");
 			return;
-		}
-		*/
+		}		
 		
 		if(isOneFile) {
 			startProcessForOneImage(removeFileExtension(imgOrFolderToOpen.getName()));
 		} else {
-			for(File currentImage : imgOrFolderToOpen.listFiles(new ImgFilterDirectoryLoop())) {
+			for(File currentImage : imgOrFolderToOpen.listFiles(new ImgFilterDirectory())) {
 				ImagePlus imgAsPlus = new ImagePlus(currentImage.getAbsolutePath());
 	        	setCurrentImageProcessor(imgAsPlus.getProcessor());
 	        	startProcessForOneImage(removeFileExtension(currentImage.getName()));
