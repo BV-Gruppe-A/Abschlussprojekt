@@ -6,7 +6,7 @@ import java.io.FilenameFilter;
 /**
  * Filter for the loop which opens all images in one folder
  */
-public class ImgFilterDirectoryLoop implements FilenameFilter {
+public class ImgFilterDirectory implements FilenameFilter {
 	/**
 	 * checks if a given file is accepted by the filter
 	 * @param directory directory of the given file

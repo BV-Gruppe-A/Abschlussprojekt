@@ -1,5 +1,6 @@
 package com.mycompany.imagej;
 
+import com.mycompany.imagej.gui.DebugWindow;
 import com.mycompany.imagej.gui.MainWindow;
 import ij.plugin.frame.PlugInFrame;
            
@@ -24,6 +25,7 @@ public class Abschlussprojekt_PlugIn extends PlugInFrame {
 	 */
     public void run(String arg) {   	
     	MainWindow window = new MainWindow("Abschlussprojekt Gruppe A");
+    	// DebugWindow window = new DebugWindow("Abschlussprojekt Gruppe A");
     	window.showDialog();
     }
 }
