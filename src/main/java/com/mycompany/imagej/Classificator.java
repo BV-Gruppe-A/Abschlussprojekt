@@ -6,7 +6,6 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import com.mycompany.imagej.datamodels.*;
-
 import ij.ImagePlus;
 import ij.process.ImageProcessor;
 
