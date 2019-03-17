@@ -3,15 +3,10 @@ package com.mycompany.imagej;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import com.mycompany.imagej.datamodels.*;
-import com.mycompany.imagej.gui.filefilters.ImgFilterDirectoryLoop;
-
-import ij.IJ;
 import ij.ImagePlus;
-import ij.io.PluginClassLoader;
 import ij.process.ImageProcessor;
 
 /**
