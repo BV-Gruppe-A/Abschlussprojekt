@@ -1,11 +1,17 @@
 package com.mycompany.imagej;
 
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import com.mycompany.imagej.datamodels.*;
+import com.mycompany.imagej.gui.filefilters.ImgFilterDirectoryLoop;
+
+import ij.IJ;
 import ij.ImagePlus;
+import ij.io.PluginClassLoader;
 import ij.process.ImageProcessor;
 
 /**
@@ -51,15 +57,21 @@ public class Classificator {
 	 * reads in all template pictures of characters in FE font and maps it to the character it represents
 	 */
 	private void initializeTemplates() {
-		//add file explorer
-		final File folder = new File("Templates");
-		File[] files = folder.listFiles();
-		templates = new Template[files.length];
+		//String with all possible licence plate characters
+		final String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ-0123456789";
+		// Get current classloader
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		//initialize array with alphabets length
+		templates = new Template[alphabet.length()];
+		
 		ImageProcessor img;
-		for (int i = 0; i < files.length; i++) {
-	        img = new ImagePlus(files[i].getPath()).getProcessor().convertToByte(false);
+		Image template;
+		//for each char in the alphabet create a Template object
+		for (int i = 0; i < templates.length; i++) {
+			template = Toolkit.getDefaultToolkit().getImage((cl.getResource(alphabet.substring(i, i+1) + ".png")));
+	        img = new ImagePlus(template.toString(),template).getProcessor().convertToByte(false);
+	        templates[i] = new Template(alphabet.substring(i, i+1), calcMean(img), img);
 	        
-	        templates[i] = new Template(files[i].getName().replaceFirst("[.][^.]+$", ""), calcMean(img), img);
 	    }
 	}
 
