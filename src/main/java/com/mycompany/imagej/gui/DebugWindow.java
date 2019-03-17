@@ -12,15 +12,25 @@ import javax.swing.*;
  * the main window in which the user can interact
  */
 @SuppressWarnings("serial")
-public class MainWindow extends GenericDialog {
+public class DebugWindow extends GenericDialog {
 	// graphical elements
 	protected JPanel contentPanel = new JPanel(new GridBagLayout());
 	protected JLabel lblOpenText = new JLabel("Open & identify ...");
+	protected JLabel lblMethod = new JLabel("Method: ");
+	protected JLabel lblContrast = new JLabel("Contrast Adjustment (0 to ignore): ");
+	protected JLabel lblGrayscale = new JLabel("Grayscale (0 to ignore): ");
+	protected JLabel lblShading = new JLabel("Shading Filter (0 to ignore): ");
 	protected JLabel lblExcelFile = new JLabel("Save Excel-File to: ");
 	protected JRadioButton rbOneImage = new JRadioButton("... 1 Image");
 	protected JRadioButton rbMoreImages = new JRadioButton("... more than 1 image");
+	protected JRadioButton rbPreprocessing = new JRadioButton("Test order for Preprocessing");
+	protected JRadioButton rbCertainMethod = new JRadioButton("Test one specific method");
 	protected JTextField txtOpenLocation = new JTextField("Imagefile Location");
 	protected JTextField txtSaveLocation = new JTextField("CSV File Location");
+	protected JTextField txtMethodNumber = new JTextField("");
+	protected JTextField txtContrastNumber = new JTextField("");
+	protected JTextField txtGrayscaleNumber = new JTextField("");
+	protected JTextField txtShadingNumber = new JTextField("");
 	protected JButton btnOpenFile = new JButton("Choose Image");
 	protected JButton btnSaveFile = new JButton("Choose Location");
 	protected JButton btnStartProcess = new JButton("Start");
@@ -28,15 +38,15 @@ public class MainWindow extends GenericDialog {
 	// local variables & objects
 	private int currentY = 0;
 	private GridBagConstraints constraints = new GridBagConstraints();
-	private MainWindowController controller;
+	private DebugWindowController controller;
 	
 	/**
 	 * Constructor which sets the title and fills the window with life
 	 * @param windowName window Name to set
 	 */
-	public MainWindow(String windowName) {
+	public DebugWindow(String windowName) {
 		super(windowName);
-		controller = new MainWindowController(this);
+		controller = new DebugWindowController(this);
 		fillWindowWithLife();
 		GUI.center(this);
 	}
@@ -44,7 +54,7 @@ public class MainWindow extends GenericDialog {
 	/**
 	 * @return connected MainWindowController of this object
 	 */
-	public MainWindowController getController() {
+	public DebugWindowController getController() {
 		return controller;
 	}
 	
@@ -77,7 +87,40 @@ public class MainWindow extends GenericDialog {
 		btnOpenFile.addActionListener((e) -> {
 			controller.decideWhichFileChooser();
 		});
+		
+		// Order of the Methods	
+		rbPreprocessing.setSelected(true);
+		rbCertainMethod.setSelected(false);
+		
+		ButtonGroup bgMethod = new ButtonGroup();
+		bgMethod.add(rbPreprocessing);
+		bgMethod.add(rbCertainMethod);
+		
+		setConstraints(0, currentY, 1, 0.5);
+		contentPanel.add(rbPreprocessing, constraints);
+		setConstraints(1, currentY++, 1, 0.5);
+		contentPanel.add(rbCertainMethod, constraints);
 				
+		setConstraints(0, currentY, 1, 0.8);
+		contentPanel.add(lblContrast, constraints);
+		setConstraints(1, currentY++, 1, 0.2);
+		contentPanel.add(txtContrastNumber, constraints);
+		
+		setConstraints(0, currentY, 1, 0.8);
+		contentPanel.add(lblGrayscale, constraints);
+		setConstraints(1, currentY++, 1, 0.2);
+		contentPanel.add(txtGrayscaleNumber, constraints);
+
+		setConstraints(0, currentY, 1, 0.8);
+		contentPanel.add(lblShading, constraints);
+		setConstraints(1, currentY++, 1, 0.2);
+		contentPanel.add(txtShadingNumber, constraints);
+		
+		setConstraints(0, currentY, 1, 0.8);
+		contentPanel.add(lblMethod, constraints);
+		setConstraints(1, currentY++, 1, 0.2);
+		contentPanel.add(txtMethodNumber, constraints);		
+		
 		// output directory (File Chooser)
 		setConstraints(0, currentY++, 2, 0.0);
 		contentPanel.add(lblExcelFile, constraints);
