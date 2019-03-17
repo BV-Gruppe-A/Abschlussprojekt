@@ -3,15 +3,11 @@ package com.mycompany.imagej;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import com.mycompany.imagej.datamodels.*;
-import com.mycompany.imagej.gui.filefilters.ImgFilterDirectoryLoop;
 
-import ij.IJ;
 import ij.ImagePlus;
-import ij.io.PluginClassLoader;
 import ij.process.ImageProcessor;
 
 /**
@@ -27,6 +23,7 @@ public class Classificator {
 	 * 
 	 */
 	public Classificator() {
+		
 		initializeTemplates();
 	}
 	
@@ -68,7 +65,7 @@ public class Classificator {
 		Image template;
 		//for each char in the alphabet create a Template object
 		for (int i = 0; i < templates.length; i++) {
-			template = Toolkit.getDefaultToolkit().getImage((cl.getResource(alphabet.substring(i, i+1) + ".png")));
+			template = Toolkit.getDefaultToolkit().getImage((cl.getResource("Templates/" + alphabet.substring(i, i+1) + ".png")));
 	        img = new ImagePlus(template.toString(),template).getProcessor().convertToByte(false);
 	        templates[i] = new Template(alphabet.substring(i, i+1), calcMean(img), img);
 	        
