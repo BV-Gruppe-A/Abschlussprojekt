@@ -49,6 +49,7 @@ public class Segmentation {
 	}
 	
 	/**
+	 * DEBUG
 	 * allows for debugging of the segmentation without needing to split it up
 	 */
 	public void debugSegmentation() {
@@ -145,8 +146,7 @@ public class Segmentation {
 	 * @return array containing all possible characters
 	 */
 	private CharacterCandidate[] makeImagesOutOfSegments() {
-		CharacterCandidate[] arrToReturn = new CharacterCandidate[finalSegmentAmount];
-		int currentArrayPos = 0;
+		CharacterCandidate[] allSegments = new CharacterCandidate[finalSegmentAmount];
 		
 		for(int countSegment = SEGMENTS_START_AMOUNT; countSegment < finalSegmentAmount; countSegment++) {
 			int leftBorder = imgWidth, upperBorder = imgHeight;
@@ -171,27 +171,20 @@ public class Segmentation {
 				}
 			}
 			
-			CharacterCandidate tempChar = new CharacterCandidate(leftBorder, rightBorder, upperBorder, bottomBorder);	
-			if(tempChar.checkIfInvalidCharacter()) {
-				continue;
-			}
-			tempChar.setAndScaleImage(binarisedImg);
-			arrToReturn[currentArrayPos++] = tempChar;
-			
-			/*
-			// check if there is a black pixel above the current segment (probably from ö, ä or ü)
-			for(int countInY = 0; countInY < upperBorder; countInY++) {
-				for(int countInX = 0; countInX < charWidth; countInX++) {
-					if(binarisedImg.getPixel(leftBorder + countInX, countInY) == BLACK) {
-						upperBorder = countInY;
-						charHeight = bottomBorder - upperBorder;
-					}
-				}
-			}
-			*/
-		}		
+			allSegments[countSegment] = new CharacterCandidate(leftBorder, rightBorder, upperBorder, bottomBorder);	
+		}
 		
-		return cleanUpAndSortCharacterArray(arrToReturn, currentArrayPos);
+		CharacterCandidate[] arrToReturn = new CharacterCandidate[finalSegmentAmount];
+		int currentReturnArrayPos = 0;
+		
+		for(int countSegment = 0; countSegment < finalSegmentAmount; countSegment++) {
+			if(!CharacterCandidate.checkIfInvalidSize(allSegments[countSegment], false)) {
+				allSegments[countSegment].checkForUmlautAndRescale(binarisedImg, allSegments);
+				arrToReturn[currentReturnArrayPos++] = allSegments[countSegment];
+			}		
+		}
+		
+		return cleanUpAndSortCharacterArray(arrToReturn, currentReturnArrayPos);
 	}
 	
 	/**
