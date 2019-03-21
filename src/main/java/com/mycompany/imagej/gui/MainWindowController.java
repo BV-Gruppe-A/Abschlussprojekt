@@ -137,7 +137,8 @@ public class MainWindowController {
 	        	setCurrentImageProcessor(imgAsPlus.getProcessor());
 	        	startProcessForOneImage(removeFileExtension(currentImage.getName()));
 			}
-		}		
+		}	
+		classificator.evaluation();
 	}
 	
 	/**

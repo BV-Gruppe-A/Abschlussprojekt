@@ -92,6 +92,7 @@ public class Classificator {
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
 		}
+		
 	}
 	
 	/**
@@ -186,13 +187,13 @@ public class Classificator {
 		}
 	}
 	
-	private void evaluation() {
+	public void evaluation() {
 		double rate = 0.0;
 
 		HashMap<String,String> results = readResults();
 		rate = errorRate(results);
 		try {
-			writeToExcel("Classification Rate:",String.format("%.3f", rate));
+			writeToExcel(String.format("%.3f", rate),"Classification Rate:");
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
 		}
@@ -205,10 +206,13 @@ public class Classificator {
 		for(Entry<String, String> result : results.entrySet()) {
 			String key = result.getKey();
 			String value = result.getValue();
-			lengthAllChars += key.length();
-			mistakes += Math.abs(key.length() - value.length());
 			for (char c : key.toCharArray()) {
-				//TODO find way to compare chars
+				String character = String.valueOf(c);
+				if(value.contains(character)){
+					value.replaceFirst(character, ".");
+				} else {
+					mistakes++;
+				}
 			}
 		}
 		rate = 1.0 - (double) mistakes / (double) lengthAllChars;
@@ -227,7 +231,7 @@ public class Classificator {
             while ((line = br.readLine()) != null) {
                 // use comma as separator
                 String[] plate = line.split(cvsSplitBy);
-                results.put(plate[0],plate[2]);
+                results.put(plate[0],plate[1]);
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
