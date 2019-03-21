@@ -2,9 +2,15 @@ package com.mycompany.imagej;
 
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map.Entry;
+
 import com.mycompany.imagej.datamodels.*;
 import ij.ImagePlus;
 import ij.process.ImageProcessor;
@@ -168,15 +174,75 @@ public class Classificator {
 	 * @param filename
 	 * @throws IOException 
 	 */
-	private void writeToExcel(String plate, String filename) throws IOException{
+	private void writeToExcel(String value, String label) throws IOException{
 		BufferedWriter writer = null;
 		try {
 			 writer = new BufferedWriter(new FileWriter(csvName, true));
-			 writer.write(filename + "," + plate + "\n");
+			 writer.write(label + "," + value + "\n");
 			 writer.close();
 		}catch(IOException e) {
 			if (writer != null)
 				writer.close();
 		}
 	}
+	
+	private void evaluation() {
+		double rate = 0.0;
+
+		HashMap<String,String> results = readResults();
+		rate = errorRate(results);
+		try {
+			writeToExcel("Classification Rate:",String.format("%.3f", rate));
+		} catch (IOException e) {
+			System.out.println(e.getMessage());
+		}
+	}
+
+	private double errorRate(HashMap<String,String> results) {
+		double rate = 0.0;
+		int lengthAllChars = 0;
+		int mistakes = 0;
+		for(Entry<String, String> result : results.entrySet()) {
+			String key = result.getKey();
+			String value = result.getValue();
+			lengthAllChars += key.length();
+			mistakes += Math.abs(key.length() - value.length());
+			for (char c : key.toCharArray()) {
+				//TODO find way to compare chars
+			}
+		}
+		rate = 1.0 - (double) mistakes / (double) lengthAllChars;
+ 		return rate;
+	}
+
+	private HashMap<String,String> readResults() {
+		BufferedReader br = null;
+        String line = "";
+        String cvsSplitBy = ",";
+        HashMap<String,String> results = new HashMap<>();
+        
+        try {
+
+            br = new BufferedReader(new FileReader(csvName));
+            while ((line = br.readLine()) != null) {
+                // use comma as separator
+                String[] plate = line.split(cvsSplitBy);
+                results.put(plate[0],plate[2]);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return results;
+    }
 }
+
