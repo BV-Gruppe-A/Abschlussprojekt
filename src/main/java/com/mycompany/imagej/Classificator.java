@@ -2,16 +2,14 @@ package com.mycompany.imagej;
 
 import java.awt.Image;
 import java.awt.Toolkit;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
 import com.mycompany.imagej.datamodels.*;
+
 import ij.ImagePlus;
 import ij.process.ImageProcessor;
 
@@ -24,6 +22,7 @@ public class Classificator {
 	private Template[] templates;
 	private String csvName = "list.csv";
 	private HashMap<String,String> results;
+	
 	/**
 	 * 
 	 */
@@ -63,7 +62,6 @@ public class Classificator {
 		final String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ-0123456789";
 		//initialize array with alphabets length
 		templates = new Template[alphabet.length()];
-		
 		ImageProcessor img;
 		Image template;
 		//for each char in the alphabet create a Template object
@@ -192,6 +190,9 @@ public class Classificator {
 		}
 	}
 	
+	/**
+	 * 
+	 */
 	public void evaluation() {
 		double rate = 0.0;
 
@@ -203,6 +204,10 @@ public class Classificator {
 		}
 	}
 
+	/**
+	 * @param results
+	 * @return
+	 */
 	private double errorRate(HashMap<String,String> results) {
 		double rate = 0.0;
 		int lengthAllChars = 0;
