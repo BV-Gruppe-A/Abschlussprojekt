@@ -6,7 +6,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import javax.swing.*;
 
-// TODO: GUI.fancify()
+// TODO: GUI.Fancify().betterPadding()
 
 /**
  * the main window in which the user can interact
@@ -24,6 +24,7 @@ public class MainWindow extends GenericDialog {
 	protected JButton btnOpenFile = new JButton("Choose Image");
 	protected JButton btnSaveFile = new JButton("Choose Location");
 	protected JButton btnStartProcess = new JButton("Start");
+	protected JCheckBox ckbEvaluation = new JCheckBox("Display Classification Rate"); 
 	
 	// local variables & objects
 	private int currentY = 0;
@@ -91,6 +92,10 @@ public class MainWindow extends GenericDialog {
 		btnSaveFile.addActionListener((e) -> {
 			controller.openFileChooserForSaving();
 		});		
+		
+		// Check Box for Classification Rate
+		setConstraints(0, currentY++, 2, 0.0);
+		contentPanel.add(ckbEvaluation, constraints);
 		
 		// Start Button
 		setConstraints(1, currentY++, 1, 0.0);
