@@ -83,8 +83,13 @@ public class Classificator {
 	 */
 	public void classify(CharacterCandidate[] characters, String filename) {
 		String licencePlate = "";
-		for (CharacterCandidate character : characters) {
-			licencePlate += classifyChar(character.getImage());
+		for (int i = 0; i < characters.length; i++) {
+			licencePlate += classifyChar(characters[i].getImage());
+			if(i < characters.length-1) {
+				if(characters[i+1].getLeftBorder() - characters[i].getRightBorder() > 10) {
+					licencePlate += "_";
+				}
+			}
 		}
 		
 		try {
@@ -206,6 +211,7 @@ public class Classificator {
 		for(Entry<String, String> result : results.entrySet()) {
 			String key = result.getKey();
 			String value = result.getValue();
+			lengthAllChars += key.length();
 			for (char c : key.toCharArray()) {
 				String character = String.valueOf(c);
 				if(value.contains(character)){
