@@ -7,24 +7,6 @@ import ij.process.ImageProcessor;
  * implements Comparable to enable sorting of arrays of this type
  */
 public class CharacterCandidate implements Comparable<CharacterCandidate> {
-	// constant static values for the sizes
-	private final static double THRESHOLD = 0.25;	
-	private final static int OPT_CHAR_HEIGHT = 38;
-	private final static int MAX_CHAR_HEIGHT = OPT_CHAR_HEIGHT + (int) Math.round(OPT_CHAR_HEIGHT * THRESHOLD);
-	private final static int MIN_CHAR_HEIGHT = OPT_CHAR_HEIGHT - (int) Math.round(OPT_CHAR_HEIGHT * THRESHOLD);
-	
-	private final static int OPT_CHAR_WIDTH = 25;
-	private final static int MAX_CHAR_WIDTH = OPT_CHAR_WIDTH + (int) Math.round(OPT_CHAR_WIDTH * THRESHOLD);
-	private final static int MIN_CHAR_WIDTH = OPT_CHAR_WIDTH - (int) Math.round(OPT_CHAR_WIDTH * THRESHOLD);
-	
-	private final static int OPT_UMLAUT_HEIGHT = 6;
-	private final static int MAX_UMLAUT_HEIGHT = OPT_UMLAUT_HEIGHT + (int) Math.round(OPT_UMLAUT_HEIGHT * THRESHOLD);
-	private final static int MIN_UMLAUT_HEIGHT = OPT_UMLAUT_HEIGHT - (int) Math.round(OPT_UMLAUT_HEIGHT * THRESHOLD);
-	
-	private final static int OPT_UMLAUT_WIDTH = 10;
-	private final static int MAX_UMLAUT_WIDTH = OPT_UMLAUT_WIDTH + (int) Math.round(OPT_UMLAUT_WIDTH * THRESHOLD);
-	private final static int MIN_UMLAUT_WIDTH = OPT_UMLAUT_WIDTH - (int) Math.round(OPT_UMLAUT_WIDTH * THRESHOLD);
-	
 	// local objects
 	private ImageProcessor image;
 	
@@ -130,46 +112,41 @@ public class CharacterCandidate implements Comparable<CharacterCandidate> {
 	}
 	
 	/**
-	 * checks if a given candidate has a size that could either be a character or an umlaut-dot
+	 * checks if a given candidate has a size that could either be a character, a dot or a dash
 	 * @param toCheck the candidate to check
-	 * @param checkDots true if the size of a possible umlaut dot should be checked
-	 * @return true if this segment is not a valid possibility for a character
+	 * @param typeToCheckFor the type of character to check for
+	 * @return true if this segment is a valid possibility for a character, dot or dash
 	 */
-	public static boolean checkIfInvalidSize(CharacterCandidate toCheck, boolean checkDots) {
-		int maxWidth = checkDots ? MAX_UMLAUT_WIDTH : MAX_CHAR_WIDTH;
-		int maxHeight = checkDots ? MAX_UMLAUT_HEIGHT : MAX_CHAR_HEIGHT;
-		int minWidth = checkDots ? MIN_UMLAUT_WIDTH : MIN_CHAR_WIDTH;
-		int minHeight = checkDots ? MIN_UMLAUT_HEIGHT : MIN_CHAR_HEIGHT;
-		 
-		if(toCheck.getWidth() > maxWidth || toCheck.getHeight() > maxHeight) {
-			return true;
+	public static boolean checkIfValidSize(CharacterCandidate toCheck, CharacterType typeToCheckFor) {
+		int[] sizes = CharacterType.getSizesForCharacterType(typeToCheckFor);
+		
+		if(toCheck.getWidth() > sizes[CharacterType.INDEX_MAX_WIDTH] || toCheck.getHeight() > sizes[CharacterType.INDEX_MAX_HEIGHT]) {
+			return false;
 		}
 		
-		if(toCheck.getWidth() < minWidth || toCheck.getHeight() < minHeight) {
-			return true;
+		if(toCheck.getWidth() < sizes[CharacterType.INDEX_MIN_WIDTH] || toCheck.getHeight() < sizes[CharacterType.INDEX_MIN_HEIGHT]) {
+			return false;
 		}
 		
-		return false;
+		return true;
 	}
 	
 	/**
-	 * checks if the candidate is an umlaut and, independently, rescales it to the template size
-	 * @param wholeImage whole number plate as an image processor
+	 * checks if the candidate is an umlaut and changes the border accordingly
 	 * @param allSegments array containing all segments as character candidates
 	 */
-	public void checkForUmlautAndRescale(ImageProcessor wholeImage, CharacterCandidate[] allSegments) {
+	public void checkForUmlautAndChangeBorder(CharacterCandidate[] allSegments) {
 		CharacterCandidate[] dots = checkForUmlaut(allSegments);
 		if(!checkForNull(dots)) {
 			changeBordersToUmlaut(dots);
 		}
-		setAndScaleImage(wholeImage);
 	}
 
 	/**
 	 * sets the image Processor to a scaled variant of the given Image
 	 * @param wholeImage whole number plate as an image processor
 	 */
-	private void setAndScaleImage(ImageProcessor wholeImage) {
+	public void setAndScaleImage(ImageProcessor wholeImage) {
 		image = wholeImage.createProcessor(getWidth(), getHeight());
 		for(int countInY = 0; countInY < getHeight(); countInY++) {
 			for(int countInX = 0; countInX < getWidth(); countInX++) {
@@ -177,7 +154,7 @@ public class CharacterCandidate implements Comparable<CharacterCandidate> {
 				image.putPixel(countInX, countInY, pixelToPut);
 			}
 		}
-		image = image.resize(OPT_CHAR_WIDTH, OPT_CHAR_HEIGHT);
+		image = image.resize(CharacterType.OPT_CHARDASH_WIDTH, CharacterType.OPT_CHAR_HEIGHT);
 	}
 	
 	/**
@@ -191,7 +168,7 @@ public class CharacterCandidate implements Comparable<CharacterCandidate> {
 		
 		for(int countSegments = 0; countSegments < allSegments.length; countSegments++) {
 			if(allSegments[countSegments].getBottomBorder() <= getUpperBorder()) {
-				if(!checkIfInvalidSize(allSegments[countSegments], true)) {
+				if(checkIfValidSize(allSegments[countSegments], CharacterType.DOT)) {
 					dots[currentDot++] = allSegments[countSegments];
 				}
 			}

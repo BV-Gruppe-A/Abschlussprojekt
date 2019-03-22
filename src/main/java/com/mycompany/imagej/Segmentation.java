@@ -1,9 +1,8 @@
 package com.mycompany.imagej;
 
 import java.util.Arrays;
-
 import com.mycompany.imagej.datamodels.CharacterCandidate;
-
+import com.mycompany.imagej.datamodels.CharacterType;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.process.ImageProcessor;
@@ -66,7 +65,7 @@ public class Segmentation {
 	 */
 	private void fillTheSegments() {
 		if(!binarisedImg.isBinary()) {     	
-        	IJ.log("ImageProcessor is not binary!");
+        	IJ.error("ImageProcessor is not binary!");
 			// TODO: Maybe throw an exception? Or Delete but not just logging
         	return;
 		}
@@ -178,10 +177,17 @@ public class Segmentation {
 		int currentReturnArrayPos = 0;
 		
 		for(int countSegment = 0; countSegment < finalSegmentAmount; countSegment++) {
-			if(!CharacterCandidate.checkIfInvalidSize(allSegments[countSegment], false)) {
-				allSegments[countSegment].checkForUmlautAndRescale(binarisedImg, allSegments);
+			boolean couldBeChar = CharacterCandidate.checkIfValidSize(allSegments[countSegment], CharacterType.CHARACTER);
+			boolean couldBeDash = CharacterCandidate.checkIfValidSize(allSegments[countSegment], CharacterType.DASH);
+
+			if(couldBeChar || couldBeDash) {
+				if(couldBeChar) {
+					allSegments[countSegment].checkForUmlautAndChangeBorder(allSegments);
+				}	
+				
+				allSegments[countSegment].setAndScaleImage(binarisedImg);
 				arrToReturn[currentReturnArrayPos++] = allSegments[countSegment];
-			}		
+			}
 		}
 		
 		return cleanUpAndSortCharacterArray(arrToReturn, currentReturnArrayPos);

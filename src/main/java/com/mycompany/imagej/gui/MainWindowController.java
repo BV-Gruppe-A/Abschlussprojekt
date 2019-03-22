@@ -118,7 +118,7 @@ public class MainWindowController {
 	/**
 	 * gets called when the start button is pressed
 	 */
-	public void reactToStartButton() {		
+	public void reactToStartButton() {			
 		if(imgOrFolderToOpen == null || !imgOrFolderToOpen.exists() && !imgOrFolderToOpen.isDirectory()) {
 			IJ.error("No existing image to open was chosen");
 			return;
@@ -135,8 +135,11 @@ public class MainWindowController {
 			for(File currentImage : imgOrFolderToOpen.listFiles(new ImgFilterDirectory())) {
 				ImagePlus imgAsPlus = new ImagePlus(currentImage.getAbsolutePath());
 	        	setCurrentImageProcessor(imgAsPlus.getProcessor());
-	        	startProcessForOneImage(removeFileExtension(currentImage.getName()));
+	        	startProcessForOneImage(removeFileExtension(currentImage.getName()));       	
 			}
+			
+			// TODO: find better way to inform user
+			IJ.error("Processing finished!");
 		}
 		
 		if(windowToControl.ckbEvaluation.isSelected()) {
@@ -175,7 +178,9 @@ public class MainWindowController {
     	segm.changeImage(getCurrentImageProcessor());
     	classificator.classify(segm.segmentThePicture(), imageName);   	
     	
+    	/*
     	ImagePlus imgToShow = new ImagePlus(imageName, getCurrentImageProcessor());
-    	imgToShow.show();
+    	imgToShow.show();    
+    	*/	
 	}
 }
