@@ -23,12 +23,12 @@ public class Classificator {
 
 	private Template[] templates;
 	private String csvName = "list.csv";
-	
+	private HashMap<String,String> results;
 	/**
 	 * 
 	 */
 	public Classificator() {
-		
+		results = new HashMap<>();
 		initializeTemplates();
 	}
 	
@@ -91,7 +91,7 @@ public class Classificator {
 				}
 			}
 		}
-		
+		results.put(filename,licencePlate);
 		try {
 			writeToExcel(licencePlate, filename);
 		} catch (IOException e) {
@@ -195,7 +195,6 @@ public class Classificator {
 	public void evaluation() {
 		double rate = 0.0;
 
-		HashMap<String,String> results = readResults();
 		rate = errorRate(results);
 		try {
 			writeToExcel(String.format("%.3f", rate),"Classification Rate:");
@@ -225,34 +224,5 @@ public class Classificator {
  		return rate;
 	}
 
-	private HashMap<String,String> readResults() {
-		BufferedReader br = null;
-        String line = "";
-        String cvsSplitBy = ",";
-        HashMap<String,String> results = new HashMap<>();
-        
-        try {
-
-            br = new BufferedReader(new FileReader(csvName));
-            while ((line = br.readLine()) != null) {
-                // use comma as separator
-                String[] plate = line.split(cvsSplitBy);
-                results.put(plate[0],plate[1]);
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return results;
-    }
 }
 
