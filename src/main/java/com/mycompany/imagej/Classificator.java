@@ -19,7 +19,8 @@ import ij.process.ImageProcessor;
  */
 public class Classificator {
 
-	private Template[] templates;
+	private Template[] templates_fe;
+	private Template[] templates_din;
 	private String csvName = "list.csv";
 	private HashMap<String,String> results;
 	
@@ -61,14 +62,21 @@ public class Classificator {
 		//String with all possible licence plate characters
 		final String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ-0123456789";
 		//initialize array with alphabets length
-		templates = new Template[alphabet.length()];
+		templates_fe = new Template[alphabet.length()];
+		templates_din = new Template[alphabet.length()];
 		ImageProcessor img;
 		Image template;
 		//for each char in the alphabet create a Template object
-		for (int i = 0; i < templates.length; i++) {
-			template = Toolkit.getDefaultToolkit().getImage((getClass().getClassLoader().getResource("Templates/" + alphabet.substring(i, i+1) + ".png")));
+		for (int i = 0; i < templates_fe.length; i++) {
+			template = Toolkit.getDefaultToolkit().getImage((getClass().getClassLoader().getResource("Templates_FE/" + alphabet.substring(i, i+1) + ".png")));
 	        img = new ImagePlus(template.toString(),template).getProcessor().convertToByte(false);
-	        templates[i] = new Template(alphabet.substring(i, i+1), calcMean(img), img);
+	        templates_fe[i] = new Template(alphabet.substring(i, i+1), calcMean(img), img);
+	        
+	    }
+		for (int i = 0; i < templates_din.length; i++) {
+			template = Toolkit.getDefaultToolkit().getImage((getClass().getClassLoader().getResource("Templates_DIN/" + alphabet.substring(i, i+1) + ".png")));
+	        img = new ImagePlus(template.toString(),template).getProcessor().convertToByte(false);
+	        templates_din[i] = new Template(alphabet.substring(i, i+1), calcMean(img), img);
 	        
 	    }
 	}
@@ -82,7 +90,7 @@ public class Classificator {
 	public void classify(CharacterCandidate[] characters, String filename) {
 		String licencePlate = "";
 		for (int i = 0; i < characters.length; i++) {
-			licencePlate += classifyChar(characters[i].getImage());
+			licencePlate += classifyChar(characters[i]);
 			if(i < characters.length-1) {
 				if(characters[i+1].getLeftBorder() - characters[i].getRightBorder() > 10) {
 					licencePlate += "_";
@@ -103,20 +111,66 @@ public class Classificator {
 	 * Does template matching of character with each template and chooses best option
 	 * @return Character that the image represents most likely
 	 */
-	private String classifyChar(ImageProcessor character) {
-		String s = null;
-		double maxVal = -1;
-		double val;
-		for ( Template template : templates) {
-			val = templateMatch(template, character);
-			if(val > maxVal) {
-				maxVal = val;
-				s = template.getCharacter();
+	private String classifyChar(CharacterCandidate character) {
+		Template bestChoiceDin = null;
+		Template bestChoiceFE = null;
+		String s;
+		double maxVal_fe = -100;
+		double val_fe;
+		double maxVal_din = -100;
+		double val_din;
+		for (int i = 0; i < templates_fe.length; i++) {
+			val_fe = templateMatch(templates_fe[i], character.getImage());
+			if(val_fe > maxVal_fe) {
+				maxVal_fe = val_fe;
+				bestChoiceFE = templates_fe[i];
+			}
+			val_din = templateMatch(templates_din[i], character.getImage());
+			if(val_din > maxVal_din) {
+				maxVal_din = val_din;
+				bestChoiceDin = templates_din[i];
 			}
 		}
+		
+		if(maxVal_fe > maxVal_din) {
+			s = hardships_fe(bestChoiceFE,character);
+		} else {
+			s = hardship_din(bestChoiceDin,character);
+		}
+		
 		return s;
 	}
 	
+	private String hardship_din(Template bestChoice, CharacterCandidate character) {
+		String s = bestChoice.getCharacter();
+		switch(bestChoice.getCharacter()) {
+		case "0":
+			break;
+		
+			
+		}
+		return s;
+	}
+
+
+
+	private String hardships_fe(Template bestChoice, CharacterCandidate character) {
+		String s = bestChoice.getCharacter();
+		switch(bestChoice.getCharacter()) {
+		case "-":
+		case "I":
+			if(character.getHeight() > character.getWidth()) {
+				s = "I";
+			}else {
+				s = "-";
+			}
+			break;
+		}
+		return s;
+	}
+
+
+
 	/**
 	 * uses template matching to determine similarity
 	 * @param template the template to compare the sample to
@@ -216,6 +270,9 @@ public class Classificator {
 			String key = result.getKey();
 			String value = result.getValue();
 			lengthAllChars += key.length();
+			if(value.length() > key.length()) {
+				mistakes += value.length() - key.length();
+			}
 			for (char c : key.toCharArray()) {
 				String character = String.valueOf(c);
 				if(value.contains(character)){
