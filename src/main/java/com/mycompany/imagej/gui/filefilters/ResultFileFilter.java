@@ -6,7 +6,7 @@ import javax.swing.filechooser.FileFilter;
 /**
  * Filters the shown images in the file chooser
  */
-public class ImgFilterFileChooser extends FileFilter {
+public class ResultFileFilter extends FileFilter {
 	/**
 	 * checks if a given file is accepted by the filter
 	 * @param file the given file
@@ -20,11 +20,11 @@ public class ImgFilterFileChooser extends FileFilter {
 	    }
 
 	    String extension = GeneralFileFilter.getFileExtension(file.getName());
-	    if (extension == null) {
+	    if (extension == null || !extension.equals("csv")) {
 	        return false;
+	    } else {
+	    	return true;
 	    }
-
-	    return GeneralFileFilter.checkForImageExtension(extension);
 	}
 
 	/**
@@ -32,6 +32,6 @@ public class ImgFilterFileChooser extends FileFilter {
 	 */
 	@Override
 	public String getDescription() {
-		return "Images: jpg, jpeg, bmp, png, tif or tiff";
+		return "CSV File";
 	}
 }

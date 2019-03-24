@@ -6,6 +6,7 @@ import com.mycompany.imagej.Classificator;
 import com.mycompany.imagej.Segmentation;
 import com.mycompany.imagej.gui.filefilters.ImgFilterDirectory;
 import com.mycompany.imagej.gui.filefilters.ImgFilterFileChooser;
+import com.mycompany.imagej.gui.filefilters.ResultFileFilter;
 import com.mycompany.imagej.preprocessing.ContrastAdjustment;
 import com.mycompany.imagej.preprocessing.Grayscale;
 import com.mycompany.imagej.preprocessing.ShadingFilter;
@@ -106,6 +107,7 @@ public class MainWindowController {
 	 */
 	public void openFileChooserForSaving() {
 		JFileChooser fcSave = new JFileChooser();
+		fcSave.setFileFilter(new ResultFileFilter());
 		
 		int returnVal = fcSave.showSaveDialog(windowToControl.btnSaveFile);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -136,15 +138,15 @@ public class MainWindowController {
 				ImagePlus imgAsPlus = new ImagePlus(currentImage.getAbsolutePath());
 	        	setCurrentImageProcessor(imgAsPlus.getProcessor());
 	        	startProcessForOneImage(removeFileExtension(currentImage.getName()));       	
-			}
-			
-			// TODO: find better way to inform user
-			IJ.error("Processing finished!");
+			}			
 		}
 		
 		if(windowToControl.ckbEvaluation.isSelected()) {
 			classificator.evaluation();
-		}
+		}		
+
+		// TODO: find better way to inform user
+		IJ.error("Processing finished!");
 	}
 	
 	/**
@@ -181,6 +183,6 @@ public class MainWindowController {
     	/*
     	ImagePlus imgToShow = new ImagePlus(imageName, getCurrentImageProcessor());
     	imgToShow.show();    
-    	*/	
+    	*/
 	}
 }

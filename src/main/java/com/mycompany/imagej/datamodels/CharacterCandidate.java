@@ -16,6 +16,8 @@ public class CharacterCandidate implements Comparable<CharacterCandidate> {
 	private int upperBorder;
 	private int bottomBorder;
 	
+	private boolean usedAsDot = false;
+	
 	/**
 	 * Constructor which sets the boundaries of this character
 	 * @param left x-coordinate of the left Border of the char
@@ -98,6 +100,20 @@ public class CharacterCandidate implements Comparable<CharacterCandidate> {
 	}
 	
 	/**
+	 * set the used As Dot bool to true
+	 */
+	public void useAsDot() {
+		usedAsDot = true;
+	}
+	
+	/**
+	 * @return true if the character was used as a dot
+	 */
+	public boolean checkIfUsedAsDot() {
+		return usedAsDot;
+	}
+	
+	/**
 	 * @return width of the candidate
 	 */
 	public int getWidth() {
@@ -137,8 +153,10 @@ public class CharacterCandidate implements Comparable<CharacterCandidate> {
 	 */
 	public void checkForUmlautAndChangeBorder(CharacterCandidate[] allSegments) {
 		CharacterCandidate[] dots = checkForUmlaut(allSegments);
+		
 		if(!checkForNull(dots)) {
 			changeBordersToUmlaut(dots);
+			setDotsToUsed(dots);
 		}
 	}
 
@@ -166,8 +184,10 @@ public class CharacterCandidate implements Comparable<CharacterCandidate> {
 		CharacterCandidate[] dots = new CharacterCandidate[2];
 		int currentDot = 0;
 		
-		for(int countSegments = 0; countSegments < allSegments.length; countSegments++) {
-			if(allSegments[countSegments].getBottomBorder() <= getUpperBorder()) {
+		for(int countSegments = 0; countSegments < allSegments.length; countSegments++) {	
+			CharacterCandidate possibleDot = allSegments[countSegments];
+			if(possibleDot.getBottomBorder() <= getUpperBorder() && !possibleDot.checkIfUsedAsDot()	
+					&& possibleDot.getRightBorder() >= getLeftBorder() && possibleDot.getLeftBorder() <= getRightBorder()) {
 				if(checkIfValidSize(allSegments[countSegments], CharacterType.DOT)) {
 					dots[currentDot++] = allSegments[countSegments];
 				}
@@ -175,6 +195,16 @@ public class CharacterCandidate implements Comparable<CharacterCandidate> {
 		}
 		
 		return dots;
+	}
+	
+	/**
+	 * set both dots to used
+	 * @param dots the dots to change
+	 */
+	private void setDotsToUsed(CharacterCandidate[] dots) {
+		for(int count = 0; count < dots.length; count++) {
+			dots[count].useAsDot();
+		}
 	}
 	
 	/**
