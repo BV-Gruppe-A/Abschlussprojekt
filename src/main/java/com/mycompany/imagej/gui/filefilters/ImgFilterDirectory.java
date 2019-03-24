@@ -15,11 +15,11 @@ public class ImgFilterDirectory implements FilenameFilter {
 	 */
 	@Override
 	public boolean accept(File directory, String fileName) {
-	    String extension = ImgFileFilter.getFileExtension(fileName);
+	    String extension = GeneralFileFilter.getFileExtension(fileName);
 	    if (extension == null) {
 	        return false;
 	    }
 
-	    return ImgFileFilter.checkForImageExtension(extension);
+	    return GeneralFileFilter.checkForImageExtension(extension);
 	}
 }

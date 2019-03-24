@@ -5,7 +5,7 @@ package com.mycompany.imagej.gui.filefilters;
  * based on this class from the Oracle Java Tutorials
  * https://docs.oracle.com/javase/tutorial/uiswing/examples/components/FileChooserDemo2Project/src/components/ImageFilter.java
  */
-public class ImgFileFilter {
+public class GeneralFileFilter {
 	/**
 	 * gets the extension for the given file
 	 * @param file file for that the extension is searched
