@@ -25,6 +25,7 @@ public class MainWindow extends GenericDialog {
 	protected JButton btnSaveFile = new JButton("Choose Location");
 	protected JButton btnStartProcess = new JButton("Start");
 	protected JCheckBox ckbEvaluation = new JCheckBox("Display Classification Rate"); 
+	protected JCheckBox ckbClearFile = new JCheckBox("Clear File");
 	
 	// local variables & objects
 	private int currentY = 0;
@@ -93,9 +94,11 @@ public class MainWindow extends GenericDialog {
 			controller.openFileChooserForSaving();
 		});		
 		
-		// Check Box for Classification Rate
+		// Check Boxes for Classification Rate & Clearing
 		setConstraints(0, currentY++, 2, 0.0);
 		contentPanel.add(ckbEvaluation, constraints);
+		setConstraints(0, currentY++, 2, 0.0);
+		contentPanel.add(ckbClearFile, constraints);
 		
 		// Start Button
 		setConstraints(1, currentY++, 1, 0.0);

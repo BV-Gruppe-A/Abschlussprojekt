@@ -125,7 +125,7 @@ public class DebugWindowController {
         if (returnVal == JFileChooser.APPROVE_OPTION) {
         	placeToSave = fcSave.getSelectedFile();
         	windowToControl.txtSaveLocation.setText(placeToSave.getPath());
-        	classificator.setCsvName(placeToSave.getAbsolutePath());
+        	classificator.setCsvName(placeToSave.getAbsolutePath(), false);
         }
 	}
 	
@@ -291,8 +291,7 @@ public class DebugWindowController {
         	setCurrentImageProcessor(shading.shading(getCurrentImageProcessor()));           	
         	cont.Binarization(getCurrentImageProcessor(), BinarizationWhite);    
         	segm.changeImage(getCurrentImageProcessor());
-        	//classificator.classify(segm.segmentThePicture(), imageName);   	
-            segm.debugSegmentation();
+        	classificator.classify(segm.segmentThePicture(), imageName);   	
         	break;        	
         default: 
         	

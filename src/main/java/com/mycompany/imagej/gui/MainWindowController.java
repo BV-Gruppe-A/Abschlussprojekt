@@ -24,7 +24,7 @@ public class MainWindowController {
 	// local objects
 	private MainWindow windowToControl;
 	private File imgOrFolderToOpen;
-	private File placeToSave;
+	private File fileToSave;
 	private ImageProcessor currentImage;
 	
 	private ContrastAdjustment cont = new ContrastAdjustment();
@@ -111,9 +111,8 @@ public class MainWindowController {
 		
 		int returnVal = fcSave.showSaveDialog(windowToControl.btnSaveFile);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-        	placeToSave = fcSave.getSelectedFile();
-        	windowToControl.txtSaveLocation.setText(placeToSave.getPath());
-        	classificator.setCsvName(placeToSave.getAbsolutePath());
+        	fileToSave = fcSave.getSelectedFile();
+        	windowToControl.txtSaveLocation.setText(fileToSave.getPath());
         }
 	}
 	
@@ -122,14 +121,16 @@ public class MainWindowController {
 	 */
 	public void reactToStartButton() {			
 		if(imgOrFolderToOpen == null || !imgOrFolderToOpen.exists() && !imgOrFolderToOpen.isDirectory()) {
-			IJ.error("No existing image to open was chosen");
+			IJ.error("No existing image (or directory) to open was chosen");
 			return;
 		}
 		
-		if(placeToSave == null) {
+		if(fileToSave == null) {
 			IJ.error("No existing place to save was chosen");
 			return;
-		}		
+		}	
+		
+		classificator.setCsvName(fileToSave.getAbsolutePath(), windowToControl.ckbClearFile.isSelected());
 		
 		if(isOneFile) {
 			startProcessForOneImage(removeFileExtension(imgOrFolderToOpen.getName()));

@@ -3,6 +3,7 @@ package com.mycompany.imagej;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
@@ -49,11 +50,15 @@ public class Classificator {
 	/**
 	 * @param csvName
 	 */
-	public void setCsvName(String csvName) {
+	public void setCsvName(String csvName, boolean clear) {
 		if(!csvName.endsWith(".csv")){
 			csvName += ".csv";
 		}
 		this.csvName = csvName;
+		File file = new File(csvName); 
+		if(clear && file.exists()) {
+			file.delete();
+		}
 	}
 
 
@@ -165,22 +170,22 @@ public class Classificator {
 		case BOTH:
 			if(maxVal_fe > maxVal_din) {
 				charIsFe[currentChar] = true;
-				s = hardships_fe(bestChoiceFE,character);
+				s = checkHardshipsFE(bestChoiceFE,character);
 				// IJ.log("This is 1. fe = " + s);
 			} else {
 				charIsFe[currentChar] = false;
-				s = hardship_din(bestChoiceDin,character);
+				s = checkhardshipsDIN(bestChoiceDin,character);
 				// IJ.log("This is 1. din = " + s);
 			}
 			break;
 			
 		case DIN:
-			s = hardship_din(bestChoiceDin,character);
+			s = checkhardshipsDIN(bestChoiceDin,character);
 			// IJ.log("This is 2. din = " + s);
 			break;
 			
 		case FE:
-			s = hardships_fe(bestChoiceFE,character);
+			s = checkHardshipsFE(bestChoiceFE,character);
 			// IJ.log("This is 2. fe = " + s);
 			break;
 			
@@ -224,13 +229,15 @@ public class Classificator {
 		return currentPlate;
 	}
 	
-	private String hardship_din(Template bestChoice, CharacterCandidate character) {
+	private String checkHardshipsFE(Template bestChoice, CharacterCandidate character) {
 		String s = bestChoice.getCharacter();
 		double mean = 0.0;
 		switch(bestChoice.getCharacter()) {
 		case "0":
-			break;
-		case "O":
+			mean = calcMean(character.getImage(),20,23,7,11);
+			if(mean < 10) {
+				s = "O";
+			}
 			break;
 		case "I":
 		case "1":
@@ -238,7 +245,6 @@ public class Classificator {
 				s = "-";
 			}else {
 				mean = calcMean(character.getImage(),1,6,8,12);
-				IJ.log(String.format("%.3f", mean));
 				if(mean > 80) {
 					s = "I";
 				} else {
@@ -247,6 +253,10 @@ public class Classificator {
 			}
 			break;
 		case "D":
+			mean = calcMean(character.getImage(),20,23,7,11);
+			if(mean > 50) {
+				s = "0";
+			}
 			break;
 		case "H":
 		case "N":
@@ -264,8 +274,9 @@ public class Classificator {
 
 
 
-	private String hardships_fe(Template bestChoice, CharacterCandidate character) {
+	private String checkhardshipsDIN(Template bestChoice, CharacterCandidate character) {
 		String s = bestChoice.getCharacter();
+		double mean = 0.0;
 		switch(bestChoice.getCharacter()) {
 		case "-":
 		case "I":
@@ -275,6 +286,14 @@ public class Classificator {
 				s = "-";
 			}
 			break;
+		case "8":
+		case "9":
+			mean = calcMean(character.getImage(),1,7,22,27);
+			if(mean > 127) {
+				s = "9";
+			} else {
+				s = "8";
+			}
 		}
 		return s;
 	}
@@ -371,7 +390,7 @@ public class Classificator {
 
 		rate = errorRate(results);
 		try {
-			writeToExcel(String.format("%.3f", rate),"Classification Rate:");
+			writeToExcel(String.format(" %.3f", rate),"Classification Rate");
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
 		}
