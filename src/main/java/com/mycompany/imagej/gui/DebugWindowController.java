@@ -291,8 +291,8 @@ public class DebugWindowController {
         	setCurrentImageProcessor(shading.shading(getCurrentImageProcessor()));           	
         	cont.Binarization(getCurrentImageProcessor(), BinarizationWhite);    
         	segm.changeImage(getCurrentImageProcessor());
-        	classificator.classify(segm.segmentThePicture(), imageName);   	
-            
+        	//classificator.classify(segm.segmentThePicture(), imageName);   	
+            segm.debugSegmentation();
         	break;        	
         default: 
         	

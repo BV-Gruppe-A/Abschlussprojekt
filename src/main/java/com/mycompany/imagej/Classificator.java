@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 
 import com.mycompany.imagej.datamodels.*;
 
+import ij.IJ;
 import ij.ImagePlus;
 import ij.process.ImageProcessor;
 
@@ -143,10 +144,37 @@ public class Classificator {
 	
 	private String hardship_din(Template bestChoice, CharacterCandidate character) {
 		String s = bestChoice.getCharacter();
+		double mean = 0.0;
 		switch(bestChoice.getCharacter()) {
 		case "0":
 			break;
-		
+		case "O":
+			break;
+		case "I":
+		case "1":
+			if(character.getHeight() <= character.getWidth()) {
+				s = "-";
+			}else {
+				mean = calcMean(character.getImage(),1,6,8,12);
+				IJ.log(String.format("%.3f", mean));
+				if(mean > 80) {
+					s = "I";
+				} else {
+					s = "1";
+				}
+			}
+			break;
+		case "D":
+			break;
+		case "H":
+		case "N":
+			mean = (calcMean(character.getImage(),14,19,24,28) + calcMean(character.getImage(),6,9,7,11)) /2;
+			if(mean > 80) {
+				s = "H";
+			} else {
+				s = "N";
+			}
+			break;
 			
 		}
 		return s;
@@ -214,18 +242,26 @@ public class Classificator {
 	 * @return mean of the images pixel values
 	 */
 	private double calcMean(ImageProcessor img) {
+		double mean = calcMean(img,0, img.getWidth(),0, img.getHeight());
+		return mean;
+	}
+
+	/**
+	 * calculates the mean of the values of a specified rectangle of pixels of an image
+	 * @param img
+	 * @return mean of the images pixel values
+	 */
+	private double calcMean(ImageProcessor img, int leftBorder, int rightBorder, int upperBorder, int lowerBorder) {
 		double mean = 0.0;
-		int J = img.getWidth();
-		int K = img.getHeight(); 
-		double N = (double) J * K;
-		for (int j = 0; j < J; j++) {
-			for(int k = 0; k < K; k++) {
+		double N = (double) (rightBorder - leftBorder) * (lowerBorder - upperBorder) ;
+		for (int j = leftBorder ; j < rightBorder; j++) {
+			for(int k = upperBorder; k < lowerBorder; k++) {
 				mean += img.getPixel(j, k) / N;		
 			}
 		}		
 		return mean;
 	}
-
+	
 	/**
 	 * writes one licence plate with filename into a row of a csv file
 	 * @param plate plate licence plate as string (result of classification)
