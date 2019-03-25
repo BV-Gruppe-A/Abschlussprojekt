@@ -7,9 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map.Entry;
-
 import com.mycompany.imagej.datamodels.*;
-
 import ij.ImagePlus;
 import ij.process.ImageProcessor;
 
@@ -18,7 +16,9 @@ import ij.process.ImageProcessor;
  *
  */
 public class Classificator {
-
+	//String with all possible licence plate characters
+	final String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ-0123456789";	
+	
 	private Template[] templates_fe;
 	private Template[] templates_din;
 	private String csvName = "list.csv";
@@ -59,8 +59,6 @@ public class Classificator {
 	 * reads in all template pictures of characters in FE font and maps it to the character it represents
 	 */
 	private void initializeTemplates() {
-		//String with all possible licence plate characters
-		final String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ-0123456789";
 		//initialize array with alphabets length
 		templates_fe = new Template[alphabet.length()];
 		templates_din = new Template[alphabet.length()];
@@ -119,16 +117,24 @@ public class Classificator {
 		double val_fe;
 		double maxVal_din = -100;
 		double val_din;
-		for (int i = 0; i < templates_fe.length; i++) {
-			val_fe = templateMatch(templates_fe[i], character.getImage());
-			if(val_fe > maxVal_fe) {
-				maxVal_fe = val_fe;
-				bestChoiceFE = templates_fe[i];
-			}
-			val_din = templateMatch(templates_din[i], character.getImage());
-			if(val_din > maxVal_din) {
-				maxVal_din = val_din;
-				bestChoiceDin = templates_din[i];
+		character.setMean(calcMean(character.getImage()));
+		
+		if(character.getMean() == 0) {
+			maxVal_din = 100.0;
+			bestChoiceFE = templates_fe[alphabet.indexOf("-")];
+			bestChoiceDin = templates_din[alphabet.indexOf("-")];
+		} else {
+			for (int i = 0; i < templates_fe.length; i++) {
+				val_fe = templateMatch(templates_fe[i], character);
+				if(val_fe > maxVal_fe) {
+					maxVal_fe = val_fe;
+					bestChoiceFE = templates_fe[i];
+				}
+				val_din = templateMatch(templates_din[i], character);
+				if(val_din > maxVal_din) {
+					maxVal_din = val_din;
+					bestChoiceDin = templates_din[i];
+				}
 			}
 		}
 		
@@ -176,7 +182,8 @@ public class Classificator {
 	 * @param template the template to compare the sample to
 	 * @param sample the sample image to compare to template
 	 */
-	private double templateMatch(Template template, ImageProcessor sample) {
+	private double templateMatch(Template template, CharacterCandidate candidate) {
+		ImageProcessor sample = candidate.getImage();
 		int J = sample.getWidth();
 		int K = sample.getHeight();
 		
@@ -184,7 +191,7 @@ public class Classificator {
 		double denominator1 = 0;
 		double  denominator2 = 0;
 		
-		double sampleMean = calcMean(sample);
+		double sampleMean = candidate.getMean();
 		double templateMean = template.getMean();
 		
 		ImageProcessor templateImg = template.getImage();
