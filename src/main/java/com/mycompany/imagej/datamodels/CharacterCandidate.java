@@ -16,6 +16,8 @@ public class CharacterCandidate implements Comparable<CharacterCandidate> {
 	private int upperBorder;
 	private int bottomBorder;
 	
+	private double meanValue;
+	
 	private boolean usedAsDot = false;
 	
 	/**
@@ -97,6 +99,21 @@ public class CharacterCandidate implements Comparable<CharacterCandidate> {
 	 */
 	public void setBottomBorder(int bottomBorder) {
 		this.bottomBorder = bottomBorder;
+	}
+	
+	/**
+	 * @return mean Value as a double
+	 */
+	public double getMean() {
+		return meanValue;
+	}
+	
+	/**
+	 * sets the mean value of the current character to the given value
+	 * @param newMean new Mean to set
+	 */
+	public void setMean(double newMean) {
+		meanValue = newMean;
 	}
 	
 	/**

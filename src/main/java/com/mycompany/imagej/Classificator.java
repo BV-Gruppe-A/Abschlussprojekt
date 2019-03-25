@@ -7,7 +7,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map.Entry;
-
 import com.mycompany.imagej.datamodels.*;
 
 import ij.IJ;
@@ -19,9 +18,12 @@ import ij.process.ImageProcessor;
  *
  */
 public class Classificator {
-
+	//String with all possible licence plate characters
+	final String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ-0123456789";	
+	
 	private Template[] templates_fe;
 	private Template[] templates_din;
+	private boolean[] charIsFe;
 	private String csvName = "list.csv";
 	private HashMap<String,String> results;
 	
@@ -60,8 +62,6 @@ public class Classificator {
 	 * reads in all template pictures of characters in FE font and maps it to the character it represents
 	 */
 	private void initializeTemplates() {
-		//String with all possible licence plate characters
-		final String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ-0123456789";
 		//initialize array with alphabets length
 		templates_fe = new Template[alphabet.length()];
 		templates_din = new Template[alphabet.length()];
@@ -90,14 +90,30 @@ public class Classificator {
 	 */
 	public void classify(CharacterCandidate[] characters, String filename) {
 		String licencePlate = "";
+		charIsFe = new boolean[characters.length];
+		int[] spaces = new int[2];
+		int countSpaces = 0;
+		
 		for (int i = 0; i < characters.length; i++) {
-			licencePlate += classifyChar(characters[i]);
-			if(i < characters.length-1) {
+			licencePlate += classifyChar(characters[i], i, FontToClassify.BOTH);
+			if(i < characters.length - 1) {
 				if(characters[i+1].getLeftBorder() - characters[i].getRightBorder() > 10) {
-					licencePlate += "_";
+					spaces[countSpaces++] = i + 1;
 				}
 			}
 		}
+		
+		licencePlate = balanceTheFont(licencePlate, characters);
+		
+		for(int i = 0; i < spaces.length; i++) {
+			if(spaces[i] != 0) {
+				licencePlate = licencePlate.substring(0, spaces[i]) + "_" + licencePlate.substring(spaces[i], licencePlate.length());
+				if(i + 1 < spaces.length && spaces[i + 1] != 0) {
+					spaces[i + 1]++;
+				}				
+			}
+		}
+		
 		results.put(filename,licencePlate);
 		try {
 			writeToExcel(licencePlate, filename);
@@ -112,7 +128,7 @@ public class Classificator {
 	 * Does template matching of character with each template and chooses best option
 	 * @return Character that the image represents most likely
 	 */
-	private String classifyChar(CharacterCandidate character) {
+	private String classifyChar(CharacterCandidate character, int currentChar, FontToClassify font) {
 		Template bestChoiceDin = null;
 		Template bestChoiceFE = null;
 		String s;
@@ -120,26 +136,92 @@ public class Classificator {
 		double val_fe;
 		double maxVal_din = -100;
 		double val_din;
-		for (int i = 0; i < templates_fe.length; i++) {
-			val_fe = templateMatch(templates_fe[i], character.getImage());
-			if(val_fe > maxVal_fe) {
-				maxVal_fe = val_fe;
-				bestChoiceFE = templates_fe[i];
-			}
-			val_din = templateMatch(templates_din[i], character.getImage());
-			if(val_din > maxVal_din) {
-				maxVal_din = val_din;
-				bestChoiceDin = templates_din[i];
+		character.setMean(calcMean(character.getImage()));
+		
+		if(character.getMean() == 0) {
+			maxVal_din = 100.0;
+			bestChoiceFE = templates_fe[alphabet.indexOf("-")];
+			bestChoiceDin = templates_din[alphabet.indexOf("-")];
+		} else {
+			for (int i = 0; i < alphabet.length(); i++) {
+				if(font != FontToClassify.DIN) {
+					val_fe = templateMatch(templates_fe[i], character);
+					if(val_fe > maxVal_fe) {
+						maxVal_fe = val_fe;
+						bestChoiceFE = templates_fe[i];
+					}
+				} 
+				if(font != FontToClassify.FE) {
+					val_din = templateMatch(templates_din[i], character);
+					if(val_din > maxVal_din) {
+						maxVal_din = val_din;
+						bestChoiceDin = templates_din[i];
+					}
+				}				
 			}
 		}
 		
-		if(maxVal_fe > maxVal_din) {
-			s = hardships_fe(bestChoiceFE,character);
-		} else {
+		switch(font) {
+		case BOTH:
+			if(maxVal_fe > maxVal_din) {
+				charIsFe[currentChar] = true;
+				s = hardships_fe(bestChoiceFE,character);
+				// IJ.log("This is 1. fe = " + s);
+			} else {
+				charIsFe[currentChar] = false;
+				s = hardship_din(bestChoiceDin,character);
+				// IJ.log("This is 1. din = " + s);
+			}
+			break;
+			
+		case DIN:
 			s = hardship_din(bestChoiceDin,character);
+			// IJ.log("This is 2. din = " + s);
+			break;
+			
+		case FE:
+			s = hardships_fe(bestChoiceFE,character);
+			// IJ.log("This is 2. fe = " + s);
+			break;
+			
+		default:
+			IJ.log("No usable case!");
+			s = "";
+			break;
 		}
 		
 		return s;
+	}
+	
+	/**
+	 * checks which font was used more and re-classifies the chars which used the othe one
+	 * @param currentPlate current recognised characters
+	 * @param characters all possible characters
+	 * @return changed string containing all changed characters
+	 */
+	private String balanceTheFont(String currentPlate, CharacterCandidate[] characters) {
+		int countDin = 0, countFe = 0;
+		for(int count = 0; count < charIsFe.length; count++) {
+			if(charIsFe[count] == true) {
+				countFe++;
+			} else {
+				countDin++;
+			}
+		}
+		
+		for(int count = 0; count < charIsFe.length; count++) {
+			if(countFe >= countDin) {
+				if(charIsFe[count] == false) {
+					currentPlate.toCharArray()[count] = classifyChar(characters[count], count, FontToClassify.FE).charAt(0);
+				}
+			} else {
+				if(charIsFe[count] == true) {
+					currentPlate.toCharArray()[count] = classifyChar(characters[count], count, FontToClassify.DIN).charAt(0);
+				}
+			}
+		}
+		
+		return currentPlate;
 	}
 	
 	private String hardship_din(Template bestChoice, CharacterCandidate character) {
@@ -204,7 +286,8 @@ public class Classificator {
 	 * @param template the template to compare the sample to
 	 * @param sample the sample image to compare to template
 	 */
-	private double templateMatch(Template template, ImageProcessor sample) {
+	private double templateMatch(Template template, CharacterCandidate candidate) {
+		ImageProcessor sample = candidate.getImage();
 		int J = sample.getWidth();
 		int K = sample.getHeight();
 		
@@ -212,7 +295,7 @@ public class Classificator {
 		double denominator1 = 0;
 		double  denominator2 = 0;
 		
-		double sampleMean = calcMean(sample);
+		double sampleMean = candidate.getMean();
 		double templateMean = template.getMean();
 		
 		ImageProcessor templateImg = template.getImage();
