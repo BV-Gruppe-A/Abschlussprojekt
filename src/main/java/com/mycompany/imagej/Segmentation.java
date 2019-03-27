@@ -1,8 +1,11 @@
 package com.mycompany.imagej;
 
 import java.util.Arrays;
+import java.util.Stack;
 import com.mycompany.imagej.datamodels.CharacterCandidate;
 import com.mycompany.imagej.datamodels.CharacterType;
+import com.mycompany.imagej.datamodels.Pixel;
+
 import ij.IJ;
 import ij.ImagePlus;
 import ij.process.ImageProcessor;
@@ -13,15 +16,13 @@ import ij.process.ImageProcessor;
 public class Segmentation {
 	// constant values
 	private final int SEGMENTS_START_AMOUNT = 0;	
-	private final int NOT_SEGMENTED = -2;
-	private final int IDENTIFIED = -1;
+	private final int NOT_SEGMENTED = -1;
 	
 	// local variables
 	private ImageProcessor binarisedImg;
 	private int imgHeight;
 	private int imgWidth;
 	private int segmentCounter;
-	private int finalSegmentAmount;
 	
 	private int[][] segments;
 	
@@ -42,9 +43,8 @@ public class Segmentation {
 	 * segments the given picture
 	 * @return each character as a single image processor
 	 */
-	public CharacterCandidate[] segmentThePicture() {	
-		fillTheSegments();
-		return makeImagesOutOfSegments();
+	public CharacterCandidate[] segmentThePicture() {
+		return checkSizesAndRescale(makeCharCandidatesOutOfSegments(fillTheSegments()));
 	}
 	
 	/**
@@ -52,8 +52,7 @@ public class Segmentation {
 	 * allows for debugging of the segmentation without needing to split it up
 	 */
 	public void debugSegmentation() {
-		fillTheSegments();
-		CharacterCandidate[] debug = makeImagesOutOfSegments();
+		CharacterCandidate[] debug = checkSizesAndRescale(makeCharCandidatesOutOfSegments(fillTheSegments()));
 		for(int count = 0; count < debug.length; count++) {
 			ImagePlus imgToShow = new ImagePlus("char " + (count + 1), debug[count].getImage());
 	    	imgToShow.show();
@@ -63,72 +62,66 @@ public class Segmentation {
 	/**
 	 * fills the Segments with the corresponding pixels
 	 */
-	private void fillTheSegments() {
+	private int fillTheSegments() {
 		if(!binarisedImg.isBinary()) {     	
         	IJ.error("ImageProcessor is not binary!");
 			// TODO: Maybe throw an exception? Or Delete but not just logging
-        	return;
+        	return 0;
 		}
 				
 		for(int countInY = 0; countInY < imgHeight; countInY++) {
 			for(int countInX = 0; countInX < imgWidth; countInX++) {
-				if(segments[countInY][countInX] == NOT_SEGMENTED && binarisedImg.getPixel(countInX, countInY) == Abschlussprojekt_PlugIn.BLACK) {
-					identifyWholeSegment(countInX, countInY);
-					sortPixelsIntoSegments(segmentCounter++);
+				int currentValueToCheck = binarisedImg.getPixel(countInX, countInY);
+				if(segments[countInY][countInX] == NOT_SEGMENTED && currentValueToCheck == Abschlussprojekt_PlugIn.BLACK) {
+					identifyAWholeSegment(new Pixel(countInX, countInY, currentValueToCheck), segmentCounter++);			
 				}
 			}
 		}
 		
-		finalSegmentAmount = segmentCounter - 1;
+		return segmentCounter - 1;
+	}
+	
+	/**
+	 * identifies a whole segment by looking in each direction and setting each black pixel to the current segment
+	 * @param start first Pixel of a segment
+	 * @param currentSegment segment to sort the pixel into
+	 */
+	private void identifyAWholeSegment(Pixel start, int currentSegment) {
+		Stack<Pixel> pixelToLookAt = new Stack<Pixel>();
+		pixelToLookAt.push(start);
+		
+		while(!pixelToLookAt.isEmpty()) {
+			Pixel currentPixel = pixelToLookAt.pop();
+			if(currentPixel.getValue() == Abschlussprojekt_PlugIn.BLACK) {
+				int currentX = currentPixel.getPosInX();
+				int currentY = currentPixel.getPosInY();
+				segments[currentY][currentX] = currentSegment;
+				
+				if (currentX - 1 >= 0) {
+					if (segments[currentY][currentX - 1] != currentSegment) {
+						pixelToLookAt.push(new Pixel(currentX - 1, currentY, binarisedImg.getPixel(currentX - 1, currentY)));
+					}
+				}
+				if (currentX + 1 < imgWidth) {
+					if (segments[currentY][currentX + 1] != currentSegment) {
+						pixelToLookAt.push(new Pixel(currentX + 1, currentY, binarisedImg.getPixel(currentX + 1, currentY)));
+					}					
+				}
+				
+				if (currentY - 1 >= 0) {
+					if (segments[currentY - 1][currentX] != currentSegment) {
+						pixelToLookAt.push(new Pixel(currentX, currentY - 1, binarisedImg.getPixel(currentX, currentY - 1)));
+					}					
+				}
+				if (currentY + 1 < imgHeight) {
+					if(segments[currentY + 1][currentX] != currentSegment) {
+						pixelToLookAt.push(new Pixel(currentX, currentY + 1, binarisedImg.getPixel(currentX, currentY + 1)));
+					}
+				}
+			}
+		}
 	}
 
-	/**
-	 * starts at a given pixel and identifies all pixel which belong to the same segment
-	 * @param startX x-Coordinate of the starting pixel
-	 * @param startY y-Coordinate of the starting pixel
-	 */
-	private void identifyWholeSegment(int startX, int startY) {
-		segments[startY][startX] = IDENTIFIED;
-		
-		if (startY - 1 >= 0) {
-			if(binarisedImg.getPixel(startX, startY - 1) == Abschlussprojekt_PlugIn.BLACK && segments[startY - 1][startX] != IDENTIFIED) {
-				identifyWholeSegment(startX, startY - 1);
-			}
-		}
-		
-		if (startX - 1 >= 0) {
-			if(binarisedImg.getPixel(startX - 1, startY) == Abschlussprojekt_PlugIn.BLACK && segments[startY][startX - 1] != IDENTIFIED) {
-				identifyWholeSegment(startX - 1, startY);
-			}
-		}
-		
-		if (startY + 1 < imgHeight) {
-			if(binarisedImg.getPixel(startX, startY + 1) == Abschlussprojekt_PlugIn.BLACK && segments[startY + 1][startX] != IDENTIFIED) {
-				identifyWholeSegment(startX, startY + 1);
-			}
-		}
-		
-		if (startX + 1 < imgWidth) {
-			if(binarisedImg.getPixel(startX + 1, startY) == Abschlussprojekt_PlugIn.BLACK && segments[startY][startX + 1] != IDENTIFIED) {
-				identifyWholeSegment(startX + 1, startY);
-			}
-		}
-	}	
-	
-	/**
-	 * adds all identified pixel to the given Segment
-	 * @param currentSegment segment which all identified pixel belong to
-	 */
-	private void sortPixelsIntoSegments(int currentSegment) {
-		for(int countInY = 0; countInY < imgHeight; countInY++) {
-			for(int countInX = 0; countInX < imgWidth; countInX++) {
-				if(segments[countInY][countInX] == IDENTIFIED) {
-					segments[countInY][countInX] = currentSegment;
-				}
-			}
-		}
-	}	
-	
 	/**
 	 * fills the segment array with default values (-2)
 	 * @param rows number of rows in the two dimensional array
@@ -144,10 +137,10 @@ public class Segmentation {
 	 * takes a single picture and slices it up into different segments, each representing a single character
 	 * @return array containing all possible characters
 	 */
-	private CharacterCandidate[] makeImagesOutOfSegments() {
-		CharacterCandidate[] allSegments = new CharacterCandidate[finalSegmentAmount];
+	private CharacterCandidate[] makeCharCandidatesOutOfSegments(int segmentAmount) {
+		CharacterCandidate[] allSegments = new CharacterCandidate[segmentAmount];
 		
-		for(int countSegment = SEGMENTS_START_AMOUNT; countSegment < finalSegmentAmount; countSegment++) {
+		for(int countSegment = SEGMENTS_START_AMOUNT; countSegment < segmentAmount; countSegment++) {
 			int leftBorder = imgWidth, upperBorder = imgHeight;
 			int rightBorder = 0, bottomBorder = 0;
 			
@@ -173,10 +166,20 @@ public class Segmentation {
 			allSegments[countSegment] = new CharacterCandidate(leftBorder, rightBorder, upperBorder, bottomBorder);	
 		}
 		
-		CharacterCandidate[] arrToReturn = new CharacterCandidate[finalSegmentAmount];
+		return allSegments;	
+	}
+	
+	/**
+	 * takes the given segments and checks for each one if it should be included for the classification
+	 * all that should be included will be rescaled
+	 * @param allSegments all Segments to consider
+	 * @return array containing all possible characters
+	 */
+	private CharacterCandidate[] checkSizesAndRescale(CharacterCandidate[] allSegments) {
+		CharacterCandidate[] arrToReturn = new CharacterCandidate[allSegments.length];
 		int currentReturnArrayPos = 0;
 		
-		for(int countSegment = 0; countSegment < finalSegmentAmount; countSegment++) {
+		for(int countSegment = 0; countSegment < allSegments.length; countSegment++) {
 			boolean couldBeChar = CharacterCandidate.checkIfValidSize(allSegments[countSegment], CharacterType.CHARACTER);
 			boolean couldBeDash = CharacterCandidate.checkIfValidSize(allSegments[countSegment], CharacterType.DASH);
 
