@@ -135,7 +135,14 @@ public class MainWindowController {
 		if(isOneFile) {
 			startProcessForOneImage(removeFileExtension(imgOrFolderToOpen.getName()));
 		} else {
-			for(File currentImage : imgOrFolderToOpen.listFiles(new ImgFilterDirectory())) {
+			File[] allFilesToOpen = imgOrFolderToOpen.listFiles(new ImgFilterDirectory());
+			
+			if(allFilesToOpen.length == 0) {
+				IJ.error("The chosen directory does not contain any images!");
+				return;
+			}
+			
+			for(File currentImage : allFilesToOpen) {
 				ImagePlus imgAsPlus = new ImagePlus(currentImage.getAbsolutePath());
 	        	setCurrentImageProcessor(imgAsPlus.getProcessor());
 	        	startProcessForOneImage(removeFileExtension(currentImage.getName()));       	
