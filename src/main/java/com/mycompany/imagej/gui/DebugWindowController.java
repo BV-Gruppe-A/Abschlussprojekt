@@ -4,8 +4,8 @@ import java.io.File;
 import javax.swing.JFileChooser;
 import com.mycompany.imagej.Classificator;
 import com.mycompany.imagej.Segmentation;
-import com.mycompany.imagej.gui.filefilters.ImgFilterDirectory;
-import com.mycompany.imagej.gui.filefilters.ImgFilterFileChooser;
+import com.mycompany.imagej.gui.filefilters.FilterForImageDirectory;
+import com.mycompany.imagej.gui.filefilters.FilterForFileChooser;
 import com.mycompany.imagej.preprocessing.ContrastAdjustment;
 import com.mycompany.imagej.preprocessing.Grayscale;
 import com.mycompany.imagej.preprocessing.ShadingFilter;
@@ -90,7 +90,7 @@ public class DebugWindowController {
 	 */
 	private void openFileChooserLoadingSingleImage() {
 		JFileChooser fcOpen = new JFileChooser();
-		fcOpen.setFileFilter(new ImgFilterFileChooser());
+		fcOpen.setFileFilter(new FilterForFileChooser(true));
 		
         int returnVal = fcOpen.showOpenDialog(windowToControl.btnOpenFile);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -177,7 +177,7 @@ public class DebugWindowController {
 		if(isOneFile) {
 			startProcessForOneImage(removeFileExtension(imgOrFolderToOpen.getName()));
 		} else {
-			for(File currentImage : imgOrFolderToOpen.listFiles(new ImgFilterDirectory())) {
+			for(File currentImage : imgOrFolderToOpen.listFiles(new FilterForImageDirectory())) {
 				ImagePlus imgAsPlus = new ImagePlus(currentImage.getAbsolutePath());
 	        	setCurrentImageProcessor(imgAsPlus.getProcessor());
 	        	startProcessForOneImage(removeFileExtension(currentImage.getName()));

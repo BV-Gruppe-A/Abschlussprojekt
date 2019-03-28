@@ -4,9 +4,8 @@ import java.io.File;
 import javax.swing.JFileChooser;
 import com.mycompany.imagej.Classificator;
 import com.mycompany.imagej.Segmentation;
-import com.mycompany.imagej.gui.filefilters.ImgFilterDirectory;
-import com.mycompany.imagej.gui.filefilters.ImgFilterFileChooser;
-import com.mycompany.imagej.gui.filefilters.ResultFileFilter;
+import com.mycompany.imagej.gui.filefilters.FilterForImageDirectory;
+import com.mycompany.imagej.gui.filefilters.FilterForFileChooser;
 import com.mycompany.imagej.preprocessing.ContrastAdjustment;
 import com.mycompany.imagej.preprocessing.Grayscale;
 import com.mycompany.imagej.preprocessing.ShadingFilter;
@@ -18,22 +17,60 @@ import ij.process.ImageProcessor;
  * Controller, which controls everything that happens in the main Window
  */
 public class MainWindowController {
-	// constant values	
+	/**
+	 * value to which the width of a picture is scaled
+	 * found in most example images
+	 */
 	public final int AVRG_IMAGE_WIDTH = 295;
 	
-	// local objects
+	/**
+	 * the Main Window which should be controlled
+	 */
 	private MainWindow windowToControl;
+	
+	/**
+	 * the file or folder which should be opened
+	 */
 	private File imgOrFolderToOpen;
+	
+	/**
+	 * the file in which the results should be saved
+	 */
 	private File fileToSave;
+	
+	/**
+	 * current Image to process
+	 */
 	private ImageProcessor currentImage;
 	
+	/**
+	 * class for contrast adjustement
+	 */
 	private ContrastAdjustment cont = new ContrastAdjustment();
+	
+	/**
+	 * class for everything grayscale related
+	 */
 	private Grayscale gray = new Grayscale();
+	
+	/**
+	 * class for shading
+	 */
 	private ShadingFilter shading = new ShadingFilter();
+	
+	/**
+	 * class for segmentation
+	 */
 	private Segmentation segm = new Segmentation();
+	
+	/**
+	 * class for the classification
+	 */
 	private Classificator classificator = new Classificator();
 	
-	// local variables
+	/**
+	 * true if only one image should be opened
+	 */
 	private boolean isOneFile = true;
 	
 	/**
@@ -77,7 +114,7 @@ public class MainWindowController {
 	 */
 	private void openFileChooserLoadingSingleImage() {
 		JFileChooser fcOpen = new JFileChooser();
-		fcOpen.setFileFilter(new ImgFilterFileChooser());
+		fcOpen.setFileFilter(new FilterForFileChooser(true));
 		
         int returnVal = fcOpen.showOpenDialog(windowToControl.btnOpenFile);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -107,7 +144,7 @@ public class MainWindowController {
 	 */
 	public void openFileChooserForSaving() {
 		JFileChooser fcSave = new JFileChooser();
-		fcSave.setFileFilter(new ResultFileFilter());
+		fcSave.setFileFilter(new FilterForFileChooser(false));
 		
 		int returnVal = fcSave.showSaveDialog(windowToControl.btnSaveFile);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -120,7 +157,8 @@ public class MainWindowController {
 	 * gets called when the start button is pressed
 	 */
 	public void reactToStartButton() {			
-		if(imgOrFolderToOpen == null || !imgOrFolderToOpen.exists() && !imgOrFolderToOpen.isDirectory()) {
+		if(imgOrFolderToOpen == null || !imgOrFolderToOpen.exists() 
+				&& !imgOrFolderToOpen.isDirectory()) {
 			IJ.error("No existing image (or directory) to open was chosen");
 			return;
 		}
@@ -130,12 +168,13 @@ public class MainWindowController {
 			return;
 		}	
 		
-		classificator.setCsvName(fileToSave.getAbsolutePath(), windowToControl.ckbClearFile.isSelected());
+		classificator.setCsvName(fileToSave.getAbsolutePath(),
+				windowToControl.ckbClearFile.isSelected());
 		
 		if(isOneFile) {
 			startProcessForOneImage(removeFileExtension(imgOrFolderToOpen.getName()));
 		} else {
-			File[] allFilesToOpen = imgOrFolderToOpen.listFiles(new ImgFilterDirectory());
+			File[] allFilesToOpen = imgOrFolderToOpen.listFiles(new FilterForImageDirectory());
 			
 			if(allFilesToOpen.length == 0) {
 				IJ.error("The chosen directory does not contain any images!");

@@ -6,30 +6,84 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import javax.swing.*;
 
-// TODO: GUI.Fancify().betterPadding()
-
 /**
  * the main window in which the user can interact
  */
 @SuppressWarnings("serial")
 public class MainWindow extends GenericDialog {
-	// graphical elements
+	/**
+	 * panel which contains all content
+	 */
 	protected JPanel contentPanel = new JPanel(new GridBagLayout());
+	
+	/**
+	 * Label at the top which informs the user about the possibilities of the first two radio buttons
+	 */
 	protected JLabel lblOpenText = new JLabel("Open & identify ...");
+	
+	/**
+	 * Label before the button for choosing a save location
+	 */
 	protected JLabel lblExcelFile = new JLabel("Save Excel-File to: ");
+	
+	/**
+	 * Radio Button for only 1 image
+	 */
 	protected JRadioButton rbOneImage = new JRadioButton("... 1 Image");
+	
+	/**
+	 * Radio Button for more than 1 image
+	 */
 	protected JRadioButton rbMoreImages = new JRadioButton("... more than 1 image");
+	
+	/**
+	 * TextField containing the location to open
+	 */
 	protected JTextField txtOpenLocation = new JTextField("Imagefile Location");
+	
+	/**
+	 * TextField containing the location to save
+	 */
 	protected JTextField txtSaveLocation = new JTextField("CSV File Location");
+	
+	/**
+	 * Button to open a file chooser for the open location
+	 */
 	protected JButton btnOpenFile = new JButton("Choose Image");
+	
+	/**
+	 * Button to open a file chooser for the save location
+	 */
 	protected JButton btnSaveFile = new JButton("Choose Location");
+	
+	/**
+	 * Button which starts the process
+	 */
 	protected JButton btnStartProcess = new JButton("Start");
-	protected JCheckBox ckbEvaluation = new JCheckBox("Display Classification Rate"); 
+	
+	/**
+	 * CheckBox which enables the evaluation of the classification
+	 */
+	protected JCheckBox ckbEvaluation = new JCheckBox("Display Classification Rate");
+	
+	/**
+	 * CheckBox which clears the file before writing
+	 */
 	protected JCheckBox ckbClearFile = new JCheckBox("Clear File");
 	
-	// local variables & objects
+	/**
+	 * describes the current y-position of added elements
+	 */
 	private int currentY = 0;
+	
+	/**
+	 * contain all location informations for the graphical elements
+	 */
 	private GridBagConstraints constraints = new GridBagConstraints();
+	
+	/**
+	 * controller which contains the logic of the window
+	 */
 	private MainWindowController controller;
 	
 	/**
@@ -41,13 +95,6 @@ public class MainWindow extends GenericDialog {
 		controller = new MainWindowController(this);
 		fillWindowWithLife();
 		GUI.center(this);
-	}
-	
-	/**
-	 * @return connected MainWindowController of this object
-	 */
-	public MainWindowController getController() {
-		return controller;
 	}
 	
 	/**

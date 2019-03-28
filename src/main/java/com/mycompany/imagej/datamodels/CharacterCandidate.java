@@ -7,15 +7,44 @@ import ij.process.ImageProcessor;
  * implements Comparable to enable sorting of arrays of this type
  */
 public class CharacterCandidate implements Comparable<CharacterCandidate> {
+	/**
+	 * the whole Image which is currently worked on
+	 */
 	private static ImageProcessor wholeImage;
-	private ImageProcessor imageForThisChar;
 	
-	// local variables
+	/**
+	 * the image containing only this character
+	 */
+	private ImageProcessor imageForThisChar;
+
+	/**
+	 * coordinate of the most left pixel of this char
+	 */
 	private int leftBorder;
+	
+	/**
+	 * coordinate of the most right pixel of this char
+	 */
 	private int rightBorder;
+	
+	/**
+	 * coordinate of the highest pixel of this char
+	 */
 	private int upperBorder;
+	
+	/**
+	 * coordinate of the lowest pixel of this char
+	 */
 	private int bottomBorder;	
+	
+	/**
+	 * mean Value of this current character
+	 */
 	private double meanValue;	
+	
+	/**
+	 * true if the character was used / identified as a dot
+	 */
 	private boolean usedAsDot = false;
 	
 	/**
@@ -142,10 +171,17 @@ public class CharacterCandidate implements Comparable<CharacterCandidate> {
 		return getBottomBorder() - getUpperBorder();
 	}
 	
+	/**
+	 * sets the whole Image to the given parameter
+	 * @param newImg image to set
+	 */
 	public static void setCurrentImage(ImageProcessor newImg) {
 		wholeImage = newImg;
 	}
 	
+	/**
+	 * @return the width of the whole image
+	 */
 	public static int getWidthOfWholeImage() {
 		return wholeImage.getWidth();
 	}
@@ -156,16 +192,19 @@ public class CharacterCandidate implements Comparable<CharacterCandidate> {
 	 * @param typeToCheckFor the type of character to check for
 	 * @return true if this segment is a valid possibility for a character, dot or dash
 	 */
-	public static boolean checkIfValidSize(CharacterCandidate toCheck, CharacterType typeToCheckFor) {
+	public static boolean checkIfValidSize(CharacterCandidate toCheck, 
+			CharacterType typeToCheckFor) {
 		double[] sizes = CharacterType.getSizesForCharacterType(typeToCheckFor);
 		double widthToCheck = (double) toCheck.getWidth() / (double) wholeImage.getWidth();
 		double heightToCheck = (double) toCheck.getHeight() / (double) wholeImage.getHeight();
 		
-		if(widthToCheck > sizes[CharacterType.INDEX_MAX_WIDTH] || heightToCheck > sizes[CharacterType.INDEX_MAX_HEIGHT]) {
+		if(widthToCheck > sizes[CharacterType.INDEX_MAX_WIDTH] 
+				|| heightToCheck > sizes[CharacterType.INDEX_MAX_HEIGHT]) {
 			return false;
 		}
 		
-		if(widthToCheck < sizes[CharacterType.INDEX_MIN_WIDTH] || heightToCheck < sizes[CharacterType.INDEX_MIN_HEIGHT]) {
+		if(widthToCheck < sizes[CharacterType.INDEX_MIN_WIDTH] 
+				|| heightToCheck < sizes[CharacterType.INDEX_MIN_HEIGHT]) {
 			return false;
 		}
 		
@@ -189,11 +228,12 @@ public class CharacterCandidate implements Comparable<CharacterCandidate> {
 	 * sets the image Processor to a scaled variant of the given Image
 	 * @param wholeImage whole number plate as an image processor
 	 */
-	public void setAndScaleImage() {
+	public void cutCharacterFromWholeImage() {
 		imageForThisChar = wholeImage.createProcessor(getWidth(), getHeight());
 		for(int countInY = 0; countInY < getHeight(); countInY++) {
 			for(int countInX = 0; countInX < getWidth(); countInX++) {
-				int pixelToPut = wholeImage.getPixel(getLeftBorder() + countInX, getUpperBorder() + countInY);
+				int pixelToPut = wholeImage.getPixel(getLeftBorder() + countInX,
+						getUpperBorder() + countInY);
 				imageForThisChar.putPixel(countInX, countInY, pixelToPut);
 			}
 		}
@@ -212,7 +252,8 @@ public class CharacterCandidate implements Comparable<CharacterCandidate> {
 		for(int countSegments = 0; countSegments < allSegments.length; countSegments++) {	
 			CharacterCandidate possibleDot = allSegments[countSegments];
 			if(possibleDot.getBottomBorder() <= getUpperBorder() && !possibleDot.checkIfUsedAsDot()	
-					&& possibleDot.getRightBorder() >= getLeftBorder() && possibleDot.getLeftBorder() <= getRightBorder()) {
+					&& possibleDot.getRightBorder() >= getLeftBorder() 
+					&& possibleDot.getLeftBorder() <= getRightBorder()) {
 				if(checkIfValidSize(allSegments[countSegments], CharacterType.DOT)) {
 					dots[currentDot++] = allSegments[countSegments];
 				}
@@ -281,7 +322,8 @@ public class CharacterCandidate implements Comparable<CharacterCandidate> {
 	 */
 	@Override
 	public int compareTo(CharacterCandidate otherCandidate) {	
-		if(getBottomBorder() < otherCandidate.getUpperBorder() || getLeftBorder() < otherCandidate.getLeftBorder()) {
+		if(getBottomBorder() < otherCandidate.getUpperBorder() 
+				|| getLeftBorder() < otherCandidate.getLeftBorder()) {
 			return -1;
 		} else if (getLeftBorder() == otherCandidate.getLeftBorder()) {
 			return 0;

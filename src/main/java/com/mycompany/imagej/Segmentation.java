@@ -14,16 +14,34 @@ import ij.process.ImageProcessor;
  * contains everything related to the segmentation
  */
 public class Segmentation {
-	// constant values
+	/**
+	 * Number of the first segment
+	 */
 	private final int SEGMENTS_START_AMOUNT = 0;	
+	
+	/**
+	 * Value for a pixel which has not been initalisied yet
+	 */
 	private final int NOT_SEGMENTED = -1;
 	
-	// local variables
+	/**
+	 * the binary Image which should be segmented
+	 */
 	private ImageProcessor binarisedImg;
-	private int imgHeight;
-	private int imgWidth;
-	private int segmentCounter;
 	
+	/**
+	 * height of the image
+	 */
+	private int imgHeight;
+	
+	/**
+	 * width of the image
+	 */
+	private int imgWidth;
+	
+	/**
+	 * two dimensional array which saves the number of the segment for each pixel
+	 */
 	private int[][] segments;
 	
 	/**
@@ -31,12 +49,16 @@ public class Segmentation {
 	 * @param newImage new Image to work on
 	 */
 	public void changeImage(ImageProcessor newImage) {
+		if(!newImage.isBinary()) {
+			IJ.error("ImageProcessor is not binary!");
+			return;
+		}
+		
 		binarisedImg = newImage;
 		imgHeight = newImage.getHeight();
 		imgWidth = newImage.getWidth();
 		segments = new int[imgHeight][imgWidth];
 		fillSegmentsArrayWithDefault(imgHeight);
-		segmentCounter = SEGMENTS_START_AMOUNT;
 		CharacterCandidate.setCurrentImage(newImage);
 	}
 	
@@ -49,32 +71,19 @@ public class Segmentation {
 	}
 	
 	/**
-	 * DEBUG
-	 * allows for debugging of the segmentation without needing to split it up
-	 */
-	public void debugSegmentation() {
-		CharacterCandidate[] debug = checkSizesAndRescale(makeCharCandidatesOutOfSegments(fillTheSegments()));
-		for(int count = 0; count < debug.length; count++) {
-			ImagePlus imgToShow = new ImagePlus("char " + (count + 1), debug[count].getImage());
-	    	imgToShow.show();
-		}		
-	}
-	
-	/**
 	 * fills the Segments with the corresponding pixels
+	 * @return the number of segments in the image
 	 */
 	private int fillTheSegments() {
-		if(!binarisedImg.isBinary()) {     	
-        	IJ.error("ImageProcessor is not binary!");
-			// TODO: Maybe throw an exception? Or Delete but not just logging
-        	return 0;
-		}
-				
+		int segmentCounter = SEGMENTS_START_AMOUNT;
+		
 		for(int countInY = 0; countInY < imgHeight; countInY++) {
 			for(int countInX = 0; countInX < imgWidth; countInX++) {
 				int currentValueToCheck = binarisedImg.getPixel(countInX, countInY);
-				if(segments[countInY][countInX] == NOT_SEGMENTED && currentValueToCheck == Abschlussprojekt_PlugIn.BLACK) {
-					identifyAWholeSegment(new Pixel(countInX, countInY, currentValueToCheck), segmentCounter++);			
+				if(segments[countInY][countInX] == NOT_SEGMENTED 
+						&& currentValueToCheck == Abschlussprojekt_PlugIn.BLACK) {
+					identifyAWholeSegment(new Pixel(countInX, countInY, currentValueToCheck),
+							segmentCounter++);			
 				}
 			}
 		}
@@ -100,23 +109,27 @@ public class Segmentation {
 				
 				if (currentX - 1 >= 0) {
 					if (segments[currentY][currentX - 1] != currentSegment) {
-						pixelToLookAt.push(new Pixel(currentX - 1, currentY, binarisedImg.getPixel(currentX - 1, currentY)));
+						pixelToLookAt.push(new Pixel(currentX - 1, currentY,
+								binarisedImg.getPixel(currentX - 1, currentY)));
 					}
 				}
 				if (currentX + 1 < imgWidth) {
 					if (segments[currentY][currentX + 1] != currentSegment) {
-						pixelToLookAt.push(new Pixel(currentX + 1, currentY, binarisedImg.getPixel(currentX + 1, currentY)));
+						pixelToLookAt.push(new Pixel(currentX + 1, currentY,
+								binarisedImg.getPixel(currentX + 1, currentY)));
 					}					
 				}
 				
 				if (currentY - 1 >= 0) {
 					if (segments[currentY - 1][currentX] != currentSegment) {
-						pixelToLookAt.push(new Pixel(currentX, currentY - 1, binarisedImg.getPixel(currentX, currentY - 1)));
+						pixelToLookAt.push(new Pixel(currentX, currentY - 1,
+								binarisedImg.getPixel(currentX, currentY - 1)));
 					}					
 				}
 				if (currentY + 1 < imgHeight) {
 					if(segments[currentY + 1][currentX] != currentSegment) {
-						pixelToLookAt.push(new Pixel(currentX, currentY + 1, binarisedImg.getPixel(currentX, currentY + 1)));
+						pixelToLookAt.push(new Pixel(currentX, currentY + 1,
+								binarisedImg.getPixel(currentX, currentY + 1)));
 					}
 				}
 			}
@@ -136,6 +149,7 @@ public class Segmentation {
 	
 	/**
 	 * takes a single picture and slices it up into different segments, each representing a single character
+	 * @param segmentAmount number of Segments in the image
 	 * @return array containing all possible characters
 	 */
 	private CharacterCandidate[] makeCharCandidatesOutOfSegments(int segmentAmount) {
@@ -164,7 +178,8 @@ public class Segmentation {
 				}
 			}
 			
-			allSegments[countSegment] = new CharacterCandidate(leftBorder, rightBorder, upperBorder, bottomBorder);	
+			allSegments[countSegment] = new CharacterCandidate(leftBorder, rightBorder,
+					upperBorder, bottomBorder);	
 		}
 		
 		return allSegments;	
@@ -181,15 +196,17 @@ public class Segmentation {
 		int currentReturnArrayPos = 0;
 		
 		for(int countSegment = 0; countSegment < allSegments.length; countSegment++) {
-			boolean couldBeChar = CharacterCandidate.checkIfValidSize(allSegments[countSegment], CharacterType.CHARACTER);
-			boolean couldBeDash = CharacterCandidate.checkIfValidSize(allSegments[countSegment], CharacterType.DASH);
+			boolean couldBeChar = CharacterCandidate.checkIfValidSize(allSegments[countSegment],
+					CharacterType.CHARACTER);
+			boolean couldBeDash = CharacterCandidate.checkIfValidSize(allSegments[countSegment],
+					CharacterType.DASH);
 
 			if(couldBeChar || couldBeDash) {
 				if(couldBeChar) {
 					allSegments[countSegment].checkForUmlautAndChangeBorder(allSegments);
 				}	
 				
-				allSegments[countSegment].setAndScaleImage();
+				allSegments[countSegment].cutCharacterFromWholeImage();
 				arrToReturn[currentReturnArrayPos++] = allSegments[countSegment];
 			}
 		}
@@ -202,9 +219,41 @@ public class Segmentation {
 	 * @param arrayToClean array which needs to be cleaned
 	 * @return a new, cleaned-up array
 	 */
-	private CharacterCandidate[] cleanUpAndSortCharacterArray(CharacterCandidate[] arrToProcess, int filledImages) {	
+	private CharacterCandidate[] cleanUpAndSortCharacterArray(CharacterCandidate[] arrToProcess,
+			int filledImages) {	
 		CharacterCandidate[] cleanedArray = Arrays.copyOf(arrToProcess, filledImages);
 		Arrays.sort(cleanedArray);
 		return cleanedArray;
- 	}
+ 	}	
+	
+	/**
+	 * DEBUG
+	 * allows for debugging of the segmentation without needing to split it up
+	 */
+	public void debugSegmentation() {
+		CharacterCandidate[] debug = checkSizesAndRescale(makeCharCandidatesOutOfSegments(
+				fillTheSegments()));
+		for(int count = 0; count < debug.length; count++) {
+			ImagePlus imgToShow = new ImagePlus("char " + (count + 1), debug[count].getImage());
+	    	imgToShow.show();
+		}		
+	}
+	
+	/**
+	 * DEBUG METHOD
+	 * Colors the segments so that you can see if the segmentation functions properly
+	 */
+	private void colorTheSegments(int segmentAmount) {
+		int stepWidth = (int) ((double) (Abschlussprojekt_PlugIn.BLACK - 2) / (double) segmentAmount);
+		
+		for(int countInY = 0; countInY < imgHeight; countInY++) {
+			for(int countInX = 0; countInX < imgWidth; countInX++) {
+				if(segments[countInY][countInX] != NOT_SEGMENTED) {
+					int currentSegment = segments[countInY][countInX];
+					int newPixel = Abschlussprojekt_PlugIn.WHITE + (currentSegment * stepWidth);
+					binarisedImg.putPixel(countInX, countInY, newPixel);
+				}				
+			}
+		}		
+	}
 }

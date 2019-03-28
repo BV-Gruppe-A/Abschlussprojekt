@@ -5,8 +5,19 @@ package com.mycompany.imagej.datamodels;
  * used for segmentation only
  */
 public class Pixel {
+	/**
+	 * current x-coordinate of the pixel
+	 */
 	private int xPos;
+	
+	/**
+	 * current y-coordinate of the pixel
+	 */
 	private int yPos;
+	
+	/**
+	 * current value of the pixel
+	 */
 	private int value;
 	
 	/**
