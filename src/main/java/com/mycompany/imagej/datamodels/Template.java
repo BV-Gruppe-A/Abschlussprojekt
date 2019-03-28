@@ -7,6 +7,15 @@ import ij.process.ImageProcessor;
  *
  */
 public class Template {
+	/**
+	 * The height of all templates
+	 */
+	public static final int HEIGHT = 38;
+	
+	/**
+	 * The Width of all templates
+	 */
+	public static final int WIDTH = 25;
 
 	/**
 	 * The character the template represents

@@ -37,6 +37,7 @@ public class Segmentation {
 		segments = new int[imgHeight][imgWidth];
 		fillSegmentsArrayWithDefault(imgHeight);
 		segmentCounter = SEGMENTS_START_AMOUNT;
+		CharacterCandidate.setCurrentImage(newImage);
 	}
 	
 	/**
@@ -188,7 +189,7 @@ public class Segmentation {
 					allSegments[countSegment].checkForUmlautAndChangeBorder(allSegments);
 				}	
 				
-				allSegments[countSegment].setAndScaleImage(binarisedImg);
+				allSegments[countSegment].setAndScaleImage();
 				arrToReturn[currentReturnArrayPos++] = allSegments[countSegment];
 			}
 		}

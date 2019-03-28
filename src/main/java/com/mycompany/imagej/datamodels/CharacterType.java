@@ -20,53 +20,52 @@ public enum CharacterType {
 	public final static int INDEX_MAX_HEIGHT = 2;
 	public final static int INDEX_MIN_HEIGHT = 3;
 	
-	// constant values for the sizes
-	private final static double THRESHOLD = 0.3;
-	// constant height of a character
-	public final static int OPT_CHAR_HEIGHT = 38;
-	private final static int MAX_CHAR_HEIGHT = OPT_CHAR_HEIGHT + (int) Math.round(OPT_CHAR_HEIGHT * THRESHOLD);
-	private final static int MIN_CHAR_HEIGHT = OPT_CHAR_HEIGHT - (int) Math.round(OPT_CHAR_HEIGHT * THRESHOLD);
-	// constant width of a character or a dash	
-	public final static int OPT_CHARDASH_WIDTH = 25;
-	private final static int MAX_CHARDASH_WIDTH = OPT_CHARDASH_WIDTH + (int) Math.round(OPT_CHARDASH_WIDTH * THRESHOLD);
-	private final static int MIN_CHARDASH_WIDTH = OPT_CHARDASH_WIDTH - (int) Math.round(OPT_CHARDASH_WIDTH * THRESHOLD);
-	// constant height of a dot or a dash
-	private final static int OPT_DOTDASH_HEIGHT = 6;
-	private final static int MAX_DOTDASH_HEIGHT = OPT_DOTDASH_HEIGHT + (int) Math.round(OPT_DOTDASH_HEIGHT * THRESHOLD);
-	private final static int MIN_DOTDASH_HEIGHT = OPT_DOTDASH_HEIGHT - (int) Math.round(OPT_DOTDASH_HEIGHT * THRESHOLD);
-	//constant width of a dot
-	private final static int OPT_DOT_WIDTH = 10;	
-	private final static int MAX_DOT_WIDTH = OPT_DOT_WIDTH + (int) Math.round(OPT_DOT_WIDTH * THRESHOLD);
-	private final static int MIN_DOT_WIDTH = OPT_DOT_WIDTH - (int) Math.round(OPT_DOT_WIDTH * THRESHOLD);
+	private final static double CHAR_WIDTH_MAX = 0.13;
+	private final static double CHAR_WIDTH_MIN = 0.05;
+	private final static double CHAR_HEIGHT_MAX = 0.8;
+	private final static double CHAR_HEIGHT_MIN = 0.5;
+	
+	private final static double DASH_WIDTH_MAX = 0.09;
+	private final static double DASH_WIDTH_MIN = 0.05;
+	private final static double DASH_HEIGHT_MAX = 0.08;
+	private final static double DASH_HEIGHT_MIN = 0.06;
+	
+	private final static double DOT_WIDTH_MAX = 0.05;
+	private final static double DOT_WIDTH_MIN = 0.01;
+	private final static double DOT_HEIGHT_MAX = 0.1;
+	private final static double DOT_HEIGHT_MIN = 0.06;
+	
+	public final static double SPACE_WIDTH_MAX = 0.14;
+	public final static double SPACE_WIDTH_MIN = 0.035;
 	
 	/**
 	 * gets the min and max sizes for a certain character Type
 	 * @param type type to get the sizes for
 	 * @return int array containing the min and max sizes 
 	 */
-	public static int[] getSizesForCharacterType(CharacterType type) {
-		int[] sizes = new int[4];
+	public static double[] getSizesForCharacterType(CharacterType type) {
+		double[] sizes = new double[4];
 		
 		switch(type) {
 		case CHARACTER:
-			sizes[INDEX_MAX_WIDTH] = MAX_CHARDASH_WIDTH;
-			sizes[INDEX_MIN_WIDTH] = MIN_CHARDASH_WIDTH;
-			sizes[INDEX_MAX_HEIGHT] = MAX_CHAR_HEIGHT;
-			sizes[INDEX_MIN_HEIGHT] = MIN_CHAR_HEIGHT;
+			sizes[INDEX_MAX_WIDTH] = CHAR_WIDTH_MAX;
+			sizes[INDEX_MIN_WIDTH] = CHAR_WIDTH_MIN;
+			sizes[INDEX_MAX_HEIGHT] = CHAR_HEIGHT_MAX;
+			sizes[INDEX_MIN_HEIGHT] = CHAR_HEIGHT_MIN;
 			break;
 			
 		case DOT:
-			sizes[INDEX_MAX_WIDTH] = MAX_DOT_WIDTH;
-			sizes[INDEX_MIN_WIDTH] = MIN_DOT_WIDTH;
-			sizes[INDEX_MAX_HEIGHT] = MAX_DOTDASH_HEIGHT;
-			sizes[INDEX_MIN_HEIGHT] = MIN_DOTDASH_HEIGHT;
+			sizes[INDEX_MAX_WIDTH] = DOT_WIDTH_MAX;
+			sizes[INDEX_MIN_WIDTH] = DOT_WIDTH_MIN;
+			sizes[INDEX_MAX_HEIGHT] = DOT_HEIGHT_MAX;
+			sizes[INDEX_MIN_HEIGHT] = DOT_HEIGHT_MIN;
 			break;
 			
 		case DASH:
-			sizes[INDEX_MAX_WIDTH] = MAX_CHARDASH_WIDTH;
-			sizes[INDEX_MIN_WIDTH] = MIN_CHARDASH_WIDTH;
-			sizes[INDEX_MAX_HEIGHT] = MAX_DOTDASH_HEIGHT;
-			sizes[INDEX_MIN_HEIGHT] = MIN_DOTDASH_HEIGHT;
+			sizes[INDEX_MAX_WIDTH] = DASH_WIDTH_MAX;
+			sizes[INDEX_MIN_WIDTH] = DASH_WIDTH_MIN;
+			sizes[INDEX_MAX_HEIGHT] = DASH_HEIGHT_MAX;
+			sizes[INDEX_MIN_HEIGHT] = DASH_HEIGHT_MIN;
 			break;
 		
 		default:

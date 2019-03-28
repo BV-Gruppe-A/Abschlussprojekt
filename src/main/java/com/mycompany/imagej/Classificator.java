@@ -126,13 +126,17 @@ public class Classificator {
 	public void classify(CharacterCandidate[] characters, String filename) {
 		String licensePlate = "";
 		charIsFe = new boolean[characters.length];
-		int[] spaces = new int[2];
+		int[] spaces = new int[characters.length - 1];
 		int countSpaces = 0;
 		
 		for (int i = 0; i < characters.length; i++) {
 			licensePlate += classifyChar(characters[i], i, FontToClassify.BOTH);
 			if(i < characters.length - 1) {
-				if(characters[i+1].getLeftBorder() - characters[i].getRightBorder() > 10) {
+				double distBetween = (double) (characters[i+1].getLeftBorder() - 
+						characters[i].getRightBorder()) 
+						/ (double) CharacterCandidate.getWidthOfWholeImage();
+				if(distBetween < CharacterType.SPACE_WIDTH_MAX 
+						&& distBetween > CharacterType.SPACE_WIDTH_MIN) {
 					spaces[countSpaces++] = i + 1;
 				}
 			}
@@ -144,8 +148,10 @@ public class Classificator {
 			if(spaces[i] != 0) {
 				licensePlate = licensePlate.substring(0, spaces[i]) + "_" 
 						+ licensePlate.substring(spaces[i], licensePlate.length());
-				if(i + 1 < spaces.length && spaces[i + 1] != 0) {
-					spaces[i + 1]++;
+				
+				int changeFollowing = i + 1;
+				while(changeFollowing < spaces.length && spaces[changeFollowing] != 0) {
+					spaces[changeFollowing++]++;
 				}				
 			}
 		}
@@ -356,8 +362,6 @@ public class Classificator {
 	 */
 	private double templateMatch(Template template, CharacterCandidate candidate) {
 		ImageProcessor sample = candidate.getImage();
-		int J = sample.getWidth();
-		int K = sample.getHeight();
 		
 		double numerator = 0;
 		double denominator1 = 0;
@@ -368,8 +372,8 @@ public class Classificator {
 		
 		ImageProcessor templateImg = template.getImage();
 		
-		for (int j = 0; j < J; j++) {
-			for(int k = 0; k < K; k++) {
+		for (int j = 0; j < Template.WIDTH; j++) {
+			for(int k = 0; k < Template.HEIGHT; k++) {
 
 				numerator += ((double)templateImg.getPixel(j, k) - templateMean) * 
 						((double)sample.getPixel(j , k) - sampleMean);

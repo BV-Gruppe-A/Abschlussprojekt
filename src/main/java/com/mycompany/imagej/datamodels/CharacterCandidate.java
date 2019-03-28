@@ -7,17 +7,15 @@ import ij.process.ImageProcessor;
  * implements Comparable to enable sorting of arrays of this type
  */
 public class CharacterCandidate implements Comparable<CharacterCandidate> {
-	// local objects
-	private ImageProcessor image;
+	private static ImageProcessor wholeImage;
+	private ImageProcessor imageForThisChar;
 	
 	// local variables
 	private int leftBorder;
 	private int rightBorder;
 	private int upperBorder;
-	private int bottomBorder;
-	
-	private double meanValue;
-	
+	private int bottomBorder;	
+	private double meanValue;	
 	private boolean usedAsDot = false;
 	
 	/**
@@ -38,7 +36,7 @@ public class CharacterCandidate implements Comparable<CharacterCandidate> {
 	 * @return imageProcessor which represents this character
 	 */
 	public ImageProcessor getImage() {
-		return image;
+		return imageForThisChar;
 	}
 
 	/**
@@ -144,6 +142,14 @@ public class CharacterCandidate implements Comparable<CharacterCandidate> {
 		return getBottomBorder() - getUpperBorder();
 	}
 	
+	public static void setCurrentImage(ImageProcessor newImg) {
+		wholeImage = newImg;
+	}
+	
+	public static int getWidthOfWholeImage() {
+		return wholeImage.getWidth();
+	}
+	
 	/**
 	 * checks if a given candidate has a size that could either be a character, a dot or a dash
 	 * @param toCheck the candidate to check
@@ -151,13 +157,15 @@ public class CharacterCandidate implements Comparable<CharacterCandidate> {
 	 * @return true if this segment is a valid possibility for a character, dot or dash
 	 */
 	public static boolean checkIfValidSize(CharacterCandidate toCheck, CharacterType typeToCheckFor) {
-		int[] sizes = CharacterType.getSizesForCharacterType(typeToCheckFor);
+		double[] sizes = CharacterType.getSizesForCharacterType(typeToCheckFor);
+		double widthToCheck = (double) toCheck.getWidth() / (double) wholeImage.getWidth();
+		double heightToCheck = (double) toCheck.getHeight() / (double) wholeImage.getHeight();
 		
-		if(toCheck.getWidth() > sizes[CharacterType.INDEX_MAX_WIDTH] || toCheck.getHeight() > sizes[CharacterType.INDEX_MAX_HEIGHT]) {
+		if(widthToCheck > sizes[CharacterType.INDEX_MAX_WIDTH] || heightToCheck > sizes[CharacterType.INDEX_MAX_HEIGHT]) {
 			return false;
 		}
 		
-		if(toCheck.getWidth() < sizes[CharacterType.INDEX_MIN_WIDTH] || toCheck.getHeight() < sizes[CharacterType.INDEX_MIN_HEIGHT]) {
+		if(widthToCheck < sizes[CharacterType.INDEX_MIN_WIDTH] || heightToCheck < sizes[CharacterType.INDEX_MIN_HEIGHT]) {
 			return false;
 		}
 		
@@ -181,15 +189,15 @@ public class CharacterCandidate implements Comparable<CharacterCandidate> {
 	 * sets the image Processor to a scaled variant of the given Image
 	 * @param wholeImage whole number plate as an image processor
 	 */
-	public void setAndScaleImage(ImageProcessor wholeImage) {
-		image = wholeImage.createProcessor(getWidth(), getHeight());
+	public void setAndScaleImage() {
+		imageForThisChar = wholeImage.createProcessor(getWidth(), getHeight());
 		for(int countInY = 0; countInY < getHeight(); countInY++) {
 			for(int countInX = 0; countInX < getWidth(); countInX++) {
 				int pixelToPut = wholeImage.getPixel(getLeftBorder() + countInX, getUpperBorder() + countInY);
-				image.putPixel(countInX, countInY, pixelToPut);
+				imageForThisChar.putPixel(countInX, countInY, pixelToPut);
 			}
 		}
-		image = image.resize(CharacterType.OPT_CHARDASH_WIDTH, CharacterType.OPT_CHAR_HEIGHT);
+		imageForThisChar = imageForThisChar.resize(Template.WIDTH, Template.HEIGHT);
 	}
 	
 	/**
