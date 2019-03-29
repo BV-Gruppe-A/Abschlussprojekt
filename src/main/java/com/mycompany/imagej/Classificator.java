@@ -134,7 +134,7 @@ public class Classificator {
 			if(i < characters.length - 1) {
 				double distBetween = (double) (characters[i+1].getLeftBorder() - 
 						characters[i].getRightBorder()) 
-						/ (double) CharacterCandidate.getWidthOfWholeImage();
+						/ (double) Segmentation.getImage().getWidth();
 				if(distBetween < CharacterType.SPACE_WIDTH_MAX 
 						&& distBetween > CharacterType.SPACE_WIDTH_MIN) {
 					spaces[countSpaces++] = i + 1;
@@ -243,7 +243,7 @@ public class Classificator {
 	private String balanceTheFont(String currentPlate, CharacterCandidate[] characters) {
 		int countDin = 0, countFe = 0;
 		for(int count = 0; count < charIsFe.length; count++) {
-			if(charIsFe[count] == true) {
+			if(charIsFe[count]) {
 				countFe++;
 			} else {
 				countDin++;
@@ -252,12 +252,12 @@ public class Classificator {
 		
 		for(int count = 0; count < charIsFe.length; count++) {
 			if(countFe >= countDin) {
-				if(charIsFe[count] == false) {
+				if(!charIsFe[count]) {
 					currentPlate.toCharArray()[count] = classifyChar(characters[count], 
 							count, FontToClassify.FE).charAt(0);
 				}
 			} else {
-				if(charIsFe[count] == true) {
+				if(charIsFe[count]) {
 					currentPlate.toCharArray()[count] = classifyChar(characters[count], 
 							count, FontToClassify.DIN).charAt(0);
 				}

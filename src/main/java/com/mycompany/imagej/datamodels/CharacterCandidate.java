@@ -1,17 +1,14 @@
 package com.mycompany.imagej.datamodels;
 
+import com.mycompany.imagej.Segmentation;
+
 import ij.process.ImageProcessor;
 
 /**
  * models one segment, which could be a character to classify
  * implements Comparable to enable sorting of arrays of this type
  */
-public class CharacterCandidate implements Comparable<CharacterCandidate> {
-	/**
-	 * the whole Image which is currently worked on
-	 */
-	private static ImageProcessor wholeImage;
-	
+public class CharacterCandidate implements Comparable<CharacterCandidate> {	
 	/**
 	 * the image containing only this character
 	 */
@@ -172,21 +169,6 @@ public class CharacterCandidate implements Comparable<CharacterCandidate> {
 	}
 	
 	/**
-	 * sets the whole Image to the given parameter
-	 * @param newImg image to set
-	 */
-	public static void setCurrentImage(ImageProcessor newImg) {
-		wholeImage = newImg;
-	}
-	
-	/**
-	 * @return the width of the whole image
-	 */
-	public static int getWidthOfWholeImage() {
-		return wholeImage.getWidth();
-	}
-	
-	/**
 	 * checks if a given candidate has a size that could either be a character, a dot or a dash
 	 * @param toCheck the candidate to check
 	 * @param typeToCheckFor the type of character to check for
@@ -195,8 +177,8 @@ public class CharacterCandidate implements Comparable<CharacterCandidate> {
 	public static boolean checkIfValidSize(CharacterCandidate toCheck, 
 			CharacterType typeToCheckFor) {
 		double[] sizes = CharacterType.getSizesForCharacterType(typeToCheckFor);
-		double widthToCheck = (double) toCheck.getWidth() / (double) wholeImage.getWidth();
-		double heightToCheck = (double) toCheck.getHeight() / (double) wholeImage.getHeight();
+		double widthToCheck = (double) toCheck.getWidth() / (double) Segmentation.getImage().getWidth();
+		double heightToCheck = (double) toCheck.getHeight() / (double) Segmentation.getImage().getHeight();
 		
 		if(widthToCheck > sizes[CharacterType.INDEX_MAX_WIDTH] 
 				|| heightToCheck > sizes[CharacterType.INDEX_MAX_HEIGHT]) {
@@ -228,7 +210,7 @@ public class CharacterCandidate implements Comparable<CharacterCandidate> {
 	 * sets the image Processor to a scaled variant of the given Image
 	 * @param wholeImage whole number plate as an image processor
 	 */
-	public void cutCharacterFromWholeImage() {
+	public void cutCharacterFromWholeImage(ImageProcessor wholeImage) {
 		imageForThisChar = wholeImage.createProcessor(getWidth(), getHeight());
 		for(int countInY = 0; countInY < getHeight(); countInY++) {
 			for(int countInX = 0; countInX < getWidth(); countInX++) {

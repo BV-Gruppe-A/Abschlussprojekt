@@ -5,7 +5,6 @@ import java.util.Stack;
 import com.mycompany.imagej.datamodels.CharacterCandidate;
 import com.mycompany.imagej.datamodels.CharacterType;
 import com.mycompany.imagej.datamodels.Pixel;
-
 import ij.IJ;
 import ij.ImagePlus;
 import ij.process.ImageProcessor;
@@ -27,7 +26,7 @@ public class Segmentation {
 	/**
 	 * the binary Image which should be segmented
 	 */
-	private ImageProcessor binarisedImg;
+	private static ImageProcessor binarisedImg;
 	
 	/**
 	 * height of the image
@@ -45,21 +44,42 @@ public class Segmentation {
 	private int[][] segments;
 	
 	/**
-	 * changes the image which is currently worked on
-	 * @param newImage new Image to work on
+	 * @return the binary Image 
 	 */
-	public void changeImage(ImageProcessor newImage) {
+	public static ImageProcessor getImage() {
+		return binarisedImg;
+	}
+	
+	/**
+	 * tries to set the image to the given one
+	 * @param newImage new ImageProcessor 
+	 * @return true if the image could be set
+	 */
+	public static boolean tryToSetImage(ImageProcessor newImage) {
 		if(!newImage.isBinary()) {
 			IJ.error("ImageProcessor is not binary!");
-			return;
+			return false;
 		}
 		
 		binarisedImg = newImage;
+		return true;
+	}
+	
+	/**
+	 * tries to change the image which is currently worked on
+	 * @param newImage new Image to work on
+	 * @return true if the change was successful
+	 */
+	public boolean tryToChangeImage(ImageProcessor newImage) {
+		if(!tryToSetImage(newImage)) {
+			return false;
+		}
+		
 		imgHeight = newImage.getHeight();
 		imgWidth = newImage.getWidth();
 		segments = new int[imgHeight][imgWidth];
 		fillSegmentsArrayWithDefault(imgHeight);
-		CharacterCandidate.setCurrentImage(newImage);
+		return true;
 	}
 	
 	/**
@@ -92,7 +112,8 @@ public class Segmentation {
 	}
 	
 	/**
-	 * identifies a whole segment by looking in each direction and setting each black pixel to the current segment
+	 * identifies a whole segment by looking in each direction 
+	 * and setting each black pixel to the current segment
 	 * @param start first Pixel of a segment
 	 * @param currentSegment segment to sort the pixel into
 	 */
@@ -137,9 +158,8 @@ public class Segmentation {
 	}
 
 	/**
-	 * fills the segment array with default values (-2)
+	 * fills the segment array with default values
 	 * @param rows number of rows in the two dimensional array
-	 * @return filled two dimensional array 
 	 */
 	private void fillSegmentsArrayWithDefault(int rows) {
 		for(int countRows = 0; countRows < rows; countRows++) {
@@ -206,7 +226,7 @@ public class Segmentation {
 					allSegments[countSegment].checkForUmlautAndChangeBorder(allSegments);
 				}	
 				
-				allSegments[countSegment].cutCharacterFromWholeImage();
+				allSegments[countSegment].cutCharacterFromWholeImage(getImage());
 				arrToReturn[currentReturnArrayPos++] = allSegments[countSegment];
 			}
 		}
@@ -217,6 +237,7 @@ public class Segmentation {
 	/**
 	 * shortens the array so that only full image processors are used
 	 * @param arrayToClean array which needs to be cleaned
+	 * @param filledImages number of filled entries in the array 
 	 * @return a new, cleaned-up array
 	 */
 	private CharacterCandidate[] cleanUpAndSortCharacterArray(CharacterCandidate[] arrToProcess,

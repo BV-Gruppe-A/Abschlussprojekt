@@ -223,9 +223,10 @@ public class MainWindowController {
     	setCurrentImageProcessor(gray.Grayscale_function(getCurrentImageProcessor()));   
     	cont.Contrast(getCurrentImageProcessor(), PercentageWhite, PercentageBlack);
     	setCurrentImageProcessor(shading.shading(getCurrentImageProcessor()));           	
-    	cont.Binarization(getCurrentImageProcessor(), BinarizationWhite);    
-    	segm.changeImage(getCurrentImageProcessor());
-    	classificator.classify(segm.segmentThePicture(), imageName);   	
+    	cont.Binarization(getCurrentImageProcessor(), BinarizationWhite);  
+    	if(segm.tryToChangeImage(getCurrentImageProcessor())) {
+    		classificator.classify(segm.segmentThePicture(), imageName);  
+    	}  	 	
     	
     	/*
     	ImagePlus imgToShow = new ImagePlus(imageName, getCurrentImageProcessor());
