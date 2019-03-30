@@ -35,8 +35,26 @@ Beantworten Sie insbesondere auch folgende Fragen:
 6. Wie bewerten Sie den Rechenaufwand? 
 
 ## Anleitung
+### Laden des Projekts in Eclipse
 
-Folgt...
+Um das Projekt in Eclipse zu öffnen, gehen Sie auf File -> Import... -> Maven -> Existing Maven Projects und dann auf Next.
+Nun muss das Verzeichnis aufgerufen werden, in welchem sich das Projekt befindet. Nach dieser Auswahl sollte die benötigte pom-Datei bereits ausgewählt sein.
+Mit dem Finish-Button kann der Import abgeschlossen werden.
+
+### Öffnen des PlugIns mit ImageJ
+
+Um das PlugIn in ImageJ zu öffnen, muss das Projekt gebaut werden. Sobald das abgeschlossen ist, kann die entstandene .jar-Datei in den Plugins-Ordner in ImageJ geladen werden.
+Danach kann in ImageJ über den Reiter "Gruppe A" das "Abschlussprojekt"-PlugIn geladen werden.
+
+### Hinweise zur GUI
+
+Nach der Ausführung des PlugIns öffnet sich eine GUI, welche mit einer Auswahl über zwei RadioButtons beginnt.
+Hier kann ausgewählt werden, ob ein einzelnes Bild oder ein Ordner von Bildern im nächsten Schritt ausgewählt werden soll.
+Im nächsten Schritt muss eine Datei oder ein Ordner ausgewählt werden. Zur Kontrolle wird der gewählte Speicherort angezeigt.
+Als nächstes muss der Speicherort für die CSV-Datei mit den Ergebnissen angegeben werden. Dabei kann eine bereits existierende Datei ausgewählt werden, oder eine neue Datei erstellt werden.
+Zum Abschluss kann eingestellt werden, ob die Klassifikationsrate angezeigt werden soll und ob die Datei vorm Beschreiben erst geleert werden soll.
+Bei der Klassifikationsrate gilt zu beachten, dass die Angabe nur repräsentativ ist, wenn die Namen der Bilder folgender Konvention entsprechen:
+Kennzeichen HX SR 206 --> HX_SR_206.jpg
 
 ## Coding Guidelines (basierend auf denen aus Mobile Systeme)
 
