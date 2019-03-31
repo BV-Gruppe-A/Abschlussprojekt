@@ -6,43 +6,53 @@ import ij.process.ImageProcessor;
 
 
 public class ShadingFilter {
-	//determine the size of the filter
-	final int radius = 6; 
-	//determine the array size for the filter
-	private int[] region = new int[(2 * radius + 1) * (2 * radius + 1)];
+	/**
+	 * determines the size of the filter and the array size for the filter
+	 */ 
+	final int RADIUS = 6; 
+	private int[] region = new int[(2 * RADIUS + 1) * (2 * RADIUS + 1)];
 	
 	public ByteProcessor shading(ImageProcessor ip) {
+		
 		int N = ip.getHeight();
 		int M = ip.getWidth();
+		/**
+		 * creates an object to save the background in an extra image
+		 */ 
 		ByteProcessor back = new ByteProcessor(M,N);
-		
-		//iterate over the image
+		/**
+		 * iterates over the image
+		 */ 
 		for (int u = 0; u < M; u++) {
 			for (int v = 0; v < N; v++) {
+				/**
+				 * collects the values from the filterregion into an array
+				 */ 
 				int k = 0;
-				//collect the values from the filterregion into an array
-				for (int i = -radius; i <= radius; i++) {
-					for (int j = -radius; j <= radius; j++) {
+				for (int i = -RADIUS; i <= RADIUS; i++) {
+					for (int j = -RADIUS; j <= RADIUS; j++) {
 						region[k] = ip.getPixel(u + i, v + j);  
 						k++;
 					}
 				}
 				Arrays.sort(region);
-				//select the highest value in the array to create the background of the license plate
+				/**
+				 * selects the highest value in the array to create the background of the license plate
+				 */ 
 				back.putPixel(u, v, region[region.length-1]);
 			}
 		}
-    	//Weight pixels with background / lighting values
+		/**
+		 * weights pixels with background / lighting values
+		 */ 
 		for (int u = 0; u < M; u++) {
 			for (int v = 0; v < N; v++) {
 				//Industrielle Bildverarbeitung: Wie optische Qualitätskontrolle wirklich funktioniert
 				//Christian Demant, Bernd Streicher-Abel, Axel Springhoff
 				//Springer-Verlag, 03.01.2011
-				back.putPixel(u, v, (int)(255*((float)ip.getPixel(u,v))/((float)back.getPixel(u,v))));
-				
+				back.putPixel(u, v, (int)(255*((float)ip.getPixel(u,v))/((float)back.getPixel(u,v))));	
 			}
 		}
-		
 		return back;
 	}
 }
