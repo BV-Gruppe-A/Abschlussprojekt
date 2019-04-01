@@ -6,13 +6,14 @@ import ij.process.ImageProcessor;
 
 
 public class ContrastAdjustment {    
-	public void Contrast(ImageProcessor ip, int PercentageWhite, int PercentageBlack) {
-	    int M = ip.getWidth();
+	
+	public void Contrast(ImageProcessor ip, int PercentageWhite, int PercentageBlack) {  //name contrast ?
+	    int M = ip.getWidth(); // haben nicht alle bilder jetzt die selben ausmaße? sonst variablen umbennen?
 	    int N = ip.getHeight();
 	    
         // the contrast should be expanded to the whole range of greyscales
-	    int color_max = Abschlussprojekt_PlugIn.WHITE;
-	    int color_min = Abschlussprojekt_PlugIn.BLACK;
+	    int colorMax = Abschlussprojekt_PlugIn.WHITE;
+	    int colorMin = Abschlussprojekt_PlugIn.BLACK;
 
 	    int[] histogram;
 	    
@@ -59,9 +60,9 @@ public class ContrastAdjustment {
 	            
 	            if(p > minThreshold && p < maxThreshold) {
 	            	//scale values linear over new range
-	            	new_p = color_min + (p - minThreshold) * (color_max - color_min) / (maxThreshold - minThreshold);	
+	            	new_p = colorMin + (p - minThreshold) * (colorMax - colorMin) / (maxThreshold - minThreshold);	
 	            } else {
-	            	new_p = (p >= maxThreshold) ? color_max : color_min;
+	            	new_p = (p >= maxThreshold) ? colorMax : colorMin;
 	            } 
 	        
 	            ip.putPixel(u, v, new_p);

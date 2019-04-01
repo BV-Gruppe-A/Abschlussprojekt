@@ -31,8 +31,8 @@ public class Grayscale {
         for (int u = 0; u < M; u++) {
             for (int v = 0; v < N; v++) {
             	int color = ip.getPixel(u, v);            	
-            	int new_p = calculateIntensity(getRGBValues(color));               	
-        		greyScaleIp.putPixel(u, v, new_p);            	
+            	int newPixel = calculateIntensity(getRGBValues(color));               	
+        		greyScaleIp.putPixel(u, v, newPixel);            	
             }
         }
         return greyScaleIp;
