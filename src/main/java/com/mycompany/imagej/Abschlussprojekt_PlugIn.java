@@ -10,6 +10,32 @@ import ij.process.ImageProcessor;
  */
 @SuppressWarnings("serial")
 public class Abschlussprojekt_PlugIn extends PlugInFrame {
+	/**
+	 * Value for a black pixel
+	 */
+	public static int BLACK = 0;
+	
+	/**
+	 * Value for a white pixel
+	 */
+	public static int WHITE = 255;	
+	
+	/**
+	 * Width to which the picture is initally resized
+	 */
+	public static int AVRG_IMAGE_WIDTH = 295;
+	
+	/**
+	 * the current Image which is processed
+	 */
+	private static ImageProcessor currentImage;
+	
+	/**
+	 * Constructor which calls the super constructor with the given applet name
+	 */
+	public Abschlussprojekt_PlugIn() {
+		super("Abschlussprojekt Gruppe A");
+	}
 	
 	/**
 	 * @return the current Image as an Image Processor
@@ -21,27 +47,26 @@ public class Abschlussprojekt_PlugIn extends PlugInFrame {
 	/**
 	 * sets the current Image Processor to the given one
 	 * @param imageToSet new Image Processor to set
+	 * @param shouldResize true if the image should be resized
 	 */
-	public static void setCurrentImageProcessor(ImageProcessor imageToSet) {
-		currentImage = imageToSet.resize(AVRG_IMAGE_WIDTH);
-
+	public static void setCurrentImageProcessor(ImageProcessor imageToSet, boolean shouldResize) {
+		currentImage = shouldResize ? imageToSet.resize(AVRG_IMAGE_WIDTH) : imageToSet;
 	}
 	
-	
-	
-	// constant values
-	public static int BLACK = 0;
-	public static int WHITE = 255;	
-	public static int WIDTH = currentImage.getWidth();
-	public static int HEIGHT = currentImage.getHeight();
-
 	/**
-	 * Constructor which calls the super constructor with the given applet name
+	 * @return height of the current Image Processor
 	 */
-	public Abschlussprojekt_PlugIn() {
-		super("Abschlussprojekt Gruppe A");
+	public static int getCurrentHeight() {
+		return getCurrentImageProcessor().getHeight();
 	}
 	
+	/**
+	 * @return width of the current Image Processor
+	 */
+	public static int getCurrentWidth() {
+		return getCurrentImageProcessor().getWidth();
+	}
+
 	/**
 	 * run-Method which shows the main Window
 	 */

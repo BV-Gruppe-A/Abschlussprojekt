@@ -1,7 +1,6 @@
 package com.mycompany.imagej.datamodels;
 
-import com.mycompany.imagej.Segmentation;
-
+import com.mycompany.imagej.Abschlussprojekt_PlugIn;
 import ij.process.ImageProcessor;
 
 /**
@@ -177,8 +176,10 @@ public class CharacterCandidate implements Comparable<CharacterCandidate> {
 	public static boolean checkIfValidSize(CharacterCandidate toCheck, 
 			CharacterType typeToCheckFor) {
 		double[] sizes = CharacterType.getSizesForCharacterType(typeToCheckFor);
-		double widthToCheck = (double) toCheck.getWidth() / (double) Segmentation.getImage().getWidth();
-		double heightToCheck = (double) toCheck.getHeight() / (double) Segmentation.getImage().getHeight();
+		double widthToCheck = (double) toCheck.getWidth() / 
+				(double) Abschlussprojekt_PlugIn.getCurrentWidth();
+		double heightToCheck = (double) toCheck.getHeight() / 
+				(double) Abschlussprojekt_PlugIn.getCurrentHeight();
 		
 		if(widthToCheck > sizes[CharacterType.INDEX_MAX_WIDTH] 
 				|| heightToCheck > sizes[CharacterType.INDEX_MAX_HEIGHT]) {
@@ -296,7 +297,8 @@ public class CharacterCandidate implements Comparable<CharacterCandidate> {
 	 * compares this character to another one for sorting
 	 * Criteria:
 	 * - the lower value for the left Border should be smaller
-	 * - if the bottom Border is above the higher Border of the other, than the higher one should be smaller
+	 * - if the bottom Border is above the higher Border of the other,
+	 *   than the higher one should be smaller
 	 *  @param otherCandidate other possible Character to compare with
 	 *  @return positive value if this should be sorted higher than the other
 	 *  		negative value if this should be sorted lower than the other

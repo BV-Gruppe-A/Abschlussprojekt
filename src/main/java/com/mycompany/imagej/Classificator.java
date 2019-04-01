@@ -126,7 +126,8 @@ public class Classificator {
 	public void classify(CharacterCandidate[] characters, String filename) {
 		String licensePlate = "";
 		charIsFe = new boolean[characters.length];
-		int[] spaces = new int[characters.length - 1];
+		int amountOfSpaces = characters.length - 1 >= 0 ? characters.length - 1 : characters.length;
+		int[] spaces = new int[amountOfSpaces];
 		int countSpaces = 0;
 		
 		for (int i = 0; i < characters.length; i++) {
@@ -134,7 +135,7 @@ public class Classificator {
 			if(i < characters.length - 1) {
 				double distBetween = (double) (characters[i+1].getLeftBorder() - 
 						characters[i].getRightBorder()) 
-						/ (double) Segmentation.getImage().getWidth();
+						/ (double) Abschlussprojekt_PlugIn.getCurrentWidth();
 				if(distBetween < CharacterType.SPACE_WIDTH_MAX 
 						&& distBetween > CharacterType.SPACE_WIDTH_MIN) {
 					spaces[countSpaces++] = i + 1;

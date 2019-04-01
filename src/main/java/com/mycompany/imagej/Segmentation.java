@@ -5,7 +5,6 @@ import java.util.Stack;
 import com.mycompany.imagej.datamodels.CharacterCandidate;
 import com.mycompany.imagej.datamodels.CharacterType;
 import com.mycompany.imagej.datamodels.Pixel;
-import ij.IJ;
 import ij.ImagePlus;
 import ij.process.ImageProcessor;
 
@@ -26,7 +25,7 @@ public class Segmentation {
 	/**
 	 * the binary Image which should be segmented
 	 */
-	private static ImageProcessor binarisedImg;
+	private ImageProcessor binarisedImg;
 	
 	/**
 	 * height of the image
@@ -44,42 +43,16 @@ public class Segmentation {
 	private int[][] segments;
 	
 	/**
-	 * @return the binary Image 
-	 */
-	public static ImageProcessor getImage() {
-		return binarisedImg;
-	}
-	
-	/**
-	 * tries to set the image to the given one
-	 * @param newImage new ImageProcessor 
-	 * @return true if the image could be set
-	 */
-	public static boolean tryToSetImage(ImageProcessor newImage) {
-		if(!newImage.isBinary()) {
-			IJ.error("ImageProcessor is not binary!");
-			return false;
-		}
-		
-		binarisedImg = newImage;
-		return true;
-	}
-	
-	/**
 	 * tries to change the image which is currently worked on
 	 * @param newImage new Image to work on
 	 * @return true if the change was successful
 	 */
-	public boolean tryToChangeImage(ImageProcessor newImage) {
-		if(!tryToSetImage(newImage)) {
-			return false;
-		}
-		
-		imgHeight = newImage.getHeight();
-		imgWidth = newImage.getWidth();
+	public void resetValuesForNewImage() {
+		binarisedImg = Abschlussprojekt_PlugIn.getCurrentImageProcessor();
+		imgHeight = Abschlussprojekt_PlugIn.getCurrentHeight();
+		imgWidth = Abschlussprojekt_PlugIn.getCurrentWidth();
 		segments = new int[imgHeight][imgWidth];
 		fillSegmentsArrayWithDefault(imgHeight);
-		return true;
 	}
 	
 	/**
@@ -87,6 +60,7 @@ public class Segmentation {
 	 * @return each character as a single image processor
 	 */
 	public CharacterCandidate[] segmentThePicture() {
+		resetValuesForNewImage();
 		return checkSizesAndRescale(makeCharCandidatesOutOfSegments(fillTheSegments()));
 	}
 	
@@ -168,14 +142,16 @@ public class Segmentation {
 	}
 	
 	/**
-	 * takes a single picture and slices it up into different segments, each representing a single character
+	 * takes a single picture and slices it up into different segments,
+	 *  each representing a single character
 	 * @param segmentAmount number of Segments in the image
 	 * @return array containing all possible characters
 	 */
 	private CharacterCandidate[] makeCharCandidatesOutOfSegments(int segmentAmount) {
 		CharacterCandidate[] allSegments = new CharacterCandidate[segmentAmount];
 		
-		for(int countSegment = SEGMENTS_START_AMOUNT; countSegment < segmentAmount; countSegment++) {
+		for(int countSegment = SEGMENTS_START_AMOUNT; 
+				countSegment < segmentAmount; countSegment++) {
 			int leftBorder = imgWidth, upperBorder = imgHeight;
 			int rightBorder = 0, bottomBorder = 0;
 			
@@ -206,7 +182,8 @@ public class Segmentation {
 	}
 	
 	/**
-	 * takes the given segments and checks for each one if it should be included for the classification
+	 * takes the given segments and checks for each one if 
+	 * it should be included for the classification
 	 * all that should be included will be rescaled
 	 * @param allSegments all Segments to consider
 	 * @return array containing all possible characters
@@ -226,7 +203,7 @@ public class Segmentation {
 					allSegments[countSegment].checkForUmlautAndChangeBorder(allSegments);
 				}	
 				
-				allSegments[countSegment].cutCharacterFromWholeImage(getImage());
+				allSegments[countSegment].cutCharacterFromWholeImage(binarisedImg);
 				arrToReturn[currentReturnArrayPos++] = allSegments[countSegment];
 			}
 		}

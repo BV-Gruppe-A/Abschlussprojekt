@@ -2,6 +2,7 @@ package com.mycompany.imagej.gui;
 
 import java.io.File;
 import javax.swing.JFileChooser;
+import com.mycompany.imagej.Abschlussprojekt_PlugIn;
 import com.mycompany.imagej.Classificator;
 import com.mycompany.imagej.Segmentation;
 import com.mycompany.imagej.gui.filefilters.FilterForImageDirectory;
@@ -11,18 +12,11 @@ import com.mycompany.imagej.preprocessing.Grayscale;
 import com.mycompany.imagej.preprocessing.ShadingFilter;
 import ij.IJ;
 import ij.ImagePlus;
-import ij.process.ImageProcessor;
 
 /**
  * Controller, which controls everything that happens in the main Window
  */
 public class MainWindowController {
-	/**
-	 * value to which the width of a picture is scaled
-	 * found in most example images
-	 */
-	public final int AVRG_IMAGE_WIDTH = 295;
-	
 	/**
 	 * the Main Window which should be controlled
 	 */
@@ -37,11 +31,6 @@ public class MainWindowController {
 	 * the file in which the results should be saved
 	 */
 	private File fileToSave;
-	
-	/**
-	 * current Image to process
-	 */
-	private ImageProcessor currentImage;
 	
 	/**
 	 * class for contrast adjustement
@@ -94,32 +83,6 @@ public class MainWindowController {
 		}
 	}
 	
-	Abschlussprojekt_PlugIn.getCurrentImageProcessor;
-	
-	Abschlussprojekt_PlugIn.setCurrentImageProcessor(ImageProcessor imageToSet);
-	
-	/**
-	 * @return the current Image as an Image Processor
-	 
-	public ImageProcessor getCurrentImageProcessor() {
-		return currentImage;
-	}
-	
-	
-	 * sets the current Image Processor to the given one
-	 * @param imageToSet new Image Processor to set
-	 
-	public void setCurrentImageProcessor(ImageProcessor imageToSet) {
-		currentImage = imageToSet.resize(AVRG_IMAGE_WIDTH);
-	}
-	 
-	 **/
-	
-	
-	
-	
-	
-	
 	/**
 	 * opens a file chooser for a single image
 	 */
@@ -132,7 +95,7 @@ public class MainWindowController {
         	imgOrFolderToOpen = fcOpen.getSelectedFile();
         	windowToControl.txtOpenLocation.setText(imgOrFolderToOpen.getPath());
         	ImagePlus imgAsPlus = new ImagePlus(imgOrFolderToOpen.getAbsolutePath());
-        	setCurrentImageProcessor(imgAsPlus.getProcessor());
+        	Abschlussprojekt_PlugIn.setCurrentImageProcessor(imgAsPlus.getProcessor(), true);
         }
 	}
 	
@@ -194,7 +157,7 @@ public class MainWindowController {
 			
 			for(File currentImage : allFilesToOpen) {
 				ImagePlus imgAsPlus = new ImagePlus(currentImage.getAbsolutePath());
-	        	setCurrentImageProcessor(imgAsPlus.getProcessor());
+				Abschlussprojekt_PlugIn.setCurrentImageProcessor(imgAsPlus.getProcessor(), true);
 	        	startProcessForOneImage(removeFileExtension(currentImage.getName()));       	
 			}			
 		}
@@ -203,7 +166,6 @@ public class MainWindowController {
 			classificator.evaluation();
 		}		
 
-		// TODO: find better way to inform user
 		IJ.error("Processing finished!");
 	}
 	
@@ -231,13 +193,15 @@ public class MainWindowController {
     	int PercentageWhite = 5;  
     	int BinarizationWhite = 65;
 		
-    	setCurrentImageProcessor(gray.Grayscale_function(getCurrentImageProcessor()));   
-    	cont.Contrast(getCurrentImageProcessor(), PercentageWhite, PercentageBlack);
-    	setCurrentImageProcessor(shading.shading(getCurrentImageProcessor()));           	
-    	cont.Binarization(getCurrentImageProcessor(), BinarizationWhite);  
-    	if(segm.tryToChangeImage(getCurrentImageProcessor())) {
-    		classificator.classify(segm.segmentThePicture(), imageName);  
-    	}  	 	
+    	Abschlussprojekt_PlugIn.setCurrentImageProcessor(
+    			gray.Grayscale_function(Abschlussprojekt_PlugIn.getCurrentImageProcessor()), false);   
+    	cont.Contrast(Abschlussprojekt_PlugIn.getCurrentImageProcessor(),
+    			PercentageWhite, PercentageBlack);
+    	Abschlussprojekt_PlugIn.setCurrentImageProcessor(
+    			shading.shading(Abschlussprojekt_PlugIn.getCurrentImageProcessor()), false);           	
+    	cont.Binarization(Abschlussprojekt_PlugIn.getCurrentImageProcessor(), BinarizationWhite);  
+    	segm.resetValuesForNewImage();
+		classificator.classify(segm.segmentThePicture(), imageName);  	 	
     	
     	/*
     	ImagePlus imgToShow = new ImagePlus(imageName, getCurrentImageProcessor());

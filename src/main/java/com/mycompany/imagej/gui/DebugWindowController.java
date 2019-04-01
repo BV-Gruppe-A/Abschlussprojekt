@@ -274,13 +274,13 @@ public class DebugWindowController {
         	
         case SEGMENTATION:
         	// DEBUG - only usable with a binarised input image!
-        	segm.tryToChangeImage(getCurrentImageProcessor());
+        	segm.resetValuesForNewImage();
         	segm.debugSegmentation();
         	
         	break;
         	
         case CLASSIFICATION:
-        	segm.tryToChangeImage(getCurrentImageProcessor());
+        	segm.resetValuesForNewImage();
         	classificator.classify(segm.segmentThePicture(), imageName);
         	
         	break;
@@ -290,7 +290,7 @@ public class DebugWindowController {
         	cont.Contrast(getCurrentImageProcessor(), PercentageWhite, PercentageBlack);
         	setCurrentImageProcessor(shading.shading(getCurrentImageProcessor()));           	
         	cont.Binarization(getCurrentImageProcessor(), BinarizationWhite);    
-        	segm.tryToChangeImage(getCurrentImageProcessor());
+        	segm.resetValuesForNewImage();
         	classificator.classify(segm.segmentThePicture(), imageName);   	
         	break;        	
         default: 
