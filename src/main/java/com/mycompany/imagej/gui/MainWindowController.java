@@ -94,20 +94,31 @@ public class MainWindowController {
 		}
 	}
 	
+	Abschlussprojekt_PlugIn.getCurrentImageProcessor;
+	
+	Abschlussprojekt_PlugIn.setCurrentImageProcessor(ImageProcessor imageToSet);
+	
 	/**
 	 * @return the current Image as an Image Processor
-	 */
+	 
 	public ImageProcessor getCurrentImageProcessor() {
 		return currentImage;
 	}
 	
-	/**
+	
 	 * sets the current Image Processor to the given one
 	 * @param imageToSet new Image Processor to set
-	 */
+	 
 	public void setCurrentImageProcessor(ImageProcessor imageToSet) {
 		currentImage = imageToSet.resize(AVRG_IMAGE_WIDTH);
 	}
+	 
+	 **/
+	
+	
+	
+	
+	
 	
 	/**
 	 * opens a file chooser for a single image
