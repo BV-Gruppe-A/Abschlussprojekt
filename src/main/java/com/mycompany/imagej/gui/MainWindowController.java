@@ -194,11 +194,11 @@ public class MainWindowController {
     	int BinarizationWhite = 65;
 		
     	Abschlussprojekt_PlugIn.setCurrentImageProcessor(
-    			gray.Grayscale_function(Abschlussprojekt_PlugIn.getCurrentImageProcessor()), false);   
+    			gray.convertToGrayscale(Abschlussprojekt_PlugIn.getCurrentImageProcessor()), false);   
     	cont.Contrast(Abschlussprojekt_PlugIn.getCurrentImageProcessor(),
     			PercentageWhite, PercentageBlack);
     	Abschlussprojekt_PlugIn.setCurrentImageProcessor(
-    			shading.shading(Abschlussprojekt_PlugIn.getCurrentImageProcessor()), false);           	
+    			shading.shade(Abschlussprojekt_PlugIn.getCurrentImageProcessor()), false);           	
     	cont.Binarization(Abschlussprojekt_PlugIn.getCurrentImageProcessor(), BinarizationWhite);  
     	segm.resetValuesForNewImage();
 		classificator.classify(segm.segmentThePicture(), imageName);  	 	

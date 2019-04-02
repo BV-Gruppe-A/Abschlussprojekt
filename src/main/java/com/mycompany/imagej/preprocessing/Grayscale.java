@@ -17,7 +17,7 @@ public class Grayscale {
 	final int GREEN_MASK = 0x0000FF00;
 	final int BLUE_MASK = 0x000000FF;
 	
-	public ByteProcessor Grayscale_function(ImageProcessor ip) {
+	public ByteProcessor convertToGrayscale(ImageProcessor ip) {
 
 		int width = Abschlussprojekt_PlugIn.getCurrentWidth();
 	    int height =  Abschlussprojekt_PlugIn.getCurrentHeight();

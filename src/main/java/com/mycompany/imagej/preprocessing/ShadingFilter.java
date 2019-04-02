@@ -15,7 +15,7 @@ public class ShadingFilter {
 	final int RADIUS = 6; 
 	private int[] region = new int[(2 * RADIUS + 1) * (2 * RADIUS + 1)];
 	
-	public ByteProcessor shading(ImageProcessor ip) {
+	public ByteProcessor shade(ImageProcessor ip) {
 		
 		int width = Abschlussprojekt_PlugIn.getCurrentWidth();
 	    int height =  Abschlussprojekt_PlugIn.getCurrentHeight();
@@ -50,9 +50,11 @@ public class ShadingFilter {
 		 */ 
 		for (int u = 0; u < width; u++) {
 			for (int v = 0; v < height; v++) {
-				//Industrielle Bildverarbeitung: Wie optische Qualitätskontrolle wirklich funktioniert
-				//Christian Demant, Bernd Streicher-Abel, Axel Springhoff
-				//Springer-Verlag, 03.01.2011
+				/**
+				 * Industrielle Bildverarbeitung: Wie optische Qualitätskontrolle wirklich funktioniert,
+				 * Christian Demant, Bernd Streicher-Abel, Axel Springhoff,
+				 * Springer-Verlag, 2011
+				 */ 
 				back.putPixel(u, v, (int)(255*((float)ip.getPixel(u,v))/((float)back.getPixel(u,v))));	
 			}
 		}

@@ -257,14 +257,14 @@ public class DebugWindowController {
         	break;
         	
         case SHADING:
-           	setCurrentImageProcessor(shading.shading(getCurrentImageProcessor()));          
+           	setCurrentImageProcessor(shading.shade(getCurrentImageProcessor()));          
         	cont.Binarization(getCurrentImageProcessor(), BinarizationWhite);            
         	
             break;
               
         case GRAYSCALE:
         	//RGB Bild in Grauwert Bild umwandeln
-            setCurrentImageProcessor(gray.Grayscale_function(getCurrentImageProcessor()));    
+            setCurrentImageProcessor(gray.convertToGrayscale(getCurrentImageProcessor()));    
             
         	break;
         	
@@ -286,9 +286,9 @@ public class DebugWindowController {
         	break;
             
         case EVERYTHING:
-        	setCurrentImageProcessor(gray.Grayscale_function(getCurrentImageProcessor()));   
+        	setCurrentImageProcessor(gray.convertToGrayscale(getCurrentImageProcessor()));   
         	cont.Contrast(getCurrentImageProcessor(), PercentageWhite, PercentageBlack);
-        	setCurrentImageProcessor(shading.shading(getCurrentImageProcessor()));           	
+        	setCurrentImageProcessor(shading.shade(getCurrentImageProcessor()));           	
         	cont.Binarization(getCurrentImageProcessor(), BinarizationWhite);    
         	segm.resetValuesForNewImage();
         	classificator.classify(segm.segmentThePicture(), imageName);   	
