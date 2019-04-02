@@ -164,6 +164,7 @@ public class MainWindowController {
 		
 		if(windowToControl.ckbEvaluation.isSelected()) {
 			classificator.evaluation();
+			classificator.resetClassificator();
 		}		
 
 		IJ.error("Processing finished!");
