@@ -473,8 +473,14 @@ public class Classificator {
 		}
 		rate = 1.0 - (double) mistakes / (double) lengthAllChars;
 
-		writeToExcel(String.format(" %.3f", rate),"Classification Rate");
-		
+		writeToExcel(String.format(" %.3f Mistakes: %d, lengthAll : %d ", rate, mistakes,lengthAllChars),"Classification Rate");		
+	}
+
+	/**
+	 * Resets the results the Classificator uses to calculate the Classification Rate
+	 */
+	public void resetClassificator() {
+		results.clear();
 	}
 
 }
