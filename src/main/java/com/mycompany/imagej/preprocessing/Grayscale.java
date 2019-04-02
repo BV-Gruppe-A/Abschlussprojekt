@@ -19,17 +19,17 @@ public class Grayscale {
 	
 	public ByteProcessor Grayscale_function(ImageProcessor ip) {
 
-		int M = ip.getWidth();
-        int N = ip.getHeight();
+		int width = Abschlussprojekt_PlugIn.getCurrentWidth();
+	    int height =  Abschlussprojekt_PlugIn.getCurrentHeight();
         /**
     	 * creates a new object type for saving a grayscale image
     	 */ 
-        ByteProcessor greyScaleIp = new ByteProcessor(M,N);
+        ByteProcessor greyScaleIp = new ByteProcessor(width,height);
         /**
     	 * iterates over the image and change the color-values to a grayscale
     	 */ 
-        for (int u = 0; u < M; u++) {
-            for (int v = 0; v < N; v++) {
+        for (int u = 0; u < width; u++) {
+            for (int v = 0; v < height; v++) {
             	int color = ip.getPixel(u, v);            	
             	int newPixel = calculateIntensity(getRGBValues(color));               	
         		greyScaleIp.putPixel(u, v, newPixel);            	

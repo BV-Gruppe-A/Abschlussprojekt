@@ -1,6 +1,9 @@
 package com.mycompany.imagej.preprocessing;
 
 import java.util.Arrays;
+
+import com.mycompany.imagej.Abschlussprojekt_PlugIn;
+
 import ij.process.ByteProcessor;
 import ij.process.ImageProcessor;
 
@@ -14,17 +17,17 @@ public class ShadingFilter {
 	
 	public ByteProcessor shading(ImageProcessor ip) {
 		
-		int N = ip.getHeight();
-		int M = ip.getWidth();
+		int width = Abschlussprojekt_PlugIn.getCurrentWidth();
+	    int height =  Abschlussprojekt_PlugIn.getCurrentHeight();
 		/**
 		 * creates an object to save the background in an extra image
 		 */ 
-		ByteProcessor back = new ByteProcessor(M,N);
+		ByteProcessor back = new ByteProcessor(width,height);
 		/**
 		 * iterates over the image
 		 */ 
-		for (int u = 0; u < M; u++) {
-			for (int v = 0; v < N; v++) {
+		for (int u = 0; u < width; u++) {
+			for (int v = 0; v < height; v++) {
 				/**
 				 * collects the values from the filterregion into an array
 				 */ 
@@ -45,8 +48,8 @@ public class ShadingFilter {
 		/**
 		 * weights pixels with background / lighting values
 		 */ 
-		for (int u = 0; u < M; u++) {
-			for (int v = 0; v < N; v++) {
+		for (int u = 0; u < width; u++) {
+			for (int v = 0; v < height; v++) {
 				//Industrielle Bildverarbeitung: Wie optische Qualitätskontrolle wirklich funktioniert
 				//Christian Demant, Bernd Streicher-Abel, Axel Springhoff
 				//Springer-Verlag, 03.01.2011

@@ -8,8 +8,9 @@ import ij.process.ImageProcessor;
 public class ContrastAdjustment {    
 	
 	public void Contrast(ImageProcessor ip, int PercentageWhite, int PercentageBlack) {  //name contrast ?
-	    int M = ip.getWidth(); // haben nicht alle bilder jetzt die selben ausmaße? sonst variablen umbennen?
-	    int N = ip.getHeight();
+		
+	    int width = Abschlussprojekt_PlugIn.getCurrentWidth();
+	    int height =  Abschlussprojekt_PlugIn.getCurrentHeight();
 	    
         // the contrast should be expanded to the whole range of greyscales
 	    int colorMax = Abschlussprojekt_PlugIn.WHITE;
@@ -54,8 +55,8 @@ public class ContrastAdjustment {
 	    int new_p;
 	    
 	    // iterate over all image coordinates (u,v)
-	    for (int u = 0; u < M; u++) {
-	        for (int v = 0; v < N; v++) {
+	    for (int u = 0; u < width; u++) {
+	        for (int v = 0; v < height; v++) {
 	            int p = ip.getPixel(u, v);
 	            
 	            if(p > minThreshold && p < maxThreshold) {
@@ -74,8 +75,9 @@ public class ContrastAdjustment {
 	
 	
 	public void Binarization(ImageProcessor ip, int PercentageWhite) {
-	    int M = ip.getWidth();
-	    int N = ip.getHeight();
+		
+		int width = Abschlussprojekt_PlugIn.getCurrentWidth();
+	    int height =  Abschlussprojekt_PlugIn.getCurrentHeight();
 
 	    int[] histogram;
 
@@ -102,8 +104,8 @@ public class ContrastAdjustment {
 	    int new_p;
 	    
 	    // iterate over all image coordinates (u,v)
-	    for (int u = 0; u < M; u++) {
-	        for (int v = 0; v < N; v++) {
+	    for (int u = 0; u < width; u++) {
+	        for (int v = 0; v < height ; v++) {
 	            int p = ip.getPixel(u, v);
 	            
 	            if(p < maxThreshold) {
