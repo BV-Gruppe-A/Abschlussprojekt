@@ -201,12 +201,13 @@ public class MainWindowController {
     	Abschlussprojekt_PlugIn.setCurrentImageProcessor(
     			shading.shade(Abschlussprojekt_PlugIn.getCurrentImageProcessor()), false);           	
     	cont.Binarization(Abschlussprojekt_PlugIn.getCurrentImageProcessor(), BinarizationWhite);  
-    	segm.resetValuesForNewImage();
 		classificator.classify(segm.segmentThePicture(), imageName);  	 	
     	
-    	/*
-    	ImagePlus imgToShow = new ImagePlus(imageName, getCurrentImageProcessor());
-    	imgToShow.show();    
-    	*/
+		/*
+    	ImagePlus imgToShow = new ImagePlus(imageName, 
+    			Abschlussprojekt_PlugIn.getCurrentImageProcessor());
+    	imgToShow.show(); 
+    	*/   
+    	
 	}
 }

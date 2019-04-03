@@ -47,7 +47,7 @@ public class Segmentation {
 	 * @param newImage new Image to work on
 	 * @return true if the change was successful
 	 */
-	public void resetValuesForNewImage() {
+	private void resetValuesForNewImage() {
 		binarisedImg = Abschlussprojekt_PlugIn.getCurrentImageProcessor();
 		imgHeight = Abschlussprojekt_PlugIn.getCurrentHeight();
 		imgWidth = Abschlussprojekt_PlugIn.getCurrentWidth();
@@ -86,8 +86,10 @@ public class Segmentation {
 	}
 	
 	/**
-	 * identifies a whole segment by looking in each direction 
-	 * and setting each black pixel to the current segment
+	 * uses Flood Filling to identify and set a whole segment
+	 * based on this source:
+	 * W. Burger und M. J. Burge, Digitale Bildverarbeitung: Eine algorithmische Einführung mit 
+	 * Java, 3. Auﬂ., Serie X.media.press.Berlin: Springer Vieweg, 2015, S. 227
 	 * @param start first Pixel of a segment
 	 * @param currentSegment segment to sort the pixel into
 	 */
@@ -229,6 +231,7 @@ public class Segmentation {
 	 * allows for debugging of the segmentation without needing to split it up
 	 */
 	public void debugSegmentation() {
+		resetValuesForNewImage();
 		CharacterCandidate[] debug = checkSizesAndRescale(makeCharCandidatesOutOfSegments(
 				fillTheSegments()));
 		for(int count = 0; count < debug.length; count++) {
