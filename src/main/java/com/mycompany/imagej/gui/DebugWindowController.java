@@ -2,6 +2,8 @@ package com.mycompany.imagej.gui;
 
 import java.io.File;
 import javax.swing.JFileChooser;
+
+import com.mycompany.imagej.Abschlussprojekt_PlugIn;
 import com.mycompany.imagej.Classificator;
 import com.mycompany.imagej.Segmentation;
 import com.mycompany.imagej.gui.filefilters.FilterForImageDirectory;
@@ -33,7 +35,6 @@ public class DebugWindowController {
 	private DebugWindow windowToControl;
 	private File imgOrFolderToOpen;
 	private File placeToSave;
-	private ImageProcessor currentImage;
 	
 	private ContrastAdjustment cont = new ContrastAdjustment();
 	private Grayscale gray = new Grayscale();
@@ -71,21 +72,6 @@ public class DebugWindowController {
 	}
 	
 	/**
-	 * @return the current Image as an Image Processor
-	 */
-	public ImageProcessor getCurrentImageProcessor() {
-		return currentImage;
-	}
-	
-	/**
-	 * sets the current Image Processor to the given one
-	 * @param imageToSet new Image Processor to set
-	 */
-	public void setCurrentImageProcessor(ImageProcessor imageToSet) {
-		currentImage = imageToSet.resize(AVRG_IMAGE_WIDTH);
-	}
-	
-	/**
 	 * opens a file chooser for a single image
 	 */
 	private void openFileChooserLoadingSingleImage() {
@@ -97,7 +83,7 @@ public class DebugWindowController {
         	imgOrFolderToOpen = fcOpen.getSelectedFile();
         	windowToControl.txtOpenLocation.setText(imgOrFolderToOpen.getPath());
         	ImagePlus imgAsPlus = new ImagePlus(imgOrFolderToOpen.getAbsolutePath());
-        	setCurrentImageProcessor(imgAsPlus.getProcessor());
+        	Abschlussprojekt_PlugIn.setCurrentImageProcessor(imgAsPlus.getProcessor(), true);
         }
 	}
 	
@@ -179,7 +165,7 @@ public class DebugWindowController {
 		} else {
 			for(File currentImage : imgOrFolderToOpen.listFiles(new FilterForImageDirectory())) {
 				ImagePlus imgAsPlus = new ImagePlus(currentImage.getAbsolutePath());
-	        	setCurrentImageProcessor(imgAsPlus.getProcessor());
+				Abschlussprojekt_PlugIn.setCurrentImageProcessor(imgAsPlus.getProcessor(), true);
 	        	startProcessForOneImage(removeFileExtension(currentImage.getName()));
 			}
 		}		
@@ -252,24 +238,20 @@ public class DebugWindowController {
     	
     	switch(chosenMethod) {
         case CONTRAST:              	
-        	cont.Contrast(getCurrentImageProcessor(), PercentageWhite, PercentageBlack);
+        	cont.Contrast(Abschlussprojekt_PlugIn.getCurrentImageProcessor(), PercentageWhite, PercentageBlack);
         	
         	break;
         	
         case SHADING:
-           	setCurrentImageProcessor(shading.shade(getCurrentImageProcessor()));          
-        	cont.Binarization(getCurrentImageProcessor(), BinarizationWhite);            
+        	Abschlussprojekt_PlugIn.setCurrentImageProcessor(shading.shade(Abschlussprojekt_PlugIn.getCurrentImageProcessor()), false);          
+        	cont.Binarization(Abschlussprojekt_PlugIn.getCurrentImageProcessor(), BinarizationWhite);            
         	
             break;
               
         case GRAYSCALE:
         	//RGB Bild in Grauwert Bild umwandeln
-            setCurrentImageProcessor(gray.convertToGrayscale(getCurrentImageProcessor()));    
+        	Abschlussprojekt_PlugIn.setCurrentImageProcessor(gray.convertToGrayscale(Abschlussprojekt_PlugIn.getCurrentImageProcessor()), false);    
             
-        	break;
-        	
-        case NO4:
-        	
         	break;
         	
         case SEGMENTATION:
@@ -284,17 +266,17 @@ public class DebugWindowController {
         	break;
             
         case EVERYTHING:
-        	setCurrentImageProcessor(gray.convertToGrayscale(getCurrentImageProcessor()));   
-        	cont.Contrast(getCurrentImageProcessor(), PercentageWhite, PercentageBlack);
-        	setCurrentImageProcessor(shading.shade(getCurrentImageProcessor()));           	
-        	cont.Binarization(getCurrentImageProcessor(), BinarizationWhite);    
-        	classificator.classify(segm.segmentThePicture(), imageName);   	
+        	Abschlussprojekt_PlugIn.setCurrentImageProcessor(gray.convertToGrayscale(Abschlussprojekt_PlugIn.getCurrentImageProcessor()), false);   
+        	cont.Contrast(Abschlussprojekt_PlugIn.getCurrentImageProcessor(), PercentageWhite, PercentageBlack);
+        	Abschlussprojekt_PlugIn.setCurrentImageProcessor(shading.shade(Abschlussprojekt_PlugIn.getCurrentImageProcessor()), false);           	
+        	cont.Binarization(Abschlussprojekt_PlugIn.getCurrentImageProcessor(), BinarizationWhite);  
+    		classificator.classify(segm.segmentThePicture(), imageName);  	
         	break;        	
         default: 
         	
     	}  
     	
-    	ImagePlus imgToShow = new ImagePlus(imageName, getCurrentImageProcessor());
+    	ImagePlus imgToShow = new ImagePlus(imageName, Abschlussprojekt_PlugIn.getCurrentImageProcessor());
     	imgToShow.show();
     }
 	
