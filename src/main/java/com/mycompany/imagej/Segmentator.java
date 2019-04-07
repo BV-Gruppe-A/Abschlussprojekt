@@ -5,27 +5,28 @@ import java.util.Stack;
 import com.mycompany.imagej.datamodels.CharacterCandidate;
 import com.mycompany.imagej.datamodels.CharacterType;
 import com.mycompany.imagej.datamodels.Pixel;
-import ij.ImagePlus;
-import ij.process.ImageProcessor;
+
+import ij.process.BinaryProcessor;
 
 /**
  * contains everything related to the segmentation
+ * TODO change comment
  */
-public class Segmentation {
+public class Segmentator {
 	/**
 	 * Number of the first segment
 	 */
 	private final int SEGMENTS_START_AMOUNT = 0;	
 	
 	/**
-	 * Value for a pixel which has not been initalisied yet
+	 * Value for a pixel, which has not been initialised yet
 	 */
 	private final int NOT_SEGMENTED = -1;
 	
 	/**
-	 * the binary Image which should be segmented
+	 * the binary Image, which should be segmented
 	 */
-	private ImageProcessor binarisedImg;
+	private BinaryProcessor binarisedImg;
 	
 	/**
 	 * height of the image
@@ -43,9 +44,9 @@ public class Segmentation {
 	private int[][] segments;
 	
 	/**
-	 * tries to change the image which is currently worked on
-	 * @param newImage new Image to work on
-	 * @return true if the change was successful
+	 * resets the member values for this object
+	 * saves the image, height and width of the current Image from the PlugIn-class
+	 * declares a new segments array
 	 */
 	private void resetValuesForNewImage() {
 		binarisedImg = Abschlussprojekt_PlugIn.getCurrentImageProcessor();
@@ -134,7 +135,8 @@ public class Segmentation {
 	}
 
 	/**
-	 * fills the segment array with default values
+	 * fills the segment array with default values since there is only one object of the segmentation per gui
+	 * and the array should be set to a value that symbolizes that each pixel has not yet been segmented
 	 * @param rows number of rows in the two dimensional array
 	 */
 	private void fillSegmentsArrayWithDefault(int rows) {
@@ -214,7 +216,7 @@ public class Segmentation {
 	}
 	
 	/**
-	 * shortens the array so that only full image processors are used
+	 * shortens the array so that only segments identified as possible characters are used
 	 * @param arrayToClean array which needs to be cleaned
 	 * @param filledImages number of filled entries in the array 
 	 * @return a new, cleaned-up array
@@ -226,35 +228,5 @@ public class Segmentation {
 		return cleanedArray;
  	}	
 	
-	/**
-	 * DEBUG
-	 * allows for debugging of the segmentation without needing to split it up
-	 */
-	public void debugSegmentation() {
-		resetValuesForNewImage();
-		CharacterCandidate[] debug = checkSizesAndRescale(makeCharCandidatesOutOfSegments(
-				fillTheSegments()));
-		for(int count = 0; count < debug.length; count++) {
-			ImagePlus imgToShow = new ImagePlus("char " + (count + 1), debug[count].getImage());
-	    	imgToShow.show();
-		}		
-	}
-	
-	/**
-	 * DEBUG METHOD
-	 * Colors the segments so that you can see if the segmentation functions properly
-	 */
-	private void colorTheSegments(int segmentAmount) {
-		int stepWidth = (int) ((double) (Abschlussprojekt_PlugIn.BLACK - 2) / (double) segmentAmount);
-		
-		for(int countInY = 0; countInY < imgHeight; countInY++) {
-			for(int countInX = 0; countInX < imgWidth; countInX++) {
-				if(segments[countInY][countInX] != NOT_SEGMENTED) {
-					int currentSegment = segments[countInY][countInX];
-					int newPixel = Abschlussprojekt_PlugIn.WHITE + (currentSegment * stepWidth);
-					binarisedImg.putPixel(countInX, countInY, newPixel);
-				}				
-			}
-		}		
-	}
+
 }

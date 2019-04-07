@@ -294,7 +294,8 @@ public class CharacterCandidate implements Comparable<CharacterCandidate> {
 	}
 	
 	/**
-	 * compares this character to another one for sorting
+	 * compares this character to another one for sorting, sorts the character to have the same order as normal reading 
+	 * order would be (left to right and row after row)
 	 * Criteria:
 	 * - the lower value for the left Border should be smaller
 	 * - if the bottom Border is above the higher Border of the other,

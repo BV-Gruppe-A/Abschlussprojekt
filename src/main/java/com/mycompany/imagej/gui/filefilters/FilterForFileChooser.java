@@ -4,7 +4,7 @@ import java.io.File;
 import javax.swing.filechooser.FileFilter;
 
 /**
- * Filters the shown images in the file chooser
+ * Filters the shown images in the file chooser, so only images or csv's are shown
  */
 public class FilterForFileChooser extends FileFilter {
 	/**
@@ -13,15 +13,15 @@ public class FilterForFileChooser extends FileFilter {
 	private boolean usedForImages;
 	
 	/**
-	 * constructor which configures if it is used for images
-	 * @param images true if it should be used for images
+	 * constructor, which configures if it is used for images
+	 * @param images true, if it should be used for images
 	 */
 	public FilterForFileChooser(boolean images) {
 		usedForImages = images;
 	}
 	
 	/**
-	 * checks if a given file is accepted by the filter
+	 * checks, if a given file is accepted by the filter
 	 * @param file the given file
 	 * @return true if the file is accepted
 	 */

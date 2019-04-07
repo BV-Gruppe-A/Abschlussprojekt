@@ -9,13 +9,11 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import com.mycompany.imagej.datamodels.*;
-
-import ij.IJ;
 import ij.ImagePlus;
 import ij.process.ImageProcessor;
 
 /**
- * This class can be used to identify 25x38 big images of characters in FE oder DIN1415 font. 
+ * This class can be used to identify 25x38 big images of characters in FE oder DIN1451 font. 
  * It uses Template Matching to identify a character.
  */
 public class Classificator {
@@ -145,6 +143,21 @@ public class Classificator {
 		
 		licensePlate = balanceTheFont(licensePlate, characters);
 		
+		licensePlate = insertSpaces(licensePlate, spaces);
+		
+		results.put(filename, licensePlate);
+
+		writeToCsv(licensePlate, filename);		
+	}
+
+
+	/**
+	 * inserts the spaces at the given positions
+	 * @param licensePlate the String of a license plate without spaces
+	 * @param spaces the positions of found spaces in the plate
+	 * @return new license Plate with the strings
+	 */
+	private String insertSpaces(String licensePlate, int[] spaces) {
 		for(int i = 0; i < spaces.length; i++) {
 			if(spaces[i] != 0) {
 				licensePlate = licensePlate.substring(0, spaces[i]) + "_" 
@@ -156,12 +169,7 @@ public class Classificator {
 				}				
 			}
 		}
-		
-		results.put(filename,licensePlate);
-
-		writeToExcel(licensePlate, filename);
-
-		
+		return licensePlate;
 	}
 	
 
@@ -175,13 +183,9 @@ public class Classificator {
 	 * @return character that the image represents most likely
 	 */
 	private String classifyChar(CharacterCandidate character, int currentChar, FontToClassify font) {
-		Template bestChoiceDin = null;
-		Template bestChoiceFE = null;
-		String s;
-		double maxValFe = -100;
-		double valFe;
-		double maxValDin = -100;
-		double valDin;
+		Template bestChoiceDin = null, bestChoiceFE = null;
+		double maxValFe = -100, maxValDin = -100;
+		double valFe, valDin;
 		
 		character.setMean(calcMean(character.getImage()));
 		
@@ -207,36 +211,18 @@ public class Classificator {
 			}
 		}
 		
-		switch(font) {
-		case BOTH:
-			if(maxValFe > maxValDin) {
-				charIsFe[currentChar] = true;
-				s = checkHardshipsFE(bestChoiceFE,character);
-			} else {
-				charIsFe[currentChar] = false;
-				s = checkhardshipsDIN(bestChoiceDin,character);
-			}
-			break;
-			
-		case DIN:
-			s = checkhardshipsDIN(bestChoiceDin,character);
-			break;
-			
-		case FE:
-			s = checkHardshipsFE(bestChoiceFE,character);
-			break;
-			
-		default:
-			IJ.log("No usable case!");
-			s = "";
-			break;
-		}
-		
-		return s;
+		if(maxValFe >= maxValDin) {
+			charIsFe[currentChar] = true;
+			return checkHardships(bestChoiceFE.getCharacter(), character, FontToClassify.FE);
+		} else {
+			charIsFe[currentChar] = false;
+			return checkHardships(bestChoiceDin.getCharacter(), character, FontToClassify.DIN);
+		}	 
 	}
 	
 	/**
 	 * checks which font was used more and re-classifies the chars which used the other one
+	 * if both fonts have been found euqally, FE gets used because it is more common 
 	 * @param currentPlate current recognized characters
 	 * @param characters all possible characters
 	 * @return changed string containing all changed characters
@@ -269,91 +255,73 @@ public class Classificator {
 	}
 	
 	/**
-	 * Checks characters that have been proven to be hard to distinguish in the FE font. Certain areas have been 
+	 * Checks characters that have been proven to be hard to distinguish in the given font. Certain areas have been 
 	 * identified manually in which these characters differ. The mean of these areas is then calculated and the 
 	 * character is identified via a threshold determined by tests. The hardships of the FE font include O's that have 
-	 * falsely been classified as 0's, I's and 1's, 0's falsely classfied as D's and H's and N's.
-	 * @param bestChoice the current best fit for the character to identify 
+	 * falsely been classified as 0's, I's and 1's, 0's falsely classfied as D's and H's and N's. 
+	 * The hardships of the DIN font include -'s and I'sand 8's and 9's
+	 * @param currentBestChoice the current best fit for the character to identify as a string
 	 * @param character the character to identify
+	 * @param font the type of font to classify
 	 * @return the character that has been identified as the best fit
 	 */
-	private String checkHardshipsFE(Template bestChoice, CharacterCandidate character) {
-		String s = bestChoice.getCharacter();
-		double mean = 0.0;
-		switch(bestChoice.getCharacter()) {
-		case "0":
-			mean = calcMean(character.getImage(),20,23,7,11);
-			if(mean < 10) {
-				s = "O";
+	private String checkHardships(String currentBestChoice, CharacterCandidate character, FontToClassify font) {	
+		if(font == FontToClassify.FE) {
+			switch(currentBestChoice) {
+				case "0":
+					if(calcMean(character.getImage(),20,23,7,11) < 10) {
+						currentBestChoice = "O";
+					}
+					break;
+				case "I":
+				case "1":
+					if(character.getHeight() <= character.getWidth()) {
+						currentBestChoice = "-";
+					} else {
+						if(calcMean(character.getImage(),1,6,8,12) > 80) {
+							currentBestChoice = "I";
+						} else {
+							currentBestChoice = "1";
+						}
+					}
+				break;
+				case "D":
+					if(calcMean(character.getImage(),20,23,7,11) > 50) {
+						currentBestChoice = "0";
+					}
+					break;
+				case "H":
+				case "N":
+					if((calcMean(character.getImage(),14,19,24,28) + calcMean(character.getImage(),6,9,7,11)) /2 > 80) {
+						currentBestChoice = "H";
+					} else {
+						currentBestChoice = "N";
+					}
+					break;
 			}
-			break;
-		case "I":
-		case "1":
-			if(character.getHeight() <= character.getWidth()) {
-				s = "-";
-			}else {
-				mean = calcMean(character.getImage(),1,6,8,12);
-				if(mean > 80) {
-					s = "I";
+		} else {
+			switch(currentBestChoice) {
+			case "-":
+			case "I":
+				if(character.getHeight() > character.getWidth()) {
+					currentBestChoice = "I";
+				}else {
+					currentBestChoice = "-";
+				}
+				break;
+			case "8":
+			case "9":
+				if(calcMean(character.getImage(),1,7,22,27) > 127) {
+					currentBestChoice = "9";
 				} else {
-					s = "1";
+					currentBestChoice = "8";
 				}
 			}
-			break;
-		case "D":
-			mean = calcMean(character.getImage(),20,23,7,11);
-			if(mean > 50) {
-				s = "0";
-			}
-			break;
-		case "H":
-		case "N":
-			mean = (calcMean(character.getImage(),14,19,24,28) + calcMean(character.getImage(),6,9,7,11)) /2;
-			if(mean > 80) {
-				s = "H";
-			} else {
-				s = "N";
-			}
-			break;
 			
 		}
-		return s;
+		
+		return currentBestChoice;		
 	}
-
-
-	/**
-	 * Checks characters that have been proven to be hard to distinguish in the DIN font. Certain areas have been 
-	 * identified manually in which these characters differ. The mean of these areas is then calculated and the 
-	 * character is identified via a threshold determined by tests. 
-	 * The hardships of the DIN font include -'s and I'sand 8's and 9's
-	 * @param bestChoice the current best fit for the character to identify 
-	 * @param character the character to identify
-	 * @return the character that has been identified as the best fit
-	 */
-	private String checkhardshipsDIN(Template bestChoice, CharacterCandidate character) {
-		String s = bestChoice.getCharacter();
-		double mean = 0.0;
-		switch(bestChoice.getCharacter()) {
-		case "-":
-		case "I":
-			if(character.getHeight() > character.getWidth()) {
-				s = "I";
-			}else {
-				s = "-";
-			}
-			break;
-		case "8":
-		case "9":
-			mean = calcMean(character.getImage(),1,7,22,27);
-			if(mean > 127) {
-				s = "9";
-			} else {
-				s = "8";
-			}
-		}
-		return s;
-	}
-
 
 	/**
 	 * Correlates two pictures and calculates the similarity between the two. 
@@ -365,8 +333,7 @@ public class Classificator {
 		ImageProcessor sample = candidate.getImage();
 		
 		double numerator = 0;
-		double denominator1 = 0;
-		double  denominator2 = 0;
+		double templateDenom = 0, sampleDenom = 0;
 		
 		double sampleMean = candidate.getMean();
 		double templateMean = template.getMean();
@@ -377,17 +344,18 @@ public class Classificator {
 			for(int k = 0; k < Template.HEIGHT; k++) {
 
 				numerator += ((double)templateImg.getPixel(j, k) - templateMean) * 
-						((double)sample.getPixel(j , k) - sampleMean);
+						((double)sample.getPixel(j, k) - sampleMean);
 				
-				denominator1 += Math.pow((double)templateImg.getPixel(j, k) - templateMean, 2);
+				templateDenom += Math.pow((double)templateImg.getPixel(j, k) - templateMean, 2);
 				
-				denominator2 += Math.pow((double)sample.getPixel(j , k) - sampleMean,2);
+				sampleDenom += Math.pow((double)sample.getPixel(j , k) - sampleMean, 2);
 			}
 		}
-		denominator1 = Math.sqrt(denominator1);
-		denominator2 = Math.sqrt(denominator2);
 		
-		return numerator / (denominator1 * denominator2) * 100;
+		templateDenom = Math.sqrt(templateDenom);
+		sampleDenom = Math.sqrt(sampleDenom);
+		
+		return numerator / (templateDenom * sampleDenom) * 100;
 	}
 
 
@@ -397,7 +365,7 @@ public class Classificator {
 	 * @return The mean of the images pixel values
 	 */
 	private double calcMean(ImageProcessor img) {
-		double mean = calcMean(img,0, img.getWidth(),0, img.getHeight());
+		double mean = calcMean(img, 0, img.getWidth(), 0, img.getHeight());
 		return mean;
 	}
 
@@ -426,19 +394,12 @@ public class Classificator {
 	 * @param value value to write to the csv file
 	 * @param label label to write to the csv file
 	 */
-	private void writeToExcel(String value, String label){
-		BufferedWriter writer = null;
-		try {
-			 writer = new BufferedWriter(new FileWriter(csvName, true));
-			 writer.write(label + "," + value + "\n");
-			 writer.close();
-		}catch(IOException e) {
-			if (writer != null)
-				try{writer.close();
-				} catch (IOException ex) {
-					System.out.println(ex.getMessage());
-				}
-		}
+	private void writeToCsv(String value, String label){
+		try(BufferedWriter writer = new BufferedWriter(new FileWriter(csvName, true))) {
+			writer.write(label + ", "+ value + "\n");
+		} catch(IOException ex) {
+			ex.printStackTrace();
+		} 
 	}
 	
 	/**
@@ -452,8 +413,7 @@ public class Classificator {
 	 */
 	public void evaluation() {
 		double rate = 0.0;
-		int lengthAllChars = 0;
-		int mistakes = 0;
+		int lengthAllChars = 0, mistakes = 0;
 		
 		for(Entry<String, String> result : results.entrySet()) {
 			String key = result.getKey();
@@ -473,7 +433,7 @@ public class Classificator {
 		}
 		rate = 1.0 - (double) mistakes / (double) lengthAllChars;
 
-		writeToExcel(String.format(" %.3f Mistakes: %d, lengthAll : %d ", rate, mistakes,lengthAllChars),"Classification Rate");		
+		writeToCsv(String.format(" %.3f", rate), "Classification Rate");		
 	}
 
 	/**
@@ -482,6 +442,5 @@ public class Classificator {
 	public void resetClassificator() {
 		results.clear();
 	}
-
 }
 

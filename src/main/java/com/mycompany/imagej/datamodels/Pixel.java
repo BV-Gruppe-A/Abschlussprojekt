@@ -8,17 +8,17 @@ public class Pixel {
 	/**
 	 * current x-coordinate of the pixel
 	 */
-	private int xPos;
+	private final int xPos;
 	
 	/**
 	 * current y-coordinate of the pixel
 	 */
-	private int yPos;
+	private final int yPos;
 	
 	/**
 	 * current value of the pixel
 	 */
-	private int value;
+	private final int value;
 	
 	/**
 	 * Constructor which sets the three attributes to the given values
@@ -27,9 +27,9 @@ public class Pixel {
 	 * @param val value of the pixel
 	 */
 	public Pixel(int x, int y, int val) {
-		setXPos(x);
-		setYPos(y);
-		setValue(val);
+		xPos = x;
+		yPos = y;
+		value = val;
 	}
 	
 	/**
@@ -38,14 +38,7 @@ public class Pixel {
 	public int getPosInX() {
 		return xPos;
 	}
-	
-	/**
-	 * sets the coordinate on the x-axis to a new value
-	 * @param newX new coordinate
-	 */
-	public void setXPos(int newX) {
-		xPos = newX;
-	}
+
 	
 	/**
 	 * @return coordinate on the y-axis
@@ -53,14 +46,7 @@ public class Pixel {
 	public int getPosInY() {
 		return yPos;
 	}
-	
-	/**
-	 * sets the coordinate on the y-axis to a new value
-	 * @param newX new coordinate
-	 */
-	public void setYPos(int newY) {
-		yPos = newY;
-	}
+
 	
 	/**
 	 * @return value of this pixel
@@ -68,12 +54,5 @@ public class Pixel {
 	public int getValue() {
 		return value;
 	}
-	
-	/**
-	 * sets the value of this pixel
-	 * @param newValue value to set
-	 */
-	public void setValue(int newValue) {
-		value = newValue;
-	}
+
 }

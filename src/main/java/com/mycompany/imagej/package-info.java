@@ -1,5 +1,5 @@
 /**
  * Main part of the Plugin
- * contains everything that has no better place
+ * contains the Steps of the image processing chain and the starting point of the plugin
  */
 package com.mycompany.imagej;

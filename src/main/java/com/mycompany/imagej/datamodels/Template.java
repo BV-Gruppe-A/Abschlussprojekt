@@ -20,17 +20,17 @@ public class Template {
 	/**
 	 * The character the template represents
 	 */
-	final private String character;
+	private final String character;
 	
 	/**
 	 * The mean of the pixel values of the templates image
 	 */
-	final private double mean;
+	private final double mean;
 	
 	/**
 	 * The template image
 	 */
-	final private ImageProcessor image;
+	private final ImageProcessor image;
 	
 	/**
 	 * Creates a new template

@@ -2,16 +2,14 @@ package com.mycompany.imagej.gui;
 
 import java.io.File;
 import javax.swing.JFileChooser;
-import com.mycompany.imagej.Abschlussprojekt_PlugIn;
 import com.mycompany.imagej.Classificator;
-import com.mycompany.imagej.Segmentation;
+import com.mycompany.imagej.Preprocessor;
+import com.mycompany.imagej.Segmentator;
 import com.mycompany.imagej.gui.filefilters.FilterForImageDirectory;
 import com.mycompany.imagej.gui.filefilters.FilterForFileChooser;
-import com.mycompany.imagej.preprocessing.ContrastAdjustment;
-import com.mycompany.imagej.preprocessing.Grayscale;
-import com.mycompany.imagej.preprocessing.ShadingFilter;
 import ij.IJ;
 import ij.ImagePlus;
+import ij.process.ImageProcessor;
 
 /**
  * Controller, which controls everything that happens in the main Window
@@ -33,24 +31,14 @@ public class MainWindowController {
 	private File fileToSave;
 	
 	/**
-	 * class for contrast adjustement
+	 * class for handling the preprocessing
 	 */
-	private ContrastAdjustment cont = new ContrastAdjustment();
-	
-	/**
-	 * class for everything grayscale related
-	 */
-	private Grayscale gray = new Grayscale();
-	
-	/**
-	 * class for shading
-	 */
-	private ShadingFilter shading = new ShadingFilter();
+	private Preprocessor preprocessor = new Preprocessor();
 	
 	/**
 	 * class for segmentation
 	 */
-	private Segmentation segm = new Segmentation();
+	private Segmentator segm = new Segmentator();
 	
 	/**
 	 * class for the classification
@@ -94,13 +82,11 @@ public class MainWindowController {
         if (returnVal == JFileChooser.APPROVE_OPTION) {
         	imgOrFolderToOpen = fcOpen.getSelectedFile();
         	windowToControl.txtOpenLocation.setText(imgOrFolderToOpen.getPath());
-        	ImagePlus imgAsPlus = new ImagePlus(imgOrFolderToOpen.getAbsolutePath());
-        	Abschlussprojekt_PlugIn.setCurrentImageProcessor(imgAsPlus.getProcessor(), true);
         }
 	}
 	
 	/**
-	 * opens a file chooser for a whole folder
+	 * opens a file chooser to choose a whole folder
 	 */
 	private void openFileChooserLoadingImages() {
 		JFileChooser fcOpen = new JFileChooser();
@@ -128,7 +114,7 @@ public class MainWindowController {
 	}
 	
 	/**
-	 * gets called when the start button is pressed
+	 * gets called when the start button is pressed, checks selected values
 	 */
 	public void reactToStartButton() {			
 		if(imgOrFolderToOpen == null || !imgOrFolderToOpen.exists() 
@@ -146,7 +132,9 @@ public class MainWindowController {
 				windowToControl.ckbClearFile.isSelected());
 		
 		if(isOneFile) {
-			startProcessForOneImage(removeFileExtension(imgOrFolderToOpen.getName()));
+        	ImagePlus imgAsPlus = new ImagePlus(imgOrFolderToOpen.getAbsolutePath());
+			startProcessForOneImage(imgAsPlus.getProcessor(),
+        			removeFileExtension(imgOrFolderToOpen.getName()));
 		} else {
 			File[] allFilesToOpen = imgOrFolderToOpen.listFiles(new FilterForImageDirectory());
 			
@@ -157,17 +145,17 @@ public class MainWindowController {
 			
 			for(File currentImage : allFilesToOpen) {
 				ImagePlus imgAsPlus = new ImagePlus(currentImage.getAbsolutePath());
-				Abschlussprojekt_PlugIn.setCurrentImageProcessor(imgAsPlus.getProcessor(), true);
-	        	startProcessForOneImage(removeFileExtension(currentImage.getName()));       	
+	        	startProcessForOneImage(imgAsPlus.getProcessor(),
+	        			removeFileExtension(currentImage.getName()));       	
 			}			
 		}
 		
 		if(windowToControl.ckbEvaluation.isSelected()) {
 			classificator.evaluation();
-			classificator.resetClassificator();
 		}		
 
-		IJ.error("Processing finished!");
+		classificator.resetClassificator();
+		IJ.showMessage("Info", "Processing finished!");
 	}
 	
 	/**
@@ -187,27 +175,10 @@ public class MainWindowController {
 	
 	/**
 	 * starts a chosen process for one specific image
-	 * @param imageName name of the file which is processsed
+	 * @param imageName name of the file which is processed
 	 */
-	private void startProcessForOneImage(String imageName) {
-		int PercentageBlack = 5;
-    	int PercentageWhite = 5;  
-    	int BinarizationWhite = 65;
-		
-    	Abschlussprojekt_PlugIn.setCurrentImageProcessor(
-    			gray.convertToGrayscale(Abschlussprojekt_PlugIn.getCurrentImageProcessor()), false);   
-    	cont.Contrast(Abschlussprojekt_PlugIn.getCurrentImageProcessor(),
-    			PercentageWhite, PercentageBlack);
-    	Abschlussprojekt_PlugIn.setCurrentImageProcessor(
-    			shading.shade(Abschlussprojekt_PlugIn.getCurrentImageProcessor()), false);           	
-    	cont.Binarization(Abschlussprojekt_PlugIn.getCurrentImageProcessor(), BinarizationWhite);  
+	private void startProcessForOneImage(ImageProcessor imgToProcess, String imageName) {	
+		preprocessor.preprocessing(imgToProcess);
 		classificator.classify(segm.segmentThePicture(), imageName);  	 	
-    	
-		/*
-    	ImagePlus imgToShow = new ImagePlus(imageName, 
-    			Abschlussprojekt_PlugIn.getCurrentImageProcessor());
-    	imgToShow.show(); 
-    	*/   
-    	
 	}
 }

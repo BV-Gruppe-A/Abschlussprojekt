@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 
 /**
- * Filter for the loop which opens all images in one folder
+ * Filter for the loop which opens all images in one folder so it only opens image files
  */
 public class FilterForImageDirectory implements FilenameFilter {
 	/**

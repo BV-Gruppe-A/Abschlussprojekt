@@ -1,7 +1,7 @@
 package com.mycompany.imagej.gui.filefilters;
 
 /**
- * Image File Filter which handels the most important aspects for the two slightly different filters
+ * Image File Filter which handles the most important aspects for the two slightly different filters
  * based on this class from the Oracle Java Tutorials
  * https://docs.oracle.com/javase/tutorial/uiswing/examples/components/FileChooserDemo2Project/src/components/ImageFilter.java
  */

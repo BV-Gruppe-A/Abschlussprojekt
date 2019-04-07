@@ -1,9 +1,8 @@
 package com.mycompany.imagej;
 
-import com.mycompany.imagej.gui.DebugWindow;
 import com.mycompany.imagej.gui.MainWindow;
 import ij.plugin.frame.PlugInFrame;
-import ij.process.ImageProcessor;
+import ij.process.BinaryProcessor;
            
 /**
  * Main Class for our PlugIn
@@ -26,9 +25,9 @@ public class Abschlussprojekt_PlugIn extends PlugInFrame {
 	public static int AVRG_IMAGE_WIDTH = 295;
 	
 	/**
-	 * the current Image which is processed
+	 * the current Image which is processed as a binary image
 	 */
-	private static ImageProcessor currentImage;
+	private static BinaryProcessor currentImage;
 	
 	/**
 	 * Constructor which calls the super constructor with the given applet name
@@ -40,17 +39,16 @@ public class Abschlussprojekt_PlugIn extends PlugInFrame {
 	/**
 	 * @return the current Image as an Image Processor
 	 */
-	public static ImageProcessor getCurrentImageProcessor() {
+	public static BinaryProcessor getCurrentImageProcessor() {
 		return currentImage;
 	}
 	
 	/**
 	 * sets the current Image Processor to the given one
 	 * @param imageToSet new Image Processor to set
-	 * @param shouldResize true if the image should be resized
 	 */
-	public static void setCurrentImageProcessor(ImageProcessor imageToSet, boolean shouldResize) {
-		currentImage = shouldResize ? imageToSet.resize(AVRG_IMAGE_WIDTH) : imageToSet;
+	public static void setCurrentImageProcessor(BinaryProcessor imageToSet) {
+		currentImage = imageToSet;
 	}
 	
 	/**
@@ -72,7 +70,6 @@ public class Abschlussprojekt_PlugIn extends PlugInFrame {
 	 */
     public void run(String arg) {   	
     	MainWindow window = new MainWindow("Abschlussprojekt Gruppe A");
-    	//DebugWindow window = new DebugWindow("Abschlussprojekt Gruppe A");
     	window.showDialog();
     }
 }

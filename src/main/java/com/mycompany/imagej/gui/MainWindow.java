@@ -27,12 +27,12 @@ public class MainWindow extends GenericDialog {
 	protected JLabel lblExcelFile = new JLabel("Save Excel-File to: ");
 	
 	/**
-	 * Radio Button for only 1 image
+	 * Radio Button for only one image
 	 */
 	protected JRadioButton rbOneImage = new JRadioButton("... 1 Image");
 	
 	/**
-	 * Radio Button for more than 1 image
+	 * Radio Button for more than one image
 	 */
 	protected JRadioButton rbMoreImages = new JRadioButton("... more than 1 image");
 	

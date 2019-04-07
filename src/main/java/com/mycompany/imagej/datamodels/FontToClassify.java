@@ -1,7 +1,7 @@
 package com.mycompany.imagej.datamodels;
 
 /**
- * describes with which font the current character should be compared
+ * describes with which font the current character should be compared to
  */
 public enum FontToClassify {
 	/**
