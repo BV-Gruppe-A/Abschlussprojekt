@@ -1,6 +1,9 @@
 package com.mycompany.imagej.datamodels;
 
 import com.mycompany.imagej.Abschlussprojekt_PlugIn;
+
+import ij.process.BinaryProcessor;
+import ij.process.ByteProcessor;
 import ij.process.ImageProcessor;
 
 /**
@@ -11,7 +14,7 @@ public class CharacterCandidate implements Comparable<CharacterCandidate> {
 	/**
 	 * the image containing only this character
 	 */
-	private ImageProcessor imageForThisChar;
+	private BinaryProcessor imageForThisChar;
 
 	/**
 	 * coordinate of the most left pixel of this char
@@ -211,16 +214,16 @@ public class CharacterCandidate implements Comparable<CharacterCandidate> {
 	 * sets the image Processor to a scaled variant of the given Image
 	 * @param wholeImage whole number plate as an image processor
 	 */
-	public void cutCharacterFromWholeImage(ImageProcessor wholeImage) {
-		imageForThisChar = wholeImage.createProcessor(getWidth(), getHeight());
+	public void cutCharacterFromWholeImage(BinaryProcessor wholeImage) {
+		ImageProcessor tempProcess = wholeImage.createProcessor(getWidth(), getHeight());
 		for(int countInY = 0; countInY < getHeight(); countInY++) {
 			for(int countInX = 0; countInX < getWidth(); countInX++) {
 				int pixelToPut = wholeImage.getPixel(getLeftBorder() + countInX,
 						getUpperBorder() + countInY);
-				imageForThisChar.putPixel(countInX, countInY, pixelToPut);
+				tempProcess.putPixel(countInX, countInY, pixelToPut);
 			}
 		}
-		imageForThisChar = imageForThisChar.resize(Template.WIDTH, Template.HEIGHT);
+		imageForThisChar = new BinaryProcessor((ByteProcessor) tempProcess.resize(Template.WIDTH, Template.HEIGHT));
 	}
 	
 	/**

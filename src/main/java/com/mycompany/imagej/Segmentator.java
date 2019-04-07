@@ -9,8 +9,8 @@ import com.mycompany.imagej.datamodels.Pixel;
 import ij.process.BinaryProcessor;
 
 /**
- * contains everything related to the segmentation
- * TODO change comment
+ * This class is used to segment a given picture into different regions and check for each region, if it could be 
+ * classified as a character. All of these regions are resized
  */
 public class Segmentator {
 	/**
